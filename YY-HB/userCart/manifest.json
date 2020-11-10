@@ -1,0 +1,22 @@
+{
+    "name" : "userCart",
+    "appid" : "__UNI__A960F11",
+    "description" : "",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
+    "uniStatistics" : {
+        "enable" : false
+    },
+    "h5" : {
+        "router" : {
+            "base" : "./"
+        },
+        "title" : "早餐下单",
+        "optimization" : {
+            "treeShaking" : {
+                "enable" : true
+            }
+        }
+    }
+}

@@ -1,0 +1,17 @@
+{
+	"pages": [
+		{
+			"path": "pages/mall/mall"
+		}, 
+		{
+			"path": "pages/mall/prepay"
+		}
+    ],
+	"globalStyle": {
+		"navigationStyle":"custom",
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "早餐下单",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	}
+}
