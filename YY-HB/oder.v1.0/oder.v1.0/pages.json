@@ -132,6 +132,7 @@
 		,{
 			"path" : "pages/finance/agent/agent_detail",
 			"style" : {  
+				"navigationBarTitleText":"",
 				"app-plus":{  
 					"titleNView":false
 				}				
@@ -153,7 +154,7 @@
 		,{
 			"path" : "pages/wallet/rebate/rebate",
 			"style" : { 
-				"navigationBarTitleText":"代放分润",
+				"navigationBarTitleText":"订制红包",
 				"app-plus":{  
 					"titleNView":{
 						"titleColor":"#FFFFFF",  

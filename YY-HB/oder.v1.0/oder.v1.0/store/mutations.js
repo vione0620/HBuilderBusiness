@@ -27,8 +27,10 @@ export default {
 		const breakfastGoods = goods.breakfastGoods 
 		//需要追加必买项的类目
 		state.addDrink =  Object.values(goods.mustBuyGoods) 
+		console.log(state.addDrink)
 		//必买项的商品编号
-		state.mustBuy = Object.keys(goods.mustBuyGoods)	
+		state.mustBuy = Object.keys(goods.mustBuyGoods)	? '[]' : Object.keys(goods.mustBuyGoods)
+		console.log(state.mustBuy)
 		//购买限制量
 		state.limitNum = goods.limitNum
 		state.mallSrot = Object.keys(breakfastGoods)
@@ -36,8 +38,10 @@ export default {
 		 
 		// 分别必加项
 		const mfoods = [].concat.apply([],state.mallFoods) 		 
-		const mustDinks = mfoods.filter(dink => dink.goodsNo == state.mustBuy); 
-		state.mustBuyItem = mustDinks 
+		const mustDinks = mfoods.filter(dink => dink.goodsNo == state.mustBuy)
+				
+		state.mustBuyItem = state.addDrink ? '[]' : mustDinks 
+		console.log(state.mustBuyItem)
 	},
 	//接收购物车数据
 	[RECEIVE_CART_GOODS](state,goods){ 

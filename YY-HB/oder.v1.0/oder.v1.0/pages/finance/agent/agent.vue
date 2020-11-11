@@ -1,6 +1,6 @@
 <template> 
 	<view class="wrap">  
-	 <uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back()" title="代放管理" color="#ffffff" background-color="RGBA(70, 184, 91, 1)" />
+	 <uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back()" title="订制管理" color="#ffffff" background-color="RGBA(70, 184, 91, 1)" />
  
  
 	<template v-if="isload">
