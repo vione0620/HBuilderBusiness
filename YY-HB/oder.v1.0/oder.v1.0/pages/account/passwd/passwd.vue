@@ -285,7 +285,7 @@
 					}else if(param.newPwd !== param.newPwd2){
 						uni.showToast({
 							icon:'none',
-							title:'新旧密码不一致',
+							title:'密码不一致',
 							duration:2000
 						})
 						return false
@@ -303,7 +303,7 @@
 					}else if(param.newPwd !== param.newPwd2){
 						uni.showToast({
 							icon:'none',
-							title:'新旧密码不一致',
+							title:'密码不一致',
 							duration:2000
 						})
 						return false

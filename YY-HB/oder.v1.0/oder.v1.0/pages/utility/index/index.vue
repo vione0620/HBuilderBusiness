@@ -1,14 +1,16 @@
 <template>
 	<view id="oderIndex"> 
-	<template v-if="iswelcome">
+	<!-- <template v-if="iswelcome">
 		<welcome></welcome>
-	</template>
+	</template> -->
 	
 	<template v-if="isload">
 		<default-page :load="true"></default-page>
 	</template>
 	
-	<template v-if="isready">  
+	<template v-if="isready">   
+		<!-- <uni-nav-bar :status-bar="true" :fixed="true" right-icon="uni-icon-settings" @clickRight="clickOption"
+		title="今日收款" color="#ffffff" background-color="RGBA(70, 184, 91, 1)"/> -->
 		<view id="mian">
 			<view class="total">{{parseFloat(recAmt/100).toFixed(2)}}<text class="txt">元</text></view>
 			<view class="getMoney">
@@ -26,7 +28,7 @@
 					<view class="txt">{{visitorNum}}</view>
 				</view>
 			</view>
-
+ 
 			<view class="tools">
 				<view class="item" @tap="openScanCode">
 					<view class="icon iconfont iconscan"></view>
@@ -80,7 +82,7 @@
 	import UniNavBar from '@/components/uni/uni-nav-bar.vue'
 	import UniBadge from '@/components/uni/uni-badge.vue' 
 	import DefaultPage from '@/components/basic/default-page.vue'
-	import Welcome from '@/components/basic/welcome.vue'
+	// import Welcome from '@/components/basic/welcome.vue'
 	
 	const gotolist = [{
 			"icon": 'iconfont iconorder-report',
@@ -136,7 +138,7 @@
 		components: {
 			UniBadge, 
 			DefaultPage,
-			Welcome,
+			// Welcome,
 			UniNavBar,
 		},
 		data() {
@@ -153,25 +155,25 @@
 				isload:false,
 				isnohave:false,
 				isready:false, 
-				iswelcome:true,//欢迎页
+				// iswelcome:true,//欢迎页
 				refreshed:'',
 				fromlogin:false,
 			}
 		}, 
 		onLoad(option) {   
-			this.loadExecution() 
+			// this.loadExecution() 
 			this.loginWhether = uni.getStorageSync('status') 
 			this.userStore = uni.getStorageSync('user')
 			this.merchNo = uni.getStorageSync('user').merchNo		
 			
 			let login_type = option.loginType 
-			if(!this.iswelcome){ 			
+			// if(!this.iswelcome){ 			
 				if(login_type === 'login'){ 
 					this.fromLogin() 
 				}else{ 
 					this.initUser() 
 				}
-			} 
+			// }  
 		}, 
 		onNavigationBarButtonTap(tap){
 			if(tap.index === 0){
@@ -183,26 +185,33 @@
 			}
 		}, 
 		methods: {  
-			loadExecution(){ 
-				try { 
-					const value = uni.getStorageSync('launchFlag') 
-					if (value) { 
-						this.iswelcome = false 
-					} else { 
-						this.iswelcome = true
-					}
-				} catch(e) { 
-					uni.setStorage({ 
-						key: 'launchFlag', 
-						data: true, 
-						success:()=> {
-							// console.log('error时存储launchFlag')
-						} 
-					})
-					this.iswelcome = true
-				}
-				return 
-			}, 
+			clickOption(){
+				uni.navigateTo({
+					url:'../../account/option/option',
+					animationType: 'pop-in',
+					animationDuration: 200
+				})
+			},
+			// loadExecution(){ 
+			// 	try { 
+			// 		const value = uni.getStorageSync('launchFlag') 
+			// 		if (value) { 
+			// 			this.iswelcome = false 
+			// 		} else { 
+			// 			this.iswelcome = true
+			// 		}
+			// 	} catch(e) { 
+			// 		uni.setStorage({ 
+			// 			key: 'launchFlag', 
+			// 			data: true, 
+			// 			success:()=> {
+			// 				// console.log('error时存储launchFlag')
+			// 			} 
+			// 		})
+			// 		this.iswelcome = true
+			// 	}
+			// 	return 
+			// }, 
 			fromLogin(){				  
 				this.getDayBusiStat('getDayBusiStat',this.loginWhether.md5key) 
 				this.getServiceMobile('getServiceMobile',this.loginWhether.md5key)  
@@ -223,6 +232,8 @@
 						token: true
 					}).then((res) => {
 						
+						this.isload = true
+						this.isready = false	
 						if (res.code === 200) {
 							let haslogin = {
 								status:true,
@@ -245,12 +256,18 @@
 								title:res.message + '请稍后重试',
 								duration: 2000
 							})
-						}else{ 
+						}else{							
+							uni.showToast({
+								icon:'none',
+								title:res.message
+							})
 							uni.reLaunch({
 								url:'../../account/login/login'
 							}) 
 						}
 					}).catch((err)=>{ 
+						this.isload = true
+						this.isready = false	
 						uni.reLaunch({
 							url:'../../account/login/login'
 						}) 

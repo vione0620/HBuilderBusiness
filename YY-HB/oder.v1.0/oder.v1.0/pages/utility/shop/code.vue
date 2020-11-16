@@ -14,15 +14,15 @@
 							<template v-if="this.qcodeImg && !this.afresh">
 								<image :src="qcodeImg" mode="" style="width: 400rpx; height: 400rpx;"></image>
 							</template>
-							<template v-else> 
+							<template v-else>  
 								<view class="canvas-hide">
 									<uni-qrcode @makeComplete="makeComplete"
-									 :text="codeText" cid="cavs" makeOnLoad :logo="merchPic"/> 
+									 :text="codeText" cid="cavs" :makeOnLoad="true" :logo="merchPic"/> 
 								</view>
 							</template> 
 						</view>
 						<view class="txt">扫一扫店铺二维码下单</view>
-						<view class="afresh" @tap="afreshBtn()"><text class="iconfont iconshuaxin"></text>{{!this.afresh ? afreshTxt : '二维码重置中···' }}</view>
+						<!-- <view class="afresh" @tap="afreshBtn()"><text class="iconfont iconshuaxin"></text>{{!this.afresh ? afreshTxt : '二维码重置中···' }}</view> -->
 					</view>
 				</view>
 				<view class="downImg">
@@ -58,7 +58,7 @@
 				isload:true, 
 				isready:false,
 				join:'',
-				
+				merchPic:'',
 			}
 		},
 		components:{
@@ -77,29 +77,30 @@
 		},
 		computed:{
 			busiType:function(){ 
-				let ps = this.userStore.busiType;   
-				let shopType = '';
+				let ps = this.userStore.busiType
+				let shopType = ''
 				switch (ps){
 					case '1' :
-					shopType = '-早餐车';
+					shopType = '-早餐车'
 					break;
 					case '2' :
-					shopType = '-早餐店';
+					shopType = '-早餐店'
 					break;
 					case '3' :
-					shopType = '-生鲜';
+					shopType = '-生鲜'
 					break;
 				}
 				return shopType
 			},
 		},
 		methods: {
-			afreshBtn(){ 
-				this.afresh = true 
-				setTimeout(()=>{ 
-					this.afresh = false 
-				},2000)
-			},
+			// afreshBtn(){ 
+			// 	this.afresh = true 
+			// 	this.getShopImg()
+			// 	setTimeout(()=>{ 
+			// 		this.afresh = false 
+			// 	},2000)
+			// },
 			getScanCode(){				 
 				let vVlue = {"merchNo": this.merchNo} //必传 
 				let sSort = getSortAscii(vVlue) ///排序    
@@ -111,11 +112,9 @@
 				},{
 					token:true
 				}).then(res => {
-					this.$api.initPage(res.code,res.message)
-					if (res.code === 200) { 					 
-						this.merchName = res.data.merchName  
-						this.codeText = res.data.merchCode 
-						// this.merchPic = res
+					this.$api.initPage(res.code,res.message) 
+					if (res.code == 200) { 					
+						this.codeText = res.data.merchCode  
 						setTimeout(()=>{
 							this.isload = false
 							this.isready = true	 
@@ -135,15 +134,15 @@
 				},{
 					token:true
 				}).then(res => { 
-					if (res.code === 200) { 					 
-						this.merchPic = res.data.merchPic 
+					if (res.code === 200) { 		 
+						this.merchPic = res.data.merchPic  
 					}
 				}).catch() 
 				
 			},
-			makeComplete(e){ 
+			makeComplete(e){  
 				this.qcodeImg = e
-				uni.setStorageSync('makeimg',e)
+				uni.setStorageSync('makeimg',e) 
 			},
 			getShopCodeImg(){  
 				if(this.qcodeImg){ 

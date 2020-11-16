@@ -102,6 +102,7 @@
 				dotpwd:[],  
 				getMoney:'',
 				postMoeny:'', 
+				optionSet:'',
 			}
 		},
 		computed:{ 
@@ -112,22 +113,22 @@
 			UniPopup,
 			PopUp, 
 		}, 
-		onLoad() { 			 
+		onLoad(option) { 			 
 			this.loginWhether = uni.getStorageSync('status') 
 			this.userStore = uni.getStorageSync('user')
 			this.merchNo = uni.getStorageSync('user').merchNo
-			
+			this.optionSet = option.seted
 		}, 
 		methods:{	
 			chooseAmt(e){ 
 				let value = e.target.value 
-				if(value > 0 && value < 0.1){
+				if(value > 0 && value < 0.2){
 					uni.showToast({
 						icon:'none',
 						title:'您可申请不小于1元的金额'
 					})
 					this.getMoney = ''					
-				}else if(value >= 0.1){					
+				}else if(value >= 0.2){					
 					this.getMoney = parseFloat(e.target.value).toFixed(2)
 					this.postMoeny = e.target.value
 				}
@@ -171,15 +172,19 @@
 						title:'您当前账户余额不足',
 						duration: 2000
 					})
-				}
-				else{
-					let fristTime = uni.getStorageSync('initPayPaswd')			
-					 console.log(fristTime)
-					if(fristTime === 1){						
-						this.$refs.isPreVerify.open()
-					}else if(fristTime === 0){
-						this.$refs.gotosetPwd.open()
-					}
+				}else{
+					// console.log(this.optionSet)
+					let fristTime = uni.getStorageSync('initPayPaswd')					
+					// if(this.optionSet){ 
+					// 	this.$refs.isPreVerify.open()
+					// 	uni.setStorageSync('initPayPaswd',1)	 					
+					// }else{
+						if(fristTime === 1){ 				
+							this.$refs.isPreVerify.open()
+						}else if(fristTime === 0){
+							this.$refs.gotosetPwd.open()
+						}
+					// } 
 				}
 			},  
 			checkPwd(e){  

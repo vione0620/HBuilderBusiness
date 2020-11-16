@@ -414,10 +414,10 @@
 					})
 					if(res.code == 200){				
 						if(type == 'set'){
-							uni.setStorageSync('initPayPaswd',1)	 
+							// uni.setStorageSync('initPayPaswd',1)	 
 							setTimeout(()=>{ 									
 								uni.redirectTo({ 
-									url:'../wallet/moeny/check'
+									url:'../wallet/moeny/check?seted=true'
 								})
 							},500) 	
 						}else{
@@ -430,8 +430,8 @@
 								})
 							},500) 	
 						}
-					}else {
-						uni.setStorageSync('initPayPaswd',0)						
+					// }else {
+					// 	uni.setStorageSync('initPayPaswd',0)						
 					}
 					
 				}).catch()	

@@ -93,10 +93,6 @@
 	
 	</view>
 	
-	<template  v-if="currentItem.payState === 1 && currentItem.orderState !== 2">
-		<btn-foot :fixd="true" title="确认收货" @tap="rightBtnList()"></btn-foot>
-	</template>
-	
 	</template>
 	
 	
@@ -137,12 +133,11 @@
 			UniNavBar,
 			BtnFoot
 		},
-		onLoad(option) { 
-			// this.orderArg = option 
+		onLoad(option) {  
 			if(option.pushNo){
 				this.pushMsg = option.pushNo   
 			}else{
-				this.orderArg = option  				
+				this.orderArg = option 
 			} 
 			
 			this.loginWhether = uni.getStorageSync('status')  
@@ -239,57 +234,7 @@
 					}
 				}).catch() 
 				
-			},
-			rightBtnList(){
-				// let current = this.orderArg.cindex 	 
-				// let oderInfo = this.userOrderList
-				let vVlue = {"merchNo":this.merchNo,"orderNo":this.orderArg.orderNo} //必传 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 	 				
-				
-				let ordertime = oderInfo[current].orderTime				
-				let buytime = ordertime.slice(0,10)				
-				let oktime = handleDate()
-				let yesterday = handleYesterday() 
-				if(oktime == buytime){
-					uni.showToast({
-						icon:'none',
-						title:'订单次日送达，请收到后再确认收货'
-					})
-					return
-				}else if(buytime == yesterday){
-					uni.showModal({
-						title: '确认收货',
-						content: '请确认您已准确无误收到货',
-						success: (res)=>{
-							if (res.confirm) {								
-								this.$request.post('reachConfirm',{
-									...vVlue,
-									"sign": sSign
-								},{
-									token:true
-								}).then(res => {  
-									if(res.code == 200){ 				
-										this.orderList[current].orderState = 2
-										this.userOrderList[current].orderState = 2 
-									}
-									uni.showToast({
-										icon:'none',
-										title:res.message,
-										duration: 2000
-									})
-								}).catch()  			 
-							}
-						}
-					})
-				}else{				
-					uni.showToast({
-						icon:'none',
-						title:'收货超时'
-					})
-					return
-				} 
-			},
+			},			
 		}
 	}
 </script>
@@ -313,8 +258,7 @@
 			position: absolute;
 			top: 120rpx;
 			left: 30rpx;
-			right: 30rpx; 
-			padding-bottom: 100rpx;
+			right: 30rpx;  
 			
 			.goods-list{
 					
