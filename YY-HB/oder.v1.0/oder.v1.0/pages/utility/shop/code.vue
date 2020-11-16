@@ -9,20 +9,19 @@
 			<view id="shopScan">
 				<view class="main">
 					<view class="title">{{userStore.merchName}}{{busiType}}{{join}}</view>
-					<view class="content">
-						<view class="code-wrap" style="width: 100%; height: 440rpx; background-color: #FFFFFF; padding: 20rpx 0;">
-							<template v-if="this.qcodeImg && !this.afresh">
+					<view class="content"> 
+						<view class="code-wrap" style="background-color: #FFFFFF; padding: 20rpx 0;">  
+							<template v-if="this.qcodeImg">
 								<image :src="qcodeImg" mode="" style="width: 400rpx; height: 400rpx;"></image>
 							</template>
-							<template v-else>  
+							<template v-else>   
 								<view class="canvas-hide">
 									<uni-qrcode @makeComplete="makeComplete"
 									 :text="codeText" cid="cavs" :makeOnLoad="true" :logo="merchPic"/> 
-								</view>
+								</view>  
 							</template> 
 						</view>
-						<view class="txt">扫一扫店铺二维码下单</view>
-						<!-- <view class="afresh" @tap="afreshBtn()"><text class="iconfont iconshuaxin"></text>{{!this.afresh ? afreshTxt : '二维码重置中···' }}</view> -->
+						<view class="txt">扫一扫店铺二维码下单</view> 
 					</view>
 				</view>
 				<view class="downImg">
@@ -52,9 +51,7 @@
 				merchCode:'', 
 				codeText:'',
 				merchName:'', 
-				qcodeImg:'',
-				afresh:false,
-				afreshTxt:'重置二维码', 
+				qcodeImg:'', 
 				isload:true, 
 				isready:false,
 				join:'',
@@ -73,7 +70,7 @@
 			this.join = '-'+ this.userStore.joinNo  
 			this.getScanCode()
 			this.getShopImg()
-			this.qcodeImg = uni.getStorageSync('makeimg')  
+			this.qcodeImg = uni.getStorageSync('makeimg')    
 		},
 		computed:{
 			busiType:function(){ 
@@ -93,14 +90,7 @@
 				return shopType
 			},
 		},
-		methods: {
-			// afreshBtn(){ 
-			// 	this.afresh = true 
-			// 	this.getShopImg()
-			// 	setTimeout(()=>{ 
-			// 		this.afresh = false 
-			// 	},2000)
-			// },
+		methods: { 
 			getScanCode(){				 
 				let vVlue = {"merchNo": this.merchNo} //必传 
 				let sSort = getSortAscii(vVlue) ///排序    
@@ -134,6 +124,7 @@
 				},{
 					token:true
 				}).then(res => { 
+					this.$api.initPage(res.code,res.message) 
 					if (res.code === 200) { 		 
 						this.merchPic = res.data.merchPic  
 					}
@@ -142,7 +133,7 @@
 			},
 			makeComplete(e){  
 				this.qcodeImg = e
-				uni.setStorageSync('makeimg',e) 
+				uni.setStorageSync('makeimg',e)  
 			},
 			getShopCodeImg(){  
 				if(this.qcodeImg){ 
@@ -188,7 +179,9 @@
 				.code-wrap{ 
 					display: flex;
 					justify-content: center; 
-					background-color: #F2F2F2;
+					// background-color: #F2F2F2;
+					width: 100%; 
+					height: 440rpx;
 					
 					.canvas-hide {
 						/* 1 */
