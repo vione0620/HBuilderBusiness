@@ -54,7 +54,7 @@ export default {
             }    
         }, 
         getData(){     
-            const param = window.location.search      
+            const param = window.location.search     
             let _index = param.indexOf('?s=') 
             let urls = param.slice(_index+3)
             

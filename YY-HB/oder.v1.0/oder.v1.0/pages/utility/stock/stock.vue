@@ -5,11 +5,7 @@
 			<default-page :load="true"></default-page>
 		</template> 
 		
-		<view class="ourStock"> 
-			<view class="record-wrap">
-				<view class="txt">查看历史库存</view>
-				<view class="txt" @tap="getToStore()">{{showOneDay}} <text class="iconfont iconright"></text></view>
-			</view>
+		<view class="ourStock">  
 			
 			<template v-if="isnostore"> 
 				<default-page :nostore="true"></default-page>
@@ -18,7 +14,7 @@
 			<template v-if="isready">
 			<view class="mian-wrap"> 
 				 
-				<view class="navbar-left" :style="'height:'+ scrollH +'px;'"> 
+				<view class="navbar-left" :style="'height:'+ scrollH +'px;'">
 					<scroll-view scroll-y :scroll-into-view="scrollInto" show-scrollbar="true" scroll-with-animation :scroll-top="left_scroll"
 					class="navbar-main left_height">
 						<block v-for="(items,index) in stockStock">
@@ -27,7 +23,7 @@
 							:class="tabIndex === index ? 'navlist-avtice':''" >
 								<view :class="items === '热门' ? 'color-red' : '' ">{{items}}</view>
 							</view> 
-						</block>
+						</block> 
 					</scroll-view>
 					
 				</view>
@@ -44,17 +40,11 @@
 				</view>
 		
 			</view> 
-			
-			<view class="clearStock" v-if="showClear"><view class="clearBtn" @click="clearBtn()">清库存</view></view>
+			 
 			
 		</template>
 		
-		</view>
-		 
-		
-		<uni-popup ref="isDaysOfMonth" type="bottom"> 
-			<uni-calendar :endDate="showOneDay" :insert="true" :clearDate="false" @confirm="choseDay" />		
-		 </uni-popup>
+		</view> 
 		
 		
 	</view>
@@ -63,10 +53,7 @@
 <script> 
 	import {mapState} from 'vuex'
 	import {b64Md5,hexMD5,} from '@/network/md5.js'	
-	import {getSortAscii, arrayExclude,handleDate,} from '@/common/util/utils.js'
-	
-	import UniPopup from '@/components/uni/uni-popup.vue'
-	import UniCalendar from '@/components/uni-calendar/uni-calendar.vue'
+	import {getSortAscii, arrayExclude} from '@/common/util/utils.js' 
 	
 	import GoodsGroup from '@/components/basic/ourstock/goods-group.vue'
 	import DefaultPage from '@/components/basic/default-page.vue'		
@@ -76,17 +63,13 @@
 				loginWhether:'',//登陆状态 
 				merchNo:'', //商户号
 				tabIndex:0,  
-				scrollH:600,
+				scrollH:0,
 				scrollInto:"",  //左侧索引 
 				left_scroll:0,  //左侧滑动值
 				ourStock:true, 
 				isload:true,
 				isnostore:false, 
-				isready:false,				 
-				showOneDay:'',
-				haveStore:false,
-				showClear:true,
-				istoday:'',
+				isready:false,				  
 			}
 		},
 		computed:{
@@ -94,42 +77,20 @@
 		},
 		onLoad() { 
 			this.loginWhether = uni.getStorageSync('status')  
-			this.merchNo = uni.getStorageSync('user').merchNo	
-			this.showOneDay = handleDate() 
-			
-			this.istoday = handleDate()
+			this.merchNo = uni.getStorageSync('user').merchNo	 
 			
 			uni.getSystemInfo({
 				success:res=>{
-					this.scrollH = res.windowHeight - 90
+					this.scrollH = res.windowHeight - 44
 				}
 			}) 
-			this.getMerchDayStore('getMerchDayStore',handleDate(),1)
+			this.getMerchDayStore('getMerchDayStore',1)
 		},
 		components:{ 
 			GoodsGroup,
-			DefaultPage, 
-			UniPopup,
-			UniCalendar,
+			DefaultPage,  
 		},  
-		methods: {
-			getToStore() {
-				this.$refs.isDaysOfMonth.open() 
-			},
-			//日报读取
-			choseDay(e) {			   
-				if(this.istoday != e.fulldate){
-					this.showClear = false
-				}else{
-					this.showClear = true
-				}
-				
-				//读取数据
-				this.showOneDay = e.fulldate  			
-				
-				this.getMerchDayStore('getMerchDayStore',e.fulldate,1)
-				this.$refs.isDaysOfMonth.close()
-			},
+		methods: { 
 			 // 切换选项
 			changeTab(index){
 			 	if (this.tabIndex === index) {
@@ -139,8 +100,8 @@
 			 	// 滚动到指定元素
 			 	this.scrollInto = 'gdsItem' + index  
 			}, 
-			getMerchDayStore(post,time,type){
-				let vVlue = {"merchNo":this.merchNo,"merchType":type,"busiDate":time} //必传 
+			getMerchDayStore(post,type){
+				let vVlue = {"merchNo":this.merchNo,"merchType":type,} //必传 
 				let sSort = getSortAscii(vVlue) ///排序
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 	  
 				
@@ -150,11 +111,8 @@
 				},{
 					token:true
 				}).then(res => {	 
-					this.$api.initPage(res.code,res.message)  
-					if(res.code == 200){
-						if(res.data.busiState != 1){
-							this.showClear = false
-						} 
+					this.$api.initPage(res.code,res.message) 
+					if(res.code == 200){ 
 						let resDataStore = res.data.store
 						setTimeout(()=>{  
 							if(resDataStore.length){ 
@@ -193,35 +151,7 @@
 					return scroll_top >= value && scroll_top < arr[index + 1]
 				}); 
 				this.tabIndex = active_index   
-			},
-			
-			clearBtn(){
-				uni.showModal({
-					title:'是否清库存',
-					content:'清除库存将同时关闭店铺',										
-					success: (res)=>{
-						if (res.confirm) {
-							console.log('用户点击确定'); 
-							let vVlue = {"merchNo": this.merchNo} //必传
-							let sSort = getSortAscii(vVlue) ///排序 
-							let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码    
-							this.$request.post('clearStore',{
-								...vVlue,
-								"sign": sSign
-							},{
-								token:true
-							}).then((res)=>{ 
-								uni.showToast({
-									icon:'none',
-									title:res.message,
-									duration: 2000
-								})
-							}).catch() 
-						}
-					}
-				})
-			},
-					
+			}, 
 		},
 	}
 </script>
@@ -229,6 +159,7 @@
 <style lang="scss" scoped>
 	.ourStock{
 		width: 100vw; 
+		height:100vh;
 		padding: 20rpx;
 	 
 	.color-red{
@@ -238,7 +169,8 @@
 	.mian-wrap{ 
 		position: relative; 
 		display: flex; 
-		width: 100%;  
+		width: 100%; 
+		height: 100%;
 		justify-content: space-between;  
 			
 		.navbar-left{ 
@@ -270,31 +202,6 @@
 		
 		
 		}  
-	}  
-	
-	.record-wrap{
-		background-color: #FFFFFF;
-		padding: 28rpx 20rpx;
-		border-radius: 12rpx;
-		margin-bottom: 20rpx;
-		display: flex;
-		justify-content: space-between;
-	}
-	
-	.clearStock{
-		padding: 0; 
-		position: fixed;
-		bottom: 20rpx;
-		left: 20rpx;
-		right: 20rpx;
-		
-		.clearBtn{
-			padding: 32rpx;
-			border-radius: 6rpx;
-			color: #FFFFFF;
-			text-align: center;
-			background-color: #46B85B;
-		}
-	}
+	}   
 	
 </style>

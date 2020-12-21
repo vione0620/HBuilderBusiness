@@ -68,6 +68,7 @@
 <script>
 	import Calendar from './util.js';
 	import calendarItem from './uni-calendar-item.vue'
+	
 	/**
 	 * Calendar 日历
 	 * @description 日历组件可以查看日期，选择任意范围内的日期，打点操作。常用场景如：酒店日期预订、火车机票选择购买日期、上下班打卡等
@@ -189,12 +190,21 @@
 			 */
 			init(date) {
 				this.weeks = this.cale.weeks 
+				let days = date.slice(date.length-2)
 				if(this.yesterday){
-					let one = date.slice(date.length-2) -1,
-						two = this.parseNumber(one),
-						three = date.slice(0,8),
-						_date = `${three}${two}`; 
-					this.nowDate = this.calendar = this.cale.getInfo(_date)
+					
+					if(days == '01'){
+						let	three = date.slice(0,8),
+							_date = `${three}${days}`;  
+						this.nowDate = this.calendar = this.cale.getInfo(_date)						
+					}else{						
+						let one = date.slice(date.length-2),
+							two = this.parseNumber(one),
+							three = date.slice(0,8),
+							_date = `${three}${two}`; 
+						this.nowDate = this.calendar = this.cale.getInfo(_date)
+					}
+					
 				}else{ 
 					this.nowDate = this.calendar = this.cale.getInfo(date)
 				}

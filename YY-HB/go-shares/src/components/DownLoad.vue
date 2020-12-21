@@ -11,9 +11,8 @@
             <div class="bottoms">  
                 <a href="http://res.yiyichina.cn/yiyi.apk" class="gobtn">安卓下载</a>
             </div> 
-            <div class="bottoms">   
-                <!-- http://itunes.apple.com/us/app/id1441621965          -->
-                <a href="#" class="gobtn">苹果下载</a>
+            <div class="bottoms">        
+                <a href="http://itunes.apple.com/us/app/id1519721447" class="gobtn">苹果下载</a>
             </div>
         </div>
         <div v-if="!isGetBtn" class="fiexd">请点击右上角<br>选择“浏览器中打开” <span class="arrow"></span></div>

@@ -4,7 +4,7 @@
 			<view class="uni-popup" :class="car ? 'carbtn' : ''">
 				<view :class="[ani, animation ? 'ani' : '', !custom ? 'uni-custom' : '']" class="uni-popup__mask" @click="close(true)" />
 				<view :class="[type, ani, animation ? 'ani' : '', !custom ? 'uni-custom' : '']" class="uni-popup__wrapper" @click="close(true)">
-					<view class="uni-popup__wrapper-box" @click.stop="clear">
+					<view class="uni-popup__wrapper-box" :class="backbg ? 'backbg' : ''" @click.stop="clear">
 						<slot />
 					</view>
 				</view>
@@ -44,6 +44,10 @@
 			show: {
 				type: Boolean,
 				default: true
+			},
+			backbg :{
+				type: Boolean,
+				default: true				
 			}
 		},
 		data() {
@@ -170,7 +174,10 @@
 
 	.uni-popup__wrapper.uni-custom .uni-popup__wrapper-box {
 		/* padding: 30upx; */
-		background: #fff
+		/* background: #fff */
+	}
+	.backbg{
+		background: #FFFFFF;
 	}
 
 	.uni-popup__wrapper.uni-custom.center .uni-popup__wrapper-box {

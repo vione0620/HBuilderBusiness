@@ -219,6 +219,7 @@
 				this.getUploadDev()
 				this.ownPaypwd('ownPaypwd',this.loginWhether.md5key)
 				this.fromlogin = true
+				this.isRegular() //是否新用户
 			}, 
 			initUser() {  
 				let vVlue = {"merchNo": this.merchNo} //必传
@@ -348,10 +349,24 @@
 						"sign": sSign
 					},{
 						token:true
-					}).catch() 
-				
+					}).catch()  
 				}
 			}, 
+			isRegular(){		
+				let vVlue = {
+					"merchNo": this.merchNo, 
+				} //必传 
+				let sSort = getSortAscii(vVlue) ///排序    
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() 
+				this.$request.post('isRegular', {	
+					...vVlue,
+					"sign": sSign
+				},{
+					token:true
+				}).then(res=>{
+					uni.setStorageSync('isRegular',res.data)
+				}).catch()  
+			},
 			navTo(path) { 
 				uni.navigateTo({ 
 					url:path,
@@ -373,8 +388,7 @@
 			openScanCode() {
 				uni.scanCode({
 					onlyFromCamera: true,
-					success: (res)=>{  
-						console.log(res)
+					success: (res)=>{   
 						let allright = res.result.indexOf('osign') 
 						if(res.scanType === "QR_CODE"){
 							let scan = JSON.parse(res.result)  

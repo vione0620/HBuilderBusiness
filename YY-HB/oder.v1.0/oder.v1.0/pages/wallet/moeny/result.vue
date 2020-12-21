@@ -13,6 +13,7 @@
 			<view class="fail">
 				<view class="icon iconfont iconiconfail"></view>
 				<view class="title">提现失败</view> 
+				<view class="txt">{{failMsg}}</view>
 			</view>	
 		</template>		
 			
@@ -30,6 +31,7 @@
 			return { 
 				typeOk:false,
 				typeFail:false,
+				failMsg:'',
 			}
 		},
 		onLoad(option) {
@@ -42,6 +44,7 @@
 				break;
 				case 'fail':
 				this.typeFail = true; 
+				this.failMsg = option.msg
 				uni.setNavigationBarTitle({
 					title: '提现失败'
 				})

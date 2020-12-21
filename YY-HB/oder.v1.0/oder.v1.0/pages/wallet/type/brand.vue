@@ -2,7 +2,10 @@
 	<view id="brandCard">
 		<template v-if="isload">
 			<default-page :load="true"></default-page>
-		</template>  
+		</template>		  
+	  <template v-if="isnohave">
+		<default-page :nohave="true"></default-page>
+	  </template>
 		
 		<template v-if="isready">
 			<view class="group" v-for="(card,index) in brandcard">
@@ -17,8 +20,7 @@
 						<view class="info">{{card.cardType == 1 ? '储蓄卡' : '信用卡'}}</view>
 						<view class="number">{{card.cardNo}}</view>
 					</view>
-					<view class="right">
-						<!-- <view class="icon iconfont iconccb-band"></view> -->
+					<view class="right"> 
 						<view class="icon" 
 				 :class="card.bankType == '1' ? 'iconfont iconccb-band' : '' || card.bankType == '2' ? 'bank-ny sign' : '' || card.bankType == '3' ? 'bank-gs sign' : '' || card.bankType == '4' ? 'bank-zg sign' : '' || card.bankType == '5' ? 'bank-yz sign' : '' || card.bankType == '6' ? 'bank-xy sign' : '' || card.bankType == '7' ? 'bank-zs sign' : '' || card.bankType == '8' ? 'bank-pa sign' : '' || card.bankType == '9' ? 'bank-jt sign' : '' || card.bankType == '10' ? 'bank-pf sign' : '' || card.bankType == '11' ? 'bank-gd sign' : '' || card.bankType == '12' ? 'bank-zx sign' : '' || card.bankType == '13' ? 'bank-bj sign' : ''"></view>
 					</view>
@@ -44,6 +46,7 @@
 				brandcard:[], // 银行卡数据		
 				isload:true,  
 				isready:false,	
+				isnohave:false,
 				bgcolorBlue:false,
 				bgcolorRed:false,
 				bgcolorYellow:false,
@@ -72,16 +75,17 @@
 				},{
 					token:true
 				}).then(res=>{ 
-					this.$api.initPage(res.code,res.message)  
-					console.log(res)
+					this.$api.initPage(res.code,res.message)   
 					if(res.code === 200){ 						
 						if(res.data.length){
 							this.brandcard = res.data  
 							this.isload = false
 							this.isready = true
-						} 
-					}  
-					console.log(this.brandcard)
+						}else{
+							this.isload = false
+							this.isnohave = true 
+						}
+					}   
 				}).catch(err=>{ 
 					uni.showToast({
 						icon:'none',

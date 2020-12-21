@@ -21,7 +21,12 @@
 	return str
 	// return sortObj;
  }
-  
+
+//去除空格和换行符
+function excludeBlankNewline(param){ 
+	let result = param.replace(/\s/g,'')  
+	return result  
+}
 
 	function parseNumber(num) {
 		return num < 10 ? "0" + num : num;
@@ -207,4 +212,5 @@ function paymentPaswd(paswd){
    foramtMonth:foramtMonth,
    foramtMonthNums:foramtMonthNums,
    foramtHanzi:foramtHanzi,
+   excludeBlankNewline:excludeBlankNewline,
  }

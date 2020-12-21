@@ -42,8 +42,7 @@
 		onLoad(){ 
 			this.loginWhether = uni.getStorageSync('status') 
 			this.userStore = uni.getStorageSync('user')
-			this.merchNo = uni.getStorageSync('user').merchNo		
-			// this.getAccountBind()
+			this.merchNo = uni.getStorageSync('user').merchNo	 
 		},
 		onShow() { 
 			this.getAccountBind()

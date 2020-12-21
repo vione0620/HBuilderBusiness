@@ -13,10 +13,11 @@
 							:class="(goodsItem.hotSale==='0' || goodsItem.hotSale === undefined) ? '' : 'hotbtn-active'" >
 							{{(goodsItem.hotSale==='0' || goodsItem.hotSale === undefined) ? '上热门' : '热门'}}</view>
 						</view>
-						<view class="etalon">{{goodsItem.goodsWeight}} 克</view> 
+						<view class="etalon">重量：{{goodsItem.goodsWeight}} 克</view> 
+						<view class="etalon">规格：{{goodsItem.goodsQuantity}} {{goodsItem.goodsUnit}}</view> 
 						<template>
 							<view class="boot">
-								<view class="price">{{parseFloat(goodsItem.merchPrice/100).toFixed(2)}}<text>元</text></view>  
+								<view class="price">{{parseFloat((goodsItem.merchPrice * goodsItem.goodsQuantity)/100).toFixed(2)/1}}<text>元</text></view>  
 								<get-btn-item :foods="goodsItem"></get-btn-item> 
 							</view> 
 						</template>
@@ -83,8 +84,8 @@ export default {
 		width: 100%; 
 	
 		.urlImg-item {
-			width: 140rpx;
-			height: 140rpx; 
+			width: 180rpx;
+			height: 180rpx; 
 			border-radius: 6rpx; 
 			box-shadow:1px 1px 3px rgba(0,0,0,.05);
 		}
@@ -119,6 +120,7 @@ export default {
 			.etalon {
 				font-size: 20rpx;
 				color: #999;
+				padding-bottom: 8rpx;
 			}
 	
 			.boot {

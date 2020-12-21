@@ -58,17 +58,12 @@
 			</view>
 		</block>
 		</view>
-		<view class="lodingMore" v-if="!Nothing" @tap="testbottom()">{{loadmore}}</view>
+		<view class="lodingMore" v-if="!Nothing" @tap="testbottom()">{{loadmore}}</view> 
 		
-		
-		
-		
-		</view>
-		
+		</view> 
 	
-	</template>
-		
-		
+	</template> 
+	
 	</view>
 </template>
 
@@ -81,7 +76,7 @@
 	import UniNavBar from '@/components/uni/uni-nav-bar.vue'
 	
 	import BtnFoot from '@/components/basic/btn-foot.vue'
-	import PopUp from '@/components/basic/rk-pop.vue'
+	import PopUp from '@/components/BuyMall/rk-pop.vue'
 	import DefaultPage from '@/components/basic/default-page.vue'
 	
 	
@@ -212,12 +207,18 @@
 				}).then(res => { 
 					this.$api.initPage(res.code,res.message) 
 					if(res.code === 200){
-						let resData = res.data	 
-						setTimeout(()=>{								
-							this.isload = false
-							this.isready = true 
-							this.orderList = resData
-							this.$store.dispatch('receive_agent_list',resData)   
+						let resData = res.data 
+						setTimeout(()=>{
+							if(resData.length){ 
+								this.isload = false
+								this.isready = true 
+								this.orderList = resData
+								this.$store.dispatch('receive_agent_list',resData)   
+							}else{
+								this.isload = false
+								this.isready = false 
+								this.isnohave = true 
+							}
 						},300)	
 					}
 				}).catch()				

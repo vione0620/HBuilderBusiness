@@ -13,19 +13,16 @@
 					:class="tagActive == index ? 'item-active':''" @tap="timeTagClick(index)">{{item}}</view>
 				</view>  
 					
-				<template v-if="tagActive === 0">
-					<!-- 日报 2020年09月23日 -->
+				<template v-if="tagActive === 0"> 
 					<view class="checkDate" @tap="getToDayEntry()">{{showDay}}
 						<view class="txt">昨日已结算</view></view>
 				</template>
-				<template v-if="tagActive === 1">
-					<!-- 周报 2020年09月第02周 -->
+				<template v-if="tagActive === 1"> 
 					<view class="checkDate" @tap="getToWeekEntry()">{{showWeek}}
 						<view class="txt">上周已结算{{`(${showWeekUntil})`}}</view>
 					</view>
 				</template>
-				<template v-if="tagActive === 2">
-					<!-- 月报 2020年09月 -->
+				<template v-if="tagActive === 2"> 
 					<view class="checkDate" @tap="getToMonthEntry()">{{showMonth}}
 						<view class="txt">上月已结算</view></view>
 				</template>
@@ -95,7 +92,7 @@
 				</template> 
 			</view>
 			
-			<uni-popup ref="isDaysOfMonth" type="bottom"> 
+			<uni-popup ref="isDaysOfMonth" type="bottom">
 				<uni-calendar :endDate="showDay" :insert="true" :clearDate="false" @confirm="choseDay" :yesterday="true" />		
 			 </uni-popup>
 			<uni-popup ref="isWeekOfYear" type="bottom">
@@ -165,8 +162,7 @@
 			this.merchNo = uni.getStorageSync('user').merchNo
 			this.initDate()
 			//日报
-			this.getBusiDay(this.p_day,'getBusiDay','busiDay')	
-						// console.log(this.p_day,'p_dayp_dayp_dayp_day')		 
+			this.getBusiDay(this.p_day,'getBusiDay','busiDay')	 	 
 		},
 		methods:{
 			openMore(){
@@ -190,16 +186,13 @@
 				this.tagActive = index; 			
 				switch (index){
 					case 0:    
-						this.getBusiDay(this.p_day,'getBusiDay','busiDay') 
-						console.log(this.p_day,'p_dayp_dayp_dayp_day')
+						this.getBusiDay(this.p_day,'getBusiDay','busiDay')  
 						break;
 					case 1:   
-						this.getBusiDay(this.p_week,'getBusiWeek','busiWeek')
-						console.log(this.p_week,'dfhjafhjhfjadhflashfdl')
+						this.getBusiDay(this.p_week,'getBusiWeek','busiWeek') 
 						break;
 					case 2:   
-						this.getBusiDay(this.p_month,'getBusiMonth','busiMonth')	
-						console.log(this.p_month,'p_monthp_monthp_monthp_monthp_month')				
+						this.getBusiDay(this.p_month,'getBusiMonth','busiMonth')	 		
 						break;
 				} 
 			},
@@ -213,6 +206,7 @@
 				let y = d.replace('-',` 年 `)  
 				let end = y.replace('-',` 月 `) 
 				this.showDay = end    
+				
 				this.p_day = e.fulldate
 				this.getBusiDay(this.p_day,'getBusiDay','busiDay')
 				this.$refs.isDaysOfMonth.close()
@@ -232,8 +226,7 @@
 				this.$request.post(post,{
 					...vVlue,
 					"sign":sSign,
-				},{token:true}).then(res=>{  
-					// console.log(res)
+				},{token:true}).then(res=>{   
 					this.$api.initPage(res.code,res.message)
 					if(res.code === 200){  
 						this.staticIncome(res.data)		 
@@ -275,9 +268,7 @@
 				this.p_week = `${week.year}${week.month}${Number(week.week_index)}`
 				this.showWeek = c_week
 				this.showWeekUntil = week.until 
-				this.getBusiDay(this.p_week,'getBusiWeek','busiWeek') 
-				console.log(this.p_week)
-				console.log(c_week)
+				this.getBusiDay(this.p_week,'getBusiWeek','busiWeek')  
 				setTimeout(()=>{
 					this.$refs.isWeekOfYear.close()
 				},100)
@@ -304,12 +295,17 @@
 				let w_days = handleWeekDays() //周的时候按正常时间算
 				let week = handleWeek()
 				let month = handleMonth()   
+				
 				//日报 
 				let d = `${days} 日`
 				let y = d.replace('-',` 年 `)  
 				let end = y.replace('-',` 月 `)  
 				this.showDay = end  
-				this.p_day = days 
+				this.p_day = days
+				if(days.slice(days.length-2) == "01"){
+					this.todayTxt = ''
+				}
+				
 				//周报				
 				let w_y = week.slice(0,4)
 				let w_w = this.parseNumber(month)
@@ -370,6 +366,7 @@
 						month:w_w -1,
 						week: this.p_week.slice(this.p_week.length-1)
 					}
+					
 				}else if(nonce_month_istrue < nonce_month.nums_val && nonce_month_istrue > 0){ 
 					find_true = { 
 						index:nonce_month_istrue,

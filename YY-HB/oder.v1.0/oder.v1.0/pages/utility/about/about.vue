@@ -6,20 +6,11 @@
 		</view>
 		<view class="list"> 
 			<view class="group">
-				<uni-list-item title="用户协议" @click="navTo('user')"></uni-list-item>
+				<uni-list-item title="服务协议" @click="navTo('treaty')"></uni-list-item>
 				<uni-list-item title="隐私政策" @click="navTo('privacy')"></uni-list-item>
-				<uni-list-item title="公司信息" @click="navTo('firm')"></uni-list-item>
+				<!-- <uni-list-item title="公司信息" @click="navTo('firm')"></uni-list-item> -->
 			</view>  
-		</view>
-		 
-		<view class="">{{pushmsg}}</view> 
-		<view style="padding: 20rpx;">---------分割线----------</view>
-		<view class="">{{clickmsg}}</view>
-		<view style="padding: 20rpx;">---------分割线----------</view>
-		
-		<view class="">{{iosMsg}}</view>
-		<view style="padding: 20rpx;">---------分割线----------</view>
-		<view> {{jsonios}} </view>
+		</view> 
 	</view>
 </template>
 
@@ -30,30 +21,11 @@
 	import UniListItem from '@/components/uni/uni-list-item.vue' 
 	export default {
 		data() {
-			return {
-				StorageInfo:Object,
-				navtoRes:Object,
-				pushmsg:Object,
-				clickmsg:Object,
-				iosMsg:Object,
-				jsonios:object,
+			return { 
 				
 			}
 		},
-		onLoad() { 	 
-			this.StorageInfo = uni.getStorageInfoSync()
-			this.pushmsg = uni.getStorageSync('receive_pushMsg')
-			this.clickmsg = uni.getStorageSync('click_pushMsg')
-			this.iosMsg = uni.getStorageSync('receive_iosMsg')
-			// this.navtoRes = options
-			this.jsonios = JSON.parse(this.iosMsg)
-			// const pushlist = {
-			// 	"__UUID__":"androidPushMsg101819565",
-			// 	"title":"新订单",
-			// 	"appid":"__UNI_C709C64",
-			// 	"content":"一笔自取的订单",
-			// 	"payload":"{\"content\":\"一笔自取的订单\",\"extendParam\":{\"msg_external_param\":\"3502031020000027052\",\"msg_action\":\"1\"},\"notifyType\":\"4\",\"title\":\"新订单\"}"
-			// }
+		onLoad() { 	  
 		},
 		components:{
 			UniListItem,
@@ -69,20 +41,19 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	page{
 		padding: 40rpx;
 		display: flex; 
 		justify-content: center;
 	}
 	.about{
-		width: 100vw;
-		// padding: 0 20rpx;
+		width: 100vw; 
 	
 		.main{
 			width: 100%;
 			text-align: center;
-			padding-bottom: 100rpx;
+			padding: 100rpx 0;
 			.icon{
 				width: 120rpx;
 				height: 120rpx;

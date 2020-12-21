@@ -33,10 +33,14 @@
 							<view class="input-group">
 								<view class="login-btn" @tap="bindLogin" hover-class="animate__animated animate__pulse" 
 								:class="(this.account.length < 6 || this.password.length < 6 || this.verifcode.length < 6) ? 'btn-disabled' : '' ">登录</view>
+							</view> 
+							<view class="footer">查阅 
+								<view class="links" @click="navto('../../utility/about/privacy')">《用户服务协议》</view>、
+								<view class="links" @click="navto('../../utility/about/treaty')">《隐私政策》</view>
 							</view>
 						</view>
 					</view>
-
+					
 				</view>
 
 			</view>
@@ -48,7 +52,7 @@
 <script>
 	import {mapState} from 'vuex'
 	import {b64Md5,hexMD5} from '@/network/md5.js'	
-	import {getSortAscii} from '@/common/util/utils.js'
+	import {getSortAscii,excludeBlankNewline} from '@/common/util/utils.js'
 	
 	import LoginInput from '@/components/basic/c-input.vue'
 	export default {
@@ -72,11 +76,21 @@
 			}
 			this.$api.getUserDev() 
 		},  
-		methods: {  
+		methods: {   
+			navto(url){
+				uni.navigateTo({
+					url:url,
+					animationType: 'pop-in',
+					animationDuration: 200,
+				})
+			},
 			getVerifCode() { 
+				this.account = excludeBlankNewline(this.account)
+				this.password = excludeBlankNewline(this.password)
+				this.verifcode = excludeBlankNewline(this.verifcode)
 				if (this.codeTime > 0 || this.password === '' || this.account.length < 7) { 
 					return
-				}
+				} 
 				this.codeTime = 180
 				let timer = setInterval(() => {
 					if (this.codeTime >= 1) {
@@ -103,13 +117,17 @@
 					})
 				}).catch() 
 			},
-			bindLogin() {  
+			bindLogin() {
+				this.account = excludeBlankNewline(this.account)
+				this.password = excludeBlankNewline(this.password)
+				this.verifcode = excludeBlankNewline(this.verifcode)
 				let vVlue = {"loginNo": this.account,"passwd": this.password,"verCode": this.verifcode} //必传 
 				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&" + this.initSign).toUpperCase() //转码   
-				if(this.account.length < 7 || this.password.length < 6 || this.verifcode.length < 6){
+				let sSign = hexMD5(sSort + "&" + this.initSign).toUpperCase() //转码    
+				if(this.account.length < 7 || this.password.length < 6 || this.verifcode.length < 6){ 
 					return
 				}
+				
 				//发送请求 
 				this.$request.post('login', {
 					"loginNo": this.account,
@@ -146,7 +164,10 @@
 								url:'../../utility/index/index?loginType=login'
 							})									
 						},300)		 	
-					}			
+					}else{						
+						this.password = ''
+						this.verifcode = ''
+					}
 				}).catch() 
 
 			},  
@@ -154,13 +175,22 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	page {
 		background-color: #FFFFFF;
 		width: 100vw;
 		height: 100vh;
 	}
-
+	
+	.footer{
+		padding: 20rpx;
+		display: flex; 
+		justify-content: center; 
+		font-size: 24rpx;
+		.links{
+			color: #46B85B;
+		}
+	}
 
 	.main { 
 		width: 100vw;

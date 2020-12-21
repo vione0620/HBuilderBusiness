@@ -2,9 +2,12 @@
 	
 	<view class="wrapper">
 	 
+	 <uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back" color="#ffffff" background-color="RGBA(70, 184, 91, 1)"/>
+	 
 	<template v-if="isload">
 		<default-page :load="true"></default-page>
 	</template> 
+	
 	<template v-if="isnohave">
 		<default-page :nohave="true"></default-page>
 	</template>
@@ -12,7 +15,6 @@
 	<template v-if="isready">
 	
 	
-		<uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back" color="#ffffff" background-color="RGBA(70, 184, 91, 1)"/>
 		<view class="goods-detail"> 
 			<view class="header">
 				<view class="status">{{orderStatus}}</view>

@@ -14,7 +14,7 @@
             "alwaysShowBeforeRender" : true, //白屏时是否开启程序启动界面
             "waiting" : true, //程序启动界面是否显示等待雪花
             "autoclose" : true, //是否自动关闭程序启动界面
-            "delay" : 3000 //启动界面在应用的首页面加载完毕后延迟关闭的时间
+            "delay" : 10000 //启动界面在应用的首页面加载完毕后延迟关闭的时间
         },
         /* 模块配置 */
         "modules" : {
@@ -60,7 +60,7 @@
             /* ios打包配置 */
             "ios" : {
                 "idfa" : false,
-                "UIBackgroundModes" : ["audio"]
+                "UIBackgroundModes" : [ "audio" ]
             },
             /* SDK配置 */
             "sdkConfigs" : {

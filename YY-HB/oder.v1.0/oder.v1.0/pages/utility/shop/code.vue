@@ -11,15 +11,15 @@
 					<view class="title">{{userStore.merchName}}{{busiType}}{{join}}</view>
 					<view class="content"> 
 						<view class="code-wrap" style="background-color: #FFFFFF; padding: 20rpx 0;">  
-							<template v-if="this.qcodeImg">
+							<!-- <template v-if="this.qcodeImg">
 								<image :src="qcodeImg" mode="" style="width: 400rpx; height: 400rpx;"></image>
 							</template>
-							<template v-else>   
-								<view class="canvas-hide">
+							<template v-else>  --> 
+								<!-- <view class="canvas-h ide"> -->
 									<uni-qrcode @makeComplete="makeComplete"
 									 :text="codeText" cid="cavs" :makeOnLoad="true" :logo="merchPic"/> 
-								</view>  
-							</template> 
+								<!-- </view>  -->
+							<!-- </template> -->
 						</view>
 						<view class="txt">扫一扫店铺二维码下单</view> 
 					</view>
@@ -47,7 +47,7 @@
 			return {
 				loginWhether:'',//登陆状态
 				userStore:'', //用户信息
-				merchNo:'', //商户号
+				merchNo:'', //商户号1
 				merchCode:'', 
 				codeText:'',
 				merchName:'', 
@@ -56,6 +56,7 @@
 				isready:false,
 				join:'',
 				merchPic:'',
+				account:'',//商户号2
 			}
 		},
 		components:{
@@ -70,7 +71,7 @@
 			this.join = '-'+ this.userStore.joinNo  
 			this.getScanCode()
 			this.getShopImg()
-			this.qcodeImg = uni.getStorageSync('makeimg')    
+			// this.qcodeImg = uni.getStorageSync('makeimg')    
 		},
 		computed:{
 			busiType:function(){ 
@@ -126,14 +127,20 @@
 				}).then(res => { 
 					this.$api.initPage(res.code,res.message) 
 					if (res.code === 200) { 		 
-						this.merchPic = res.data.merchPic  
+						this.merchPic = res.data.merchPic
+						// this.account = res.data.merchNo
 					}
 				}).catch() 
 				
 			},
 			makeComplete(e){  
-				this.qcodeImg = e
-				uni.setStorageSync('makeimg',e)  
+				this.qcodeImg = e 
+				// console.log(e)
+			// 	if(this.merchNo != this.account){
+					
+			// 	}else{					
+			// 		uni.setStorageSync('makeimg',e) 
+			// 	}
 			},
 			getShopCodeImg(){  
 				if(this.qcodeImg){ 

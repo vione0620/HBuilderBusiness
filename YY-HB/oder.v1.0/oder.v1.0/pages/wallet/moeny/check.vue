@@ -1,13 +1,11 @@
-<template>
-	<view class="moeny-check">
-		
+4<template>
+	<view class="moeny-check"> 
 		<view class="group"> 
 			<view class="title">提现金额</view>
 			<view class="contMain"> 
 			<input class="nums" type="number" placeholder="0.00" v-model="getMoney"
 			@blur="chooseAmt" @confirm="chooseAmt" />
-			<text class="lab">元</text></view>
-			<!-- <view class="info">温馨提示：公司制定提现银行为建设银行！</view> -->
+			<text class="lab">元</text></view> 
 		</view>
 		
 		<view class="group-type">			
@@ -26,20 +24,22 @@
 		</view>
 		
 		<btn-foot title="确认提现" @tap="verifyPassword()"></btn-foot>
-		
+		 
+		 
 		<uni-popup ref="isPreVerify" type="center" :maskClick="false">
 			<view class="preVerify">
 				<view class="title">请输入支付密码</view>
 				<view class="main">  
-					<input type="number" maxlength="6" class="in_put" @input="checkPwd" v-model="passwd" focus="true"/>  
+					<input type="number" maxlength="6" class="in_put" 
+					@input="checkPwd" v-model="passwd" focus="true" cursor-spacing="50" adjust-position="true"/>  
 					<view class="substitute"> 
 						<view class='dot-wrap'>
-							<view class="dot">{{passwd[0]? '•' :''}}</view>
-							<view class="dot">{{passwd[1]? '•' :''}}</view>
-							<view class="dot">{{passwd[2]? '•' :''}}</view>
-							<view class="dot">{{passwd[3]? '•' :''}}</view>
-							<view class="dot">{{passwd[4]? '•' :''}}</view>
-							<view class="dot">{{passwd[5]? '•' :''}}</view> 
+							<view class="dot">{{passwd[0]? '•' : ''}}</view>
+							<view class="dot">{{passwd[1]? '•' : ''}}</view>
+							<view class="dot">{{passwd[2]? '•' : ''}}</view>
+							<view class="dot">{{passwd[3]? '•' : ''}}</view>
+							<view class="dot">{{passwd[4]? '•' : ''}}</view>
+							<view class="dot">{{passwd[5]? '•' : ''}}</view> 
 						</view> 
 					</view>
 					
@@ -88,7 +88,7 @@
 	import {getSortAscii,paymentPaswd} from '@/common/util/utils.js'
 	
 	import UniPopup from '@/components/uni/uni-popup.vue' 
-	import PopUp from '@/components/basic/rk-pop.vue'
+	import PopUp from '@/components/BuyMall/rk-pop.vue'
 	import BtnFoot from '@/components/basic/btn-foot.vue'
 	export default{
 		data(){
@@ -101,8 +101,7 @@
 				passwd:[],
 				dotpwd:[],  
 				getMoney:'',
-				postMoeny:'', 
-				optionSet:'',
+				postMoeny:'',  
 			}
 		},
 		computed:{ 
@@ -116,19 +115,18 @@
 		onLoad(option) { 			 
 			this.loginWhether = uni.getStorageSync('status') 
 			this.userStore = uni.getStorageSync('user')
-			this.merchNo = uni.getStorageSync('user').merchNo
-			this.optionSet = option.seted
+			this.merchNo = uni.getStorageSync('user').merchNo 
 		}, 
-		methods:{	
-			chooseAmt(e){ 
+		methods:{  
+			chooseAmt(e){  
 				let value = e.target.value 
-				if(value > 0 && value < 0.2){
+				if(value > 0 && value < 1){
 					uni.showToast({
 						icon:'none',
 						title:'您可申请不小于1元的金额'
 					})
 					this.getMoney = ''					
-				}else if(value >= 0.2){					
+				}else if(value >= 1){					
 					this.getMoney = parseFloat(e.target.value).toFixed(2)
 					this.postMoeny = e.target.value
 				}
@@ -172,25 +170,19 @@
 						title:'您当前账户余额不足',
 						duration: 2000
 					})
-				}else{
-					// console.log(this.optionSet)
-					let fristTime = uni.getStorageSync('initPayPaswd')					
-					// if(this.optionSet){ 
-					// 	this.$refs.isPreVerify.open()
-					// 	uni.setStorageSync('initPayPaswd',1)	 					
-					// }else{
-						if(fristTime === 1){ 				
-							this.$refs.isPreVerify.open()
-						}else if(fristTime === 0){
-							this.$refs.gotosetPwd.open()
-						}
-					// } 
+				}else{ 
+					let fristTime = uni.getStorageSync('initPayPaswd')
+					if(fristTime === 1){
+						this.$refs.isPreVerify.open()
+					}else if(fristTime === 0){
+						this.$refs.gotosetPwd.open()
+					} 
 				}
 			},  
 			checkPwd(e){  
 				this.value = e.target.value
 				this.passwd = this.value
-				this.dotpwd = this.value 
+				this.dotpwd = this.value
 			},
 			Yconfirm(){ 
 				if(this.passwd == '' || this.passwd.length < 6){ 
@@ -287,7 +279,7 @@
 									duration: 2000
 								})
 								uni.redirectTo({
-									url:'./result?type=ok'
+									url:`./result?type=ok`
 								}) 
 							}else if(res.data.cashCode == 2){								
 								uni.showToast({
@@ -296,7 +288,7 @@
 									duration: 2000
 								})
 								uni.redirectTo({
-									url:'./result?type=fail'
+									url:'./result?type=fail&msg=${res.message}'
 								}) 								
 							}else if(res.data.cashCode == 3){									
 								uni.showToast({
@@ -305,16 +297,16 @@
 									duration: 2000
 								})
 								uni.redirectTo({
-									url:'./result?type=fail'
+									url:'./result?type=fail&msg=${res.message}'
 								}) 								
 							}		
 						}else{
-							uni.showToast({
-								icon:'none',
-								title:res.message,
-								duration: 2000
-							})	
 							if(res.code === 412){
+								uni.showToast({
+									icon:'none',
+									title:res.message,
+									duration: 2000
+								})	
 								//没有关联账号 		 
 								uni.navigateTo({
 									url: '../../account/authid/authid',
@@ -322,16 +314,47 @@
 									animationDuration: 200
 								})  
 							}else if(res.code === 302){ 
+								uni.showToast({
+									icon:'none',
+									title:res.message,
+									duration: 2000
+								})	
 								//未设置密码 
 								uni.navigateTo({
 									url: '../../payment/setup?type=setup', 
 									animationType: 'pop-in',
 									animationDuration: 200
 								}) 
-							}else if(res.code === 400){ 		 		 
+							}else if(res.code === 400){								
+								uni.showToast({
+									icon:'none',
+									title:res.message,
+									duration: 2000
+								})	
 								uni.redirectTo({
-									url:'./result?type=fail'
+									url:`./result?type=fail&msg=${res.message}`
 								}) 
+							}else if(res.code === 403){								
+								uni.showToast({
+									icon:'none',
+									title:res.message,
+									duration: 2000
+								})	
+							} else if(res.code === 404){ 									
+								uni.showModal({
+									title:'安全提醒',
+									content:res.message,
+									showCancel:false,
+									success: (res) => {
+										if(res.confirm){
+											uni.navigateTo({
+												url: '../../payment/setup?type=forget', 
+												animationType: 'pop-in',
+												animationDuration: 200
+											}) 
+										}
+									}
+								})	
 							} 
 						}
 						
@@ -346,8 +369,7 @@
 	}
 </script>
 
-<style scoped lang="scss"> 
-  
+<style scoped lang="scss">  
 	.moeny-check{ 
 		width: 100%;
 		padding: 20rpx;

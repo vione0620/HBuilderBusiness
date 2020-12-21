@@ -113,8 +113,7 @@
 
 <style scoped lang="scss">
 	.moneny-wrap{
-		width: 100%;
-		// padding: 20rpx;
+		width: 100%; 
 		position: relative;
 		.main{
 			margin: 20rpx;

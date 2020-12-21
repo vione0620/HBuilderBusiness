@@ -114,26 +114,6 @@ export default {
 		})
 		
 	},
-	
-	//监听网路状态	
-	getNetworkType(){
-		uni.getNetworkType({
-		    success:(res)=> {
-				if(res.networkType == 'none'){
-					uni.showToast({
-						icon:'none',
-						title:'您当前处于无网络状态',
-						duration: 2000						
-					})
-				}else if(res.networkType !== 'wifi'){ 
-					uni.showModal({
-						title:'网络提醒',
-						content:'您当前使用' + res.networkType + '网络', 
-						showCancel:false
-					}) 
-				} 				
-		    }
-		})
-	},
+	 
 }
 

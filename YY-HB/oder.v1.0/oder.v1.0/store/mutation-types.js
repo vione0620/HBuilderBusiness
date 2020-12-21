@@ -20,6 +20,13 @@ export const RECEIVE_USER_UNITY_LIST = 'receive_user_unity_list' //接收买家�
 export const RECEIVE_GET_MONEY_RECORD = 'receive_get_money_record' //接收买家个人用户订单页面数据
 export const RECEIVE_AGENT_LIST = 'receive_agent_list' //代放管理页面数据
 
+export const RECEIVE_PREVIOUS_ORDER = 'receive_previous_order' //接收未支付订单数据
+// export const RECEIVE_PREVIOUS_DETAIL = 'receive_previous_Detail' //接收未支付订单数据
+
+
+export const GET_COUPON_ID = 'get_coupon_id' //优惠券GET_CART_AMT
+export const GET_CART_AMT = 'get_cart_amt' //实付金额GET_CART_AMT
+export const GET_UNUSUAL_AMT = 'get_unusual_amt' //已选券无需再减券的金额get_unusual_amt
 // userUnityList
 
 // export const BEFORGET_REPORT_CHART = 'beforget_report_chart' //点击获取当前日期报表数据显示在图表中

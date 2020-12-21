@@ -16,15 +16,18 @@
 				</view>
 			</uni-list-item> 
 		</view>
+		<view class="group">  
+			<uni-list-item title="优惠券管理"  @click="navTo('../coupon/coupon')"></uni-list-item>    
+		</view> 
 		<view class="group"> 
 			<uni-list-item title="修改密码"  @click="navTo('../passwd/passwd?type=change')"></uni-list-item>
 			<uni-list-item title="关联账号"  @click="navTo('../authid/authid')"></uni-list-item>
 			<uni-list-item title="银行卡管理"  @click="navTo('../../wallet/type/brand')"></uni-list-item>
-			<uni-list-item title="支付管理"  @click="navTo('../../payment/payment')"></uni-list-item> 
+			<uni-list-item title="支付管理"  @click="navTo('../../payment/payment')"></uni-list-item>  
 		</view> 
 		
 		<view class="group"> 
-			<!-- <uni-list-item title="关于移移" @click="navTo('../../utility/about/about')"></uni-list-item> -->
+			<uni-list-item title="关于移移" @click="navTo('../../utility/about/about')"></uni-list-item>
 			<!-- <uni-list-item title="关于移移"></uni-list-item> -->
 			<uni-list-item title="客服热线" @tap="onPhone">   
 				<view slot="right" class="callText"><text class="iconfont icondianhua-copy"></text>立即联系</view>
@@ -173,7 +176,7 @@
 					}else if(openStatus === 1){					
 						uni.showModal({
 							title:'关闭营业提醒',
-							content:'您辛苦啦！关闭营业将同时清空店铺库存，因此当天不可重复开店',
+							content:'您辛苦啦！关店将阻止用户下单！',
 							success: (res) => {
 								if(res.confirm){
 									resolve()  			

@@ -107,7 +107,6 @@
 			
 			if(option.pushNo){
 				this.pushMsg = option.pushNo  
-				console.log(this.pushMsg)
 			}else{
 				this.orderArg = option  				
 			} 

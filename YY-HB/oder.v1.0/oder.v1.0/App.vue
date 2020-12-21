@@ -101,8 +101,7 @@
 				})
 				
 				// #endif
-			})
-			this.$api.getNetworkType() 
+			}) 
 			 
 			
 		}, 

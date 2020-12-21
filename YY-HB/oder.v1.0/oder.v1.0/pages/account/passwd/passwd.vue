@@ -11,17 +11,13 @@
 				<template v-if="typeForget">
 					<view class="input-wrap">
 						<view class="input-group">
-							<text class="input-text">请输入身份证号</text>
-							<login-input type="number" pattern="\d*" focus v-model="forget.idCard" :maxSize="18"></login-input>
-						</view> 
-						<view class="input-group">
 							<text class="input-text">请输入登录账号</text>
 							<login-input type="number" pattern="\d*" focus v-model="forget.loginNo" :maxSize="7"></login-input>
 						</view>  
 						<view class="input-group">
 							<text class="input-text">请输入新密码</text>
 							<login-input password displayable type="password" v-model="forget.pswNew"></login-input>
-							<view class="tips">{{pswTips}}</view>
+							<!-- <view class="tips">{{pswTips}}</view> -->
 						</view>
 						<view class="input-group">
 							<text class="input-text">重新输入新密码</text>
@@ -49,7 +45,7 @@
 						<view class="input-group">
 							<text class="input-text">请输入新密码</text>
 							<login-input password displayable type="password" v-model="change.pswNew"></login-input>
-							<view class="tips">{{pswTips}}</view>
+							<!-- <view class="tips">{{pswTips}}</view> -->
 						</view>
 						<view class="input-group">
 							<text class="input-text">重新输入新密码</text>
@@ -75,7 +71,7 @@
 
 <script>
 	import {b64Md5,hexMD5} from '@/network/md5.js'
-	import {getSortAscii,paymentPaswd} from '@/common/util/utils.js' 
+	import {getSortAscii,excludeBlankNewline} from '@/common/util/utils.js' 
 	import LoginInput from '@/components/basic/c-input.vue'
 	import UniNavBar from '@/components/uni/uni-nav-bar.vue'
 	export default {
@@ -94,7 +90,6 @@
 					verifcode: '',
 				},
 				forget:{
-					idCard:'',
 					loginNo:'',
 					pswNew:'',
 					pswOneMore:'',
@@ -138,8 +133,8 @@
 					sSort = getSortAscii(vVlue) ///排序  
 					sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码					
 				}else if(type == 'forget'){
-					vVlue = {"loginNo": this.forget.loginNo,"identCard":this.forget.idCard} //必传 
-					sSort = getSortAscii(vVlue) ///排序  
+					vVlue = {"loginNo": this.forget.loginNo} //必传 
+					sSort = getSortAscii(vVlue) ///排序   
 					sSign = hexMD5(sSort + "&" + this.initSign).toUpperCase() //转码
 				} 
 				
@@ -169,6 +164,9 @@
 				}).catch()
 			}, 
 			getVerifCodeChange(){
+				this.change.pswOld = excludeBlankNewline(this.change.pswOld)
+				this.change.pswNew = excludeBlankNewline(this.change.pswNew)
+				this.change.pswOneMore = excludeBlankNewline(this.change.pswOneMore)
 				let isright = this.matchFormat('change',{ 
 					"oldPwd":this.change.pswOld,
 					"newPwd":this.change.pswNew,	
@@ -179,26 +177,20 @@
 				}
 			},
 			getVerifCodeForget(){
+				this.forget.loginNo = excludeBlankNewline(this.forget.loginNo)
+				this.forget.pswNew = excludeBlankNewline(this.forget.pswNew)
+				this.forget.pswOneMore = excludeBlankNewline(this.forget.pswOneMore)
 				let isright = this.matchFormat('forget',{
-					"identCard":this.forget.idCard,	
 					"loginNo":this.forget.loginNo,	 
 					"newPwd":this.forget.pswNew,	
 					"newPwd2":this.forget.pswOneMore,				
-				})  
-				if(this.forget.idCard.length === 15 || this.forget.idCard.length === 18){	
-					if(isright){	 			 
-						this.getCodeNo('getVerCodeF','forget')
-					}
-				}else{				
-					uni.showToast({
-						icon:'none',
-						title:'请核对身份证号码',
-						duration:2000
-					})
+				})
+				
+				if(isright){		 
+					this.getCodeNo('getVerCodeF','forget')
 				}
 			},
-			getDataCommon(post,type,param){ 
-				
+			getDataCommon(post,type,param){
 				let vVlue = param
 				let sSign = ''
 				let sSort = getSortAscii(vVlue) ///排序 
@@ -233,6 +225,10 @@
 				
 			},
 			pswForget(){
+				this.forget.verifcode = excludeBlankNewline(this.forget.verifcode)
+				this.forget.loginNo = excludeBlankNewline(this.forget.loginNo)
+				this.forget.pswNew = excludeBlankNewline(this.forget.pswNew)
+				this.forget.pswOneMore = excludeBlankNewline(this.forget.pswOneMore)
 				if(this.forget.verifcode.length != 6){
 					uni.showToast({
 						icon:'none',
@@ -242,7 +238,6 @@
 					return 
 				} 
 				this.getDataCommon('forgetPwd','forget',{	
-					"identCard":this.forget.idCard,		
 					"loginNo":this.forget.loginNo,	
 					"verCode":this.forget.verifcode,	
 					"newPwd":this.forget.pswNew,
@@ -250,6 +245,11 @@
 				})
 			},
 			pswChange(){	
+				this.merchNo = excludeBlankNewline(this.merchNo)
+				this.change.verifcode = excludeBlankNewline(this.change.verifcode)
+				this.change.pswOld = excludeBlankNewline(this.change.pswOld)
+				this.change.pswNew = excludeBlankNewline(this.change.pswNew)
+				this.change.pswOneMore = excludeBlankNewline(this.change.pswOneMore)
 				if(this.change.verifcode.length != 6){
 					uni.showToast({
 						icon:'none',
@@ -268,20 +268,13 @@
 			},
 			matchFormat(type,param){
 				if(type == 'forget'){
-					if(!param.identCard || !param.loginNo || !param.newPwd || !param.newPwd2 || param.loginNo.length < 7 || param.newPwd.length < 6 || param.newPwd2.length < 6){ 
+					if(!param.loginNo || !param.newPwd || !param.newPwd2 || param.loginNo.length < 7 || param.newPwd.length < 6 || param.newPwd2.length < 6){ 
 						uni.showToast({
 							icon:'none',
 							title:'输入有误',
 							duration:2000
 						})
 						return false
-					}else if(param.identCard.length < 15 || param.identCard.length > 18){ 
-						uni.showToast({
-							icon:'none',
-							title:'请核对身份证号码',
-							duration:2000
-						})
-						return false 
 					}else if(param.newPwd !== param.newPwd2){
 						uni.showToast({
 							icon:'none',
@@ -291,8 +284,7 @@
 						return false
 					}
 					return true	 
-				}else if(type == 'change'){
-					console.log(param)
+				}else if(type == 'change'){ 
 					if(!param.oldPwd || !param.newPwd || !param.newPwd2 || param.oldPwd.length < 6 || param.newPwd.length < 6 || param.newPwd2.length < 6){ 
 						uni.showToast({
 							icon:'none',

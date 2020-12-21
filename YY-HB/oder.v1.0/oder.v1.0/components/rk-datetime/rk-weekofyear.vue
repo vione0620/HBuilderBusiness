@@ -11,13 +11,13 @@
 				 :id="`anchor${index+1}`">{{`——&nbsp;${rkYear}年${group.nums_key}月&nbsp;——`}}</view> 
 				<view class="cont-group">   
 					<view class="cont-group-list" hover-class="chooseHover"
-					:class="rkYear === current_year && ((is_child_week.week -1) === index) &&  myscroll=== (+group.nums_key) ? 'chooseHover week-active' : ''"
+					:class="rkYear === current_year && ((is_child_week.week -1) === index) &&  (myscroll-1)=== (+group.nums_key) ? 'chooseHover week-active' : ''"
 					v-for="(week,index) in group.nums_val" 
-					@click="chooesWeeks({month:group.nums_key,day:group.nums_unit[index],week_index:index})" :key="'4'+index">   
+					@click="chooesWeeks({month:group.nums_key,day:group.nums_unit[index],week_index:index})" :key="'4'+index">
 							<!-- 本年度的这个月 -->
-							<view :class="(myscroll) < (+group.nums_key) && rkYear === current_year ? 'disabled-color' : ''">
+							<view :class="(myscroll-1) < (+group.nums_key) && rkYear === current_year ? 'disabled-color' : ''">
 								<!-- 本月的这个周 -->
-								<view :class="rkYear === current_year && (myscroll) === (+group.nums_key) && is_child_week.week-1 < index ? 'disabled-color' : ''">
+								<view :class="rkYear === current_year && (myscroll-1) === (+group.nums_key) && (is_child_week.week-1) < index ? 'disabled-color' : ''">
 									<view class="tit">第{{hanziNums[index]}}周</view>
 									<view class="txt">{{group.nums_unit[index]}}</view>
 								</view>
@@ -52,6 +52,7 @@
 			this.m_month_week(this.rkYear)
 			this.w_week_interval(this.rkYear)
 			this.anchor_m() 
+			// console.log(this.rkYear,this.current_year)
 		}, 
 		props: {
 		  is_child_week:Object, 
@@ -60,6 +61,7 @@
 			anchor_m(){
 				let current_month = handleMonth() 
 				this.myscroll = current_month 
+				console.log(current_month)
 			}, 
 			m_month_week(rkYear){
 				//一年中每个月多少周列表渲染 
@@ -76,6 +78,7 @@
 				this.weeksInterval = handleWeeksInterval(rkYear)	 
 			},
 			chooesWeeks(month){  
+				console.log((+month.month),month.week_index,this.is_child_week.week)
 				if(this.myscroll === (+month.month) && month.week_index > this.is_child_week.week-1){ 
 					return
 				}

@@ -2,26 +2,34 @@
 	
 	<view class="wrapper">
 	
-	 <uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back" color="#ffffff" background-color="RGBA(70, 184, 91, 1)"/>
 	 
 	<template v-if="isload">
 		<default-page :load="true"></default-page>
 	</template> 
 	
-	<template v-if="isready"> 
+	<template v-if="isready">
 	
+	<view class="" v-if="currentItem.orderState == 1">
+		<my-map :order-map-data="orderMapData"></my-map>
+	</view> 
+	<view class="" v-if="currentItem.orderState == 1">
+		<view class="bg-mapspace"></view>
+	</view>	
+	<template v-if="currentItem.orderState != 1"> 
+		<uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back" color="#ffffff" background-color="RGBA(70, 184, 91, 1)"/>
+	</template>
 	<view class="goods-detail"> 
 		<view class="header">
 			<view class="status">{{orderStatus}}</view> 
 			<template v-if="currentItem.orderState == 0"> 
-				<view class="txt">您的订单审核中，请耐心等待</view>
+				<view class="txt">您的订单等待配送</view>
 			</template>
 			<template v-if="currentItem.orderState == 1"> 
 				<view class="txt">您的订单正在配送中，请耐心等待</view>
-			</template v-if="currentItem.orderState == 2">
+			</template> 
+			<template v-if="currentItem.orderState == 2">
 				<view class="txt">您的订单已送达，祝您生活愉快</view>
-			<template> 
-			</template>
+			</template> 
 		</view> 
 		
 		
@@ -29,23 +37,64 @@
 		<view class="content">
 			<view class="goods-list">
 				<view class="title">商品列表</view> 
-				<block v-for="(items,index) in currentItem.content" :key="'4'+index">
+				<block v-for="(items,index) in currentItem.content" :key="'4'+index">	 
 					<view class="goods-group">
-						<view class="tit">{{items.goodsName}} <text class="hot">{{(items.hotSale === '0') ? '' : '热卖' }}</text></view>
-						<view class="cont">
-							<view class="price">{{parseFloat(items.merchPrice/100).toFixed(2)}} 元</view>
-							<view class="unit">{{items.goodsNum}} {{items.goodsUnit}}</view>
+						<view class="tit">{{items.goodsName}} <text class="hot">{{(items.hotSale === '0') ? '' : '热卖' }}</text></view> 
+						<view class="cont"  v-if="preicePart">
+							<view class="price">{{parseFloat(items.merchPrice * items.goodsNum / items.goodsQuantity * items.goodsQuantity / 100).toFixed(2)/1}} 元</view>
+							<view class="unit">{{items.goodsQuantity}} {{items.goodsUnit}} * {{items.goodsNum/items.goodsQuantity}}</view>
 						</view>
 					</view>
-				</block>
-			
-				<view class="total-list">
-					<view class="tit">合计</view> 
-					<view class="cont"><text class="price">{{parseFloat(currentItem.orderAmt/100).toFixed(2)}}</text><text class="unit">元</text></view>
-				</view>
-			</view> 
+				</block>   
+				<template v-if="preicePart">
+						
+					<view class="giveback-list" v-if="currentItem.couponAmt > 0">
+						<view class="group">
+							<view class="left"><view class="redicon">￥</view><view class="txt">满减红包</view></view> 
+							<view class="right">
+								<view class="price">减{{parseFloat(currentItem.couponAmt/100).toFixed(2)/1}}元</view> 
+							</view>
+						</view>
+						<!-- <view class="group">
+							<view class="left"><view class="redicon">￥</view><view class="txt">会员折扣</view></view> 
+							<view class="right">
+								<view class="price">减9元</view> 
+							</view>
+						</view> -->
+					</view>
+					<view class="total-list"> 
+						<view class="right">
+							<view class="sub_left" v-if="currentItem.couponAmt > 0">
+								<view class="">已优惠</view> <view class="price">{{parseFloat(currentItem.couponAmt/100).toFixed(2)/1}}</view>元
+							</view>
+							<view class="sub_right">
+								<view class="tit">实付</view>  
+								<view class="price">{{parseFloat(currentItem.realAmt/100).toFixed(2)/1}}</view>
+								<view class="unit">元</view>
+							</view>
+							
+						</view>
+					</view> 
+					
+				</template>
+				
+			</view>   
 			 
 			<view class="orderList">
+				<template v-if="currentItem.orderState == 1">
+					<view class="order-group">
+						<view class="tit">配送人手机号</view>
+						<!-- <view class="cont callNo" @tap="driverPhone(currentItem.deliverPhone)">{{currentItem.deliverPhone}}</view> -->
+						<view class="cont callNo" @tap="driverPhone(currentItem.deliverPhone)">
+							<view class="callText"><text class="iconfont icondianhua-copy"></text>联系配送</view>
+						</view>
+						
+					</view>
+					<view class="order-group" v-if="currentItem.orderState == 1">
+						<view class="tit">配送人名字</view>
+						<view class="cont">{{currentItem.deliverName}}</view>
+					</view>
+				</template>
 				<view class="order-group">
 					<view class="tit">订单编号</view>
 					<view class="cont">{{currentItem.orderNo}}</view>
@@ -59,12 +108,6 @@
 					<view class="cont">{{currentItem.merchName}}</view> 
 				</view>
 				<view class="order-group">
-					<view class="tit">联系方式</view>
-					<view class="cont callNo" @click="callNoBtn">
-						<view class="callText"><text class="iconfont icondianhua-copy"></text>立即联系</view>
-					</view>
-				</view>
-				<view class="order-group">
 					<view class="tit">下单时间</view>
 					<view class="cont"><text>{{currentItem.orderTime}}</text></view> 
 				</view>
@@ -74,7 +117,7 @@
 				</view>
 				<view class="order-group">
 					<view class="tit">备注</view>
-					<view class="cont">{{(currentItem.remark == null) ? '无': currentItem.remark }}</view>
+					<view class="cont">{{currentItem.remark ? currentItem.remark : '无'}}</view>
 				</view>
 				<view class="order-group">
 					<view class="tit">支付状态</view>
@@ -86,19 +129,23 @@
 						<view class="cont">{{currentItem.reason}}</view>
 					</view>
 				</template> 
+				<view class="order-group">
+					<view class="tit">联系客服</view>
+					<view class="cont callNo" @tap="callNoBtn()">
+						<view class="callText"><text class="iconfont icondianhua-copy"></text>联系客服</view>
+					</view>
+				</view>
 			</view>
+			 
+			<view class="btnwrap" v-if="currentItem.payState != 1 && currentItem.orderState == 0">
+				<view class="btncancel" @tap="cancelOrder()">取消订单</view>
+			</view> 
 			
 		</view>
-	 
-	
+	  
 	</view>
 	
-	</template>
-	
-	
-	
-	
-	
+	</template> 
 	</view>
 </template>
 
@@ -110,7 +157,8 @@
 	
 	import UniNavBar from '@/components/uni/uni-nav-bar.vue'
 	import DefaultPage from '@/components/basic/default-page.vue'
-	import BtnFoot from '@/components/basic/btn-foot.vue'
+	import BtnFoot from '@/components/basic/btn-foot.vue' 
+	import MyMap from '@/components/maps/myMap.nvue'
 	
 	export default {
 		data() {
@@ -126,25 +174,34 @@
 				isnohave:false,
 				isready:false,
 				pushMsg:'',
+				orderMapData:'', 
+				mapDistance:'',
+				preicePart:false,
 			};
 		},
 		components:{
 			DefaultPage,
 			UniNavBar,
-			BtnFoot
+			BtnFoot, 
+			MyMap,
 		},
 		onLoad(option) {  
 			if(option.pushNo){
-				this.pushMsg = option.pushNo   
+				this.pushMsg = option.pushNo
 			}else{
-				this.orderArg = option 
-			} 
+				this.orderArg = option  
+			}  
 			
 			this.loginWhether = uni.getStorageSync('status')  
 			this.merchNo = uni.getStorageSync('user').merchNo		
+			 
+			this.getDetail()	
 			
-			this.getDetail()			
-		},  
+			
+			if(this.orderArg.from == 'parents'){
+				this.preicePart = true 
+			}	 
+		},
 		computed:{  
 			...mapState(['userOrderList'],),
 			payStatus:function(){
@@ -165,7 +222,7 @@
 				let os = this.currentItem.orderState;				
 				switch (os){
 					case 0 :
-						return '已审核';
+						return '待配送';
 						break;					
 					case 1 :
 						return '配送中';
@@ -189,7 +246,9 @@
 				}
 			},
 		},
-		methods: {
+		
+		methods: { 
+			 
 			back() {
 				uni.navigateBack({
 					delta: 1
@@ -208,6 +267,42 @@
 				    }
 				}); 
 			},
+			driverPhone(option){
+				uni.makePhoneCall({
+					phoneNumber: option
+				})
+			},
+			cancelOrder(){ 
+				let vVlue = ''
+				if(this.pushMsg){ 
+					vVlue = {"merchNo":this.merchNo,"orderNo":this.pushMsg,} //必传 
+				}else{  
+					vVlue = {"merchNo":this.merchNo,"orderNo":this.orderArg.orderNo,} //必传 
+				}  
+				let sSort = getSortAscii(vVlue) ///排序
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 		 
+				this.$request.post('cancelOrder',{
+					...vVlue, 
+					"sign": sSign
+				},{
+					token:true
+				}).then(res => {
+					this.$api.initPage(res.code,res.message) 
+					if(res.code == 200){ 						
+						setTimeout(()=>{
+							uni.showLoading({
+								icon:'none',
+								title:'订单取消成功'
+							})
+						},500) 
+					}else{
+						uni.showLoading({
+							icon:'none',
+							title:res.message
+						})
+					}
+				})
+			},
 			getDetail(){ 			 
 				let vVlue = ''
 				if(this.pushMsg){ 
@@ -224,13 +319,22 @@
 				},{
 					token:true
 				}).then(res => {
-					this.$api.initPage(res.code,res.message)
+					this.$api.initPage(res.code,res.message) 
 					if(res.code == 200){ 						
 						setTimeout(()=>{
 							this.isload = false
 							this.isready = true						
-							this.currentItem = res.data		
-						},300)	
+							this.currentItem = res.data
+							
+							let orderMapData = {
+								longitude:res.data.vanLongitude,
+								latitude:res.data.vanLatitude,
+								shopName:res.data.merchName,
+								shoplongitude:res.data.longitude,
+								shoplatitude:res.data.latitude 
+							}
+							this.orderMapData = orderMapData
+						},300)	 
 					}
 				}).catch() 
 				
@@ -240,6 +344,10 @@
 </script>
 
 <style lang="scss" scoped> 
+.bg-mapspace{
+	background-color: #46B85B;
+	height: 40rpx;
+}
 	.goods-detail{
 		width: 100vw; 
 		position: relative; 
@@ -261,27 +369,33 @@
 			right: 30rpx;  
 			
 			.goods-list{
-					
+				margin-bottom: 30rpx;
 				padding: 30rpx;
 				border-radius: 12rpx;			 
 				background-color: #FFFFFF;
 				
 				.title{ color:#999999; font-size:26rpx; padding-bottom: 20rpx; border-bottom: 1rpx solid #D4D4D4;}
 				.goods-group{
-					display: flex;
-					justify-content: space-between;
+					display: flex; 
+					align-items: center;
 					padding: 32rpx 0;
 					border-bottom: 1px solid #d4d4d4;
 					
 					.tit{
+						flex: 1;
 						font-size: 30rpx;
 						padding-top: 12rpx;
 						display: flex;
 						align-items: flex-start;
 												
 						.hot{ font-size:16rpx; color: #FF0000; padding-left: 8rpx;}
+					} 
+					.units{
+						flex: 1;
+						font-size: 30rpx; 
 					}
 					.cont{
+						flex: 1;
 						text-align: right;
 						.price{
 							font-size: 26rpx;
@@ -292,30 +406,103 @@
 					}
 					
 				}
+				&:last-child{
+					margin: 0;
+				}
 			}
 			
-			.total-list{
-				display: flex;
-				padding-top: 30rpx;
-				justify-content: space-between;
+			
+			.giveback-list{
 				align-items: center;
-				.tit{
-					font-size: 30rpx; 
-				}
-				.cont{
-					text-align: right; 
-					align-items: flex-end;
-					.price{
-						font-size: 50rpx;
+				padding: 32rpx 0;
+				border-bottom: 1rpx solid #D4D4D4;
+				.group{
+					display: flex;
+					justify-content: space-between;
+					margin-bottom: 20rpx;
+					.left{				
+						display: flex;		
+						color: #666666;
+						.redicon{
+							background-color: #E20F0F;
+							color: #FFFFFF;
+							font-weight: bolder;
+							font-size: 24rpx; 
+							border-radius: 4rpx;
+							align-items: center;
+							padding: 6rpx;
+							text-align: center;
+						} 
+						.txt{
+							padding-left: 8rpx;
+						}
 					}
-					.unit{ font-size: 28rpx; color: #999999;}
-					
+					.right{
+						color: #E20F0F;
+					}
+					&:last-child{
+						margin-bottom: 0;
+					}
+				}
+			}
+			.total-list{
+				display: flex; 
+				justify-content: flex-end; 
+				align-items: flex-end; 
+				padding: 30rpx 0;
+				// .left{ 
+				// 	.btncancel{
+				// 		align-items: center;
+				// 		border:1px solid #CCCCCC;
+				// 		border-radius: 24rpx;					
+				// 		font-size: 30rpx;
+				// 		padding: 8rpx 16rpx;
+				// 		color: #929292;
+				// 	}
+				// }
+				.right{
+					display: flex;
+					justify-content: flex-end;
+					align-items: flex-end;
+					.sub_left{
+						display: flex;
+						padding-right: 30rpx;
+						color: #666666;
+						.price{
+							color: #E20F0F;
+						}
+					}
+					.sub_right{
+						display: flex;
+						color: #666666;
+						align-items: flex-end;
+						
+						.price{
+							color: #E20F0F;
+							font-size: 48rpx;
+							font-weight: bold;
+							margin-bottom: -8rpx;
+						}  
+					} 
 				}
 			}
 			
 		}
-		
-		
+		 
+		.btnwrap{
+			display: flex;
+			justify-content: flex-end;
+			padding-bottom: 40rpx;
+			.btncancel{
+				align-items: center;
+				border:1px solid #CCCCCC;
+				border-radius: 24rpx;					
+				font-size: 30rpx;
+				padding: 8rpx 16rpx;
+				color: #929292;
+			}
+			
+		} 
 		.orderList{
 			margin: 30rpx 0;
 			padding: 30rpx; 

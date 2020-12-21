@@ -9,6 +9,7 @@ export default {
 	mustBuy:'',	//必买项编号
 	mustBuyItem:{},// 把必加项分别出来
 	limitNum:[], //购买限制量
+	limitAmt:0, //购买金额设置
 	addDrink:{}, //get追加必的编号
 	mustSortTot:[] ,//需要追加豆浆的类目
 	mustAddItemNums:0, //必买类目的总数等于必买项的总数
@@ -23,5 +24,10 @@ export default {
 	userUnityList:[],//买家订单列表
 	getAgentList:[],//代放管理
 	
-	
+	previousOrder:[],//未支付订单
+	// previousOrderDetail:[],//RECEIVE_PREVIOUS_DETAIL
+	getCouponId:'', //优惠券id
+	getCartAmt:'', //实付金额
+	getUnusualAmt:'',//已选券无需再减券的金额
+	getUnusualNo:'',//已选券无需再减券的券号
 }

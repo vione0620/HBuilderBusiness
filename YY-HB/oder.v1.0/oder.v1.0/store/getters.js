@@ -8,7 +8,10 @@ export default {
 		return state.cartGoods.reduce((preTotal,food) => preTotal + food.boxNums,0)
 	},
 	totalPrice(state){ 
-		return state.cartGoods.reduce((preTotal,food) => preTotal + food.boxNums * food.merchPrice,0)
+		return state.cartGoods.reduce((preTotal,food) => preTotal + food.boxNums * food.merchPrice * food.goodsQuantity,0)
+	},
+	prevOrderPrice(state){ 
+		return state.previousOrder.orderAmt
 	},
 	 
 }

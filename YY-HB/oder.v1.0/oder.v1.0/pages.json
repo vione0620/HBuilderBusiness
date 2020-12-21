@@ -128,7 +128,7 @@
 					"titleNView":false
 				}				
 			}
-		} 
+		}  	
 		,{
 			"path" : "pages/finance/agent/agent",
 			"style" : {  		
@@ -230,6 +230,36 @@
 				}
 			}
 		}
+        ,{
+            "path" : "pages/utility/about/treaty",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "服务协议",
+				"app-plus":{  
+					"titleNView":{
+						"titleColor":"#FFFFFF",  
+						"autoBackButton":true,
+						"backgroundColor":"#46B85B"
+					} 
+				}
+            }
+            
+        }
+        ,{
+            "path" : "pages/utility/about/privacy",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "隐私政策",
+				"app-plus":{  
+					"titleNView":{
+						"titleColor":"#FFFFFF",  
+						"autoBackButton":true,
+						"backgroundColor":"#46B85B"
+					} 
+				}
+            }
+            
+        }
 		,{
 			"path" : "pages/wallet/moeny/moeny",
 			"style" : { 
@@ -360,6 +390,33 @@
 				}
 			}
         } 
+        ,{
+            "path" : "hybrid/html/e_contract/e_contract",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "加盟协议",
+                "enablePullDownRefresh": false
+            }
+            
+        }  
+        ,{
+            "path" : "pages/account/coupon/coupon",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "优惠券管理",
+                "enablePullDownRefresh": false
+            }
+            
+        } 
+        ,{
+            "path" : "pages/account/coupon/usable",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "可用券",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",

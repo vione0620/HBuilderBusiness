@@ -19,6 +19,12 @@ import {
 	RECEIVE_USER_UNITY_LIST,
 	RECEIVE_GET_MONEY_RECORD,
 	RECEIVE_AGENT_LIST,
+	
+	RECEIVE_PREVIOUS_ORDER,
+	// RECEIVE_PREVIOUS_DETAIL,
+	GET_COUPON_ID,
+	GET_CART_AMT,
+	GET_UNUSUAL_AMT,
 } from './mutation-types'
 
 export default { 
@@ -26,22 +32,23 @@ export default {
 	[RECEIVE_MALL_GOODS](state,goods){ 
 		const breakfastGoods = goods.breakfastGoods 
 		//需要追加必买项的类目
-		state.addDrink =  Object.values(goods.mustBuyGoods) 
-		console.log(state.addDrink)
+		// state.addDrink =  Object.values(goods.mustBuyGoods) 
+		// console.log(state.addDrink)
 		//必买项的商品编号
-		state.mustBuy = Object.keys(goods.mustBuyGoods)	? '[]' : Object.keys(goods.mustBuyGoods)
-		console.log(state.mustBuy)
+		// state.mustBuy = Object.keys(goods.mustBuyGoods)	? '[]' : Object.keys(goods.mustBuyGoods)
+		// console.log(state.mustBuy)
 		//购买限制量
 		state.limitNum = goods.limitNum
+		state.limitAmt = goods.limitAmt
 		state.mallSrot = Object.keys(breakfastGoods)
 		state.mallFoods = Object.values(breakfastGoods)		
 		 
 		// 分别必加项
-		const mfoods = [].concat.apply([],state.mallFoods) 		 
-		const mustDinks = mfoods.filter(dink => dink.goodsNo == state.mustBuy)
+		// const mfoods = [].concat.apply([],state.mallFoods) 		 
+		// const mustDinks = mfoods.filter(dink => dink.goodsNo == state.mustBuy)
 				
-		state.mustBuyItem = state.addDrink ? '[]' : mustDinks 
-		console.log(state.mustBuyItem)
+		// state.mustBuyItem = state.addDrink ? '[]' : mustDinks 
+		// console.log(state.mustBuyItem)
 	},
 	//接收购物车数据
 	[RECEIVE_CART_GOODS](state,goods){ 
@@ -52,8 +59,8 @@ export default {
 	[ADD_FOOD_COUNT](state,isfood){
 		let _this = isfood.food 
 		
-		let must_buy_item = state.mustBuyItem
-		let additem = state.addDrink[0]   	
+		// let must_buy_item = state.mustBuyItem
+		// let additem = state.addDrink[0]   	
 		
 		if(!_this.boxNums){ //第一次增加
 			Vue.set(_this,'boxNums',1)   
@@ -62,9 +69,9 @@ export default {
 			if(state.limitNum === 0){ 
 				_this.boxNums++ 		
 			}else{ 
-				if(_this.goodsNo === must_buy_item[0].goodsNo){	
-						_this.boxNums++					
-				}else{					
+				// if(_this.goodsNo === must_buy_item[0].goodsNo){	
+				// 		_this.boxNums++					
+				// }else{					
 					if(_this.boxNums === state.limitNum){					
 						return uni.showToast({
 							icon:'none',
@@ -73,79 +80,79 @@ export default {
 					}else{					
 						_this.boxNums++
 					}
-				}
+				// }
 			} 
 		}  
-		if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){ 		 
-			if(!must_buy_item[0].boxNums){ 
-				Vue.set(must_buy_item[0],'boxNums',1) 
-				state.cartGoods.push(must_buy_item[0])
-			}else{
-				let ismust = []
-				for(let i in state.cartGoods){
-					let cccart = state.cartGoods[i]
-					if(cccart.categoryNo === additem[0] || cccart.categoryNo === additem[1]){
-						ismust.push(cccart)
-					}
-				} 
-				const mustTotNums = ismust.reduce((preTotal,food) => preTotal + food.boxNums,0)   						 
-				state.mustAddItemNums = mustTotNums > 0 ? mustTotNums : 0 			
-				must_buy_item[0].boxNums++		 
-			}
+		// if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){ 		 
+		// 	// if(!must_buy_item[0].boxNums){ 
+		// 	// 	Vue.set(must_buy_item[0],'boxNums',1) 
+		// 	// 	state.cartGoods.push(must_buy_item[0])
+		// 	// }else{
+		// 		let ismust = []
+		// 		for(let i in state.cartGoods){
+		// 			let cccart = state.cartGoods[i]
+		// 			// if(cccart.categoryNo === additem[0] || cccart.categoryNo === additem[1]){
+		// 			// 	ismust.push(cccart)
+		// 			// }
+		// 		} 
+		// 		const mustTotNums = ismust.reduce((preTotal,food) => preTotal + food.boxNums,0)   						 
+		// 		state.mustAddItemNums = mustTotNums > 0 ? mustTotNums : 0 			
+		// 		// must_buy_item[0].boxNums++		 
+		// 	// }
 			
-		}  
+		// }  
 		
 	},
 	// //购物车减
 	[LESS_FOOD_COUNT](state,isfood){
 		let _this = isfood.food
 		 
-		let must_buy_item = state.mustBuyItem 
-		let additem = state.addDrink[0]
+		// let must_buy_item = state.mustBuyItem 
+		// let additem = state.addDrink[0]
 		
 		if(_this.boxNums > 0){ //为0禁操作 			
 			
 			let ismust = []
 			for(let i in state.cartGoods){
 				let cccart = state.cartGoods[i]
-				if(cccart.categoryNo === additem[0] || cccart.categoryNo === additem[1]){
-					ismust.push(cccart)
-				}
+				// if(cccart.categoryNo === additem[0] || cccart.categoryNo === additem[1]){
+				// 	ismust.push(cccart)
+				// }
 			} 			
 			const mustTotNums = ismust.reduce((preTotal,food) => preTotal + food.boxNums,0)    
 			state.mustAddItemNums = mustTotNums > 0 ? mustTotNums : 0  
 			
-			if(_this.goodsNo === must_buy_item[0].goodsNo){//必选项操作		
-				if(state.mustAddItemNums > 0){
-					if(_this.boxNums <= state.mustAddItemNums){
-						let short = state.mustAddItemNums - must_buy_item[0].boxNums  
-						if(short > 0){ 
-							must_buy_item[0].boxNums += short 					
-						} 
-						uni.showToast({
-							icon:'none',
-							title:`该商品不能少于${state.mustAddItemNums}份`,
-						})  
-						return
-					}
-				}else{
-					_this.boxNums--	
-				}
-				if(_this.boxNums === 0){ //移除自己
-					state.cartGoods.splice(state.cartGoods.indexOf(_this),1)
-				}
-			}else{			
+			// if(_this.goodsNo === must_buy_item[0].goodsNo){//必选项操作		
+			// 	if(state.mustAddItemNums > 0){
+			// 		if(_this.boxNums <= state.mustAddItemNums){
+			// 			let short = state.mustAddItemNums - must_buy_item[0].boxNums  
+			// 			if(short > 0){ 
+			// 				must_buy_item[0].boxNums += short 					
+			// 			} 
+			// 			uni.showToast({
+			// 				icon:'none',
+			// 				title:`该商品不能少于${state.mustAddItemNums}份`,
+			// 			})  
+			// 			return
+			// 		}
+			// 	}else{
+			// 		_this.boxNums--	
+			// 	}
+			// 	if(_this.boxNums === 0){ //移除自己
+			// 		state.cartGoods.splice(state.cartGoods.indexOf(_this),1)
+			// 	}
+			// }else{			
 				_this.boxNums--			
-				if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){ 				
-					must_buy_item[0].boxNums--				
-				}
+				// if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){ 				
+				// 	must_buy_item[0].boxNums--				
+				// }
 				if(_this.boxNums === 0){ //移除自己
 					state.cartGoods.splice(state.cartGoods.indexOf(_this),1)
 				}
-				if(must_buy_item[0].boxNums == 0){ //必选为0			
-					state.cartGoods.splice(state.cartGoods.indexOf(must_buy_item[0]),1) 
-				}
-			}
+				// if(must_buy_item[0].boxNums == 0){ //必选为0			
+				// 	state.cartGoods.splice(state.cartGoods.indexOf(must_buy_item[0]),1) 
+				// }
+			// }
 			
 			
 		}
@@ -155,19 +162,19 @@ export default {
 		let _this = isfood.food
 		let _value = isfood.valueNums		 
 		
-		let must_buy_item = state.mustBuyItem 
-		let additem = state.addDrink[0] 
+		// let must_buy_item = state.mustBuyItem 
+		// let additem = state.addDrink[0] 
 		
-		if(_this.goodsNo === must_buy_item[0].goodsNo){//必选项输入			 
-			_this.boxNums = _value  
-			if(_value < state.mustAddItemNums){ //<需加项的总和提示错误 
-				_this.boxNums = state.mustAddItemNums  
-				uni.showToast({
-					icon:'none',
-					title:`该商品不能少于${state.mustAddItemNums}份`,
-				}) 
-			}
-		}else{	//非必选项输入
+		// if(_this.goodsNo === must_buy_item[0].goodsNo){//必选项输入			 
+		// 	_this.boxNums = _value  
+		// 	if(_value < state.mustAddItemNums){ //<需加项的总和提示错误 
+		// 		_this.boxNums = state.mustAddItemNums  
+		// 		uni.showToast({
+		// 			icon:'none',
+		// 			title:`该商品不能少于${state.mustAddItemNums}份`,
+		// 		}) 
+		// 	}
+		// }else{	//非必选项输入
 			
 			if(state.limitNum === 0){  //无限制
 					_this.boxNums = _value  
@@ -176,70 +183,70 @@ export default {
 						state.cartGoods.splice(state.cartGoods.indexOf(_this),1) 
 					}  
 					//需加项...  
-					if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){   //购物车中，必加总数
+					// if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){   //购物车中，必加总数
 					
-						must_buy_item[0].boxNums += _this.boxNums - 1
-						// 购物车需加项总和 
-						let ismust = []
-						for(let i in state.cartGoods){
-							let cccart = state.cartGoods[i]
-							if(cccart.categoryNo === additem[0] || cccart.categoryNo === additem[1]){
-								ismust.push(cccart)
-							}
-						} 
-						const mustTotNums = ismust.reduce((preTotal,food) => preTotal + food.boxNums,0)						
-						state.mustAddItemNums = mustTotNums > 0 ? mustTotNums : 0
-						must_buy_item[0].boxNums = state.mustAddItemNums 
-					}				 
-					if(must_buy_item[0].boxNums === 0){ //必加为0自行移除
-						state.cartGoods.splice(state.cartGoods.indexOf(must_buy_item[0]),1)					
-					}  
+					// 	must_buy_item[0].boxNums += _this.boxNums - 1
+					// 	// 购物车需加项总和 
+					// 	let ismust = []
+					// 	for(let i in state.cartGoods){
+					// 		let cccart = state.cartGoods[i]
+					// 		if(cccart.categoryNo === additem[0] || cccart.categoryNo === additem[1]){
+					// 			ismust.push(cccart)
+					// 		}
+					// 	} 
+					// 	const mustTotNums = ismust.reduce((preTotal,food) => preTotal + food.boxNums,0)						
+					// 	state.mustAddItemNums = mustTotNums > 0 ? mustTotNums : 0
+					// 	must_buy_item[0].boxNums = state.mustAddItemNums 
+					// }				 
+					// if(must_buy_item[0].boxNums === 0){ //必加为0自行移除
+					// 	state.cartGoods.splice(state.cartGoods.indexOf(must_buy_item[0]),1)					
+					// }  
 				
 				}else{  //有限制 
 					if(_value > state.limitNum){ //>限制项=为限制数量
 						_this.boxNums = state.limitNum 
 						//需加必选...追加当前数量
-						if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){ 
-							must_buy_item[0].boxNums += _this.boxNums - 1
-						}	
+						// if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){ 
+						// 	must_buy_item[0].boxNums += _this.boxNums - 1
+						// }	
 						uni.showToast({
 							icon:'none',
-							title:`-------当前单品限制${state.limitNum}份`
+							title:`当前单品限制${state.limitNum}份`
 						})
 						
 					}else{ //>限制量=当前输入量
 					
 						_this.boxNums = _value					
-						if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){   
-							must_buy_item[0].boxNums += _this.boxNums - 1
-						}					
+						// if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){   
+						// 	must_buy_item[0].boxNums += _this.boxNums - 1
+						// }					
 						if(_value === 0){ //输入为0
 							state.cartGoods.splice(state.cartGoods.indexOf(_this),1) 
 						}
 						
 					}   
-					// 必加项=需加项
-					if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){   //购物车中，必加总数
+					// // 必加项=需加项
+					// if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){   //购物车中，必加总数
 					
-						let ismust = []
-						for(let i in state.cartGoods){
-							let cccart = state.cartGoods[i]
-							if(cccart.categoryNo === additem[0] || cccart.categoryNo === additem[1]){
-								ismust.push(cccart)
-							}
-						} 
-						const mustTotNums = ismust.reduce((preTotal,food) => preTotal + food.boxNums,0)    
-						state.mustAddItemNums = mustTotNums > 0 ? mustTotNums : 0
-						must_buy_item[0].boxNums = state.mustAddItemNums 
+					// 	let ismust = []
+					// 	for(let i in state.cartGoods){
+					// 		let cccart = state.cartGoods[i]
+					// 		if(cccart.categoryNo === additem[0] || cccart.categoryNo === additem[1]){
+					// 			ismust.push(cccart)
+					// 		}
+					// 	} 
+					// 	const mustTotNums = ismust.reduce((preTotal,food) => preTotal + food.boxNums,0)    
+					// 	state.mustAddItemNums = mustTotNums > 0 ? mustTotNums : 0
+					// 	must_buy_item[0].boxNums = state.mustAddItemNums 
 						
-						if(must_buy_item[0].boxNums === 0){ //必加为0				 
-							state.cartGoods.splice(state.cartGoods.indexOf(must_buy_item[0]),1)
-						} 
-					}		
+					// 	if(must_buy_item[0].boxNums === 0){ //必加为0				 
+					// 		state.cartGoods.splice(state.cartGoods.indexOf(must_buy_item[0]),1)
+					// 	} 
+					// }		
 					 
 				}
 		
-		} 
+		// } 
 		
 	},
 	
@@ -300,11 +307,32 @@ export default {
 		state.getAgentList = agent
 	},
 	
+	//接收未支付订单数据
+	[RECEIVE_PREVIOUS_ORDER](state,unpaid){
+		console.log('未支付weizhifudingdan',unpaid)
+		state.previousOrder = unpaid
+	},
 	
+	//接收上一笔未支付订单详情	
+	// [RECEIVE_PREVIOUS_DETAIL](state,unpaiddetail){
+	// 	console.log('未支付weizhifudingdan详情',unpaiddetail)
+	// 	state.previousOrderDetail = unpaiddetail 
+	// },
 	
-	
-	
-	
+	//优惠券id
+	[GET_COUPON_ID](state,couponid){
+		state.getCouponId = couponid
+	},
+	//实付金额GET_CART_AMT
+	[GET_CART_AMT](state,cartAmt){
+		state.getCartAmt = cartAmt 
+	},
+	//已选券无需再减券的金额GET_UNUSUAL_AMT
+	[GET_UNUSUAL_AMT](state,unusualAmt){
+		console.log(unusualAmt)
+		state.getUnusualAmt = unusualAmt.amt
+		state.getUnusualNo = unusualAmt.no
+	},
 	
 	
 	// 登录

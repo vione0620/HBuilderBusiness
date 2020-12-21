@@ -141,6 +141,7 @@
 					newpwd:'',
 					checkpwd:'',
 				}, 
+				islock:''
 			}
 		}, 
 		onLoad(option) { 
@@ -164,7 +165,9 @@
 				})
 				break;
 			}  
-			 
+			if(option.state) {
+				this.islock = option.state 
+			}
 			this.loginWhether = uni.getStorageSync('status')  
 			this.merchNo = uni.getStorageSync('user').merchNo		
 			
@@ -399,8 +402,7 @@
 			getDataCommon(post,type,param){ 
 				let vVlue = param
 				let sSort = getSortAscii(vVlue) ///排序 
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码     
-				
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码      
 				this.$request.post(post,{
 					...vVlue,
 					"sign":sSign
@@ -412,16 +414,15 @@
 						title: res.message,
 						duration: 2000
 					})
-					if(res.code == 200){				
-						if(type == 'set'){
-							// uni.setStorageSync('initPayPaswd',1)	 
+					if(res.code == 200){						
+						if(type == 'set'){			 
+							uni.setStorageSync('initPayPaswd',1)	 
 							setTimeout(()=>{ 									
 								uni.redirectTo({ 
 									url:'../wallet/moeny/check?seted=true'
 								})
-							},500) 	
-						}else{
-							console.log('??????')
+							},500) 
+						}else if(type == 'forget'){		
 							setTimeout(()=>{ 
 								uni.navigateBack({
 									delta: 1,
@@ -429,11 +430,8 @@
 									animationDuration: 200
 								})
 							},500) 	
-						}
-					// }else {
-					// 	uni.setStorageSync('initPayPaswd',0)						
+						} 
 					}
-					
 				}).catch()	
 				
 			} 

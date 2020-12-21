@@ -23,8 +23,8 @@
 						<view class="txt">今日出售商品需提前一天预定。</view> 
 						<view class="txt">订购次日商品需先关闭营业。</view>
 						<view class="tit">下单</view>
-						<view class="txt">1.商户下单为固定时间如（9:20-11:20）</view>
-						<view class="txt">4.点击将商品设置为本店的热门分类。</view>
+						<view class="txt">1.商户可在固定时间如（9:20-11:20）内补货下单，以保证配送的衔接性。</view>
+						<view class="txt">4.选购时点击商品右上角“上热门”，可将设置为本店的热门分类。*注意常设的热门会根据订购时候的设置变化</view>
 						<view class="tit">确认收货</view>
 						<view class="txt">1.请确保自己准确无误收货，即可查看当日库存。</view>
 						<view class="txt">2.如未收到商品请及时联系<text class="links" @tap="navTo('../manage/manage')"> 区域经理</text></view>  
@@ -52,9 +52,9 @@
 				</uni-collapse-item>
 				<uni-collapse-item title="订制管理" :show-animation="true">
 					<view class="content">
-						<view class="txt">定制管理是针对顾客DIY订制早餐的服务，平台将订制产品暂放商家店铺，提供顾客到店取餐，且代收商家可获得分利。</view>
+						<view class="txt">订制管理是针对顾客DIY订制早餐的服务，平台将订制产品暂放商家店铺，提供顾客到店取餐，且代收商家可获得分利。</view>
 						<view class="tit">订制管理</view>
-						<view class="txt">DIY早餐将在每早晨配送商家订单时，一同送达，商家需确认收货</view>
+						<view class="txt">DIY早餐将在配送商家订单时一同送达，商家需确认收到DIY品类的商品，在订制管理点击“确认收货”</view>
 						<view class="tit">订制红包</view>
 						<view class="txt">流程:到店取餐 > 顾客确认 > 商家扫描取餐码 > 完成订单 > 结算分润</view> 
 					</view>

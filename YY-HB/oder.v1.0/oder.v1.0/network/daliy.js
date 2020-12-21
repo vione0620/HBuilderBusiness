@@ -32,7 +32,10 @@ function handleDays(){
 	let year = dtime.getFullYear()
 	let month = dtime.getMonth()+1
 	let months = parseNumber(month)
-	let day = dtime.getDate() - 1
+	let day = dtime.getDate() 
+	if(day > 1){  
+		day = day - 1
+	}
 	return year+'-'+ months+'-'+ parseNumber(day)
 } 
 
@@ -42,6 +45,8 @@ function handleWeekDays(){
 	let month = dtime.getMonth()+1
 	let months = parseNumber(month)
 	let day = dtime.getDate() 
+	console.log(dtime,year,month,months,day)
+	console.log(year+'-'+ months+'-'+ parseNumber(day))
 	return year+'-'+ months+'-'+ parseNumber(day)
 }
 

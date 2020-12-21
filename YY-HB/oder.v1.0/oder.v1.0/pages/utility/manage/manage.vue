@@ -12,7 +12,7 @@
 			<block v-for="(item,index) in workData" :key="'4'+index">
 				<view class="group">
 					<view class="area">{{item.areaName}}</view>
-					<image :src="item.avatar + '?imageView2/1/w/160/h/160' ? item.avatar : '../../../static/noImg.png'" class="urlImg"></image>
+					<image :src="item.avatar + '?imageView2/1/w/160/h/160' ? item.avatar : '../../../static/noImg.png'" class="urlImg" mode="widthFix"></image>
 					<view class="info">
 						<view class="name">姓名：{{item.busiManager}}</view>
 						<view class="txt">职务：{{item.workPosition}}</view>
