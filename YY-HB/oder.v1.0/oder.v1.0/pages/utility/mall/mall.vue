@@ -8,7 +8,7 @@
 		</template>
 		
 		<template v-if="isready">
-			<view class="markTips">温馨提示：点击热门标签将商品加入到热门分类</view>  
+			<!-- <view class="markTips">温馨提示：点击热门标签将商品加入到热门分类</view>  -->
 			<view class="mian-wrap">
 				 
 				<view class="navbar-left">
@@ -34,23 +34,35 @@
 				</view>
 			</view> 
 			
-			<mall-cart :bottomCart="this.bottomCars" :first-order="this.FirstOrder" :has-final-pay="this.hasFinalPay"></mall-cart>
+			<mall-cart 
+			:bottomCart="this.bottomCars" 
+			:first-order="this.FirstOrder" 
+			:has-final-pay="this.hasFinalPay"
+			@open-sum-rebate="openSumRebate"></mall-cart>
 					
 		</template>
 		
-		<uni-popup ref="openAds" type="center" :backbg="false" :maskClick="false">
-			<view class="pop_content">
-				<image src="../../../static/popbg.png" mode="aspectFit"></image>
-				<view class="title iconfont iconclose" @tap="closeAd()"></view> 
-				
+		
+		<!-- 凑单提醒begin -->
+		<uni-popup ref="openSumRebate" type="center" :backbg="false" :maskClick="false">
+			<view class="rebateNum_checked"> 			
+				<view class="title">是否继续凑单</view> 
+				<view class="content"> 
+					支付满300元可领取50元优惠券
+				</view>  
+				<view class="checkOnShop">
+					<view class="checkBtn yes" @tap="checkOnShop(true)">凑单，领取</view>
+					<view class="checkBtn no" @tap="checkOnShop(false)">放弃，付款</view>
+				</view>
 			</view>
 		</uni-popup>
+		<!-- 凑单提醒end -->
 		
 	</view>
 </template>
 
 <script>  
-	import {mapState} from 'vuex'
+	import {mapState,mapGetters} from 'vuex'
 	import {b64Md5,hexMD5} from '@/network/md5.js'	
 	import {getSortAscii} from '@/common/util/utils.js'	 
 	
@@ -63,7 +75,8 @@
 	
 	export default {
 		computed:{
-			...mapState(['mallSrot','mallFoods','cartGoods','goodsTopScroll'])
+			...mapState(['mallSrot','mallFoods','cartGoods','goodsTopScroll']),
+			...mapGetters(['totalCount','totalPrice','prevOrderPrice']), 
 		},
 		components:{
 			UniBadge,  
@@ -86,18 +99,20 @@
 				left_scroll:0,  //左侧滑动值
 				sortList:[],
 				goodsList:[],
+				newOrderGoods:[], //预支付下单时的商品数据
 				bottomCars:{},
 				downOrderTime:'', 
 				isload:true,
 				isnostore:false,
 				isnohave:false,
 				isready:false,
-				FirstOrder:true,
+				FirstOrder:false,
 				hasFinalPay:false, 
 				webview:false,//电子合同
 				prevOrder:[],//上一笔订单
 				prevOrderDetail:[],//上一笔订单详情
 				isRegular:0,//是否新用户
+				isAds:0,//优惠开关
 			}
 		}, 
 		onLoad() {  
@@ -106,26 +121,14 @@
 			this.merchNo = uni.getStorageSync('user').merchNo
 			
 			this.$nextTick(()=>{ 
-				this.isRegular = uni.getStorageSync('isRegular').isRegular
-				
-				this.getPrevOrder()
-				if(this.isRegular == 1){
-					this.getPrevOrder()
-					this.FirstOrder = false
+				this.isRegular = uni.getStorageSync('isRegular').isRegular 
+				if(this.isRegular == 1){ 
+					this.getPrevOrder() 
+				}else{					
+					this.openEcontract()
 				}
-				//根据状态如果是首次下单
-				let agreeChecked = uni.getStorageSync('agreeChecked')
-				
-				if(this.FirstOrder && !agreeChecked){  
-					setTimeout(()=>{
-						this.$refs.openAds.open()
-					},500) 
-				}else{  
-					setTimeout(()=>{
-						this.$refs.openAds.open()
-					},500)  
-				} 
 			})
+			this.getUnpaidOrderDetail()
 		},  
 		onReady() {  
 			uni.getSystemInfo({
@@ -157,33 +160,108 @@
 				uni.navigateBack({ 
 					delta:1
 				})
-			},	
-			closeAd(){
-				this.$refs.openAds.close()
-				let agreeChecked = uni.getStorageSync('agreeChecked')
-				if(!agreeChecked){ 
-					setTimeout(()=>{
-						this.openEcontract()
-					},1000)					
-				} 
 			},
+			openSumRebate(e){ 
+				if(this.isAds == 0){
+					this.$refs.openSumRebate.open()					
+				}else{
+					this.prePayOrder()
+				}
+			},
+			checkOnShop(option){
+				if(option == true){
+					this.$refs.openSumRebate.close()
+				}else{
+					this.prePayOrder() 
+				}
+			},  
+			getUnpaidOrderDetail(){				
+				let vVlue = {"merchNo":this.merchNo}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()  
+				
+				this.$request.post('getUnpaidOrderDetail',{
+				  ...vVlue, 
+				  "sign": sSign
+				},{
+					token:true
+				}).then((res)=>{   
+					if(res.code == 200){ 
+						this.isAds = res.data.actionSwitch						
+					}
+				})
+			},
+			perpay(){ 
+				//转换商品数据，准备支付时调用
+				let getCarList = this.cartGoods
+				for(let i in getCarList){
+					let res = { 
+						goodsNo:getCarList[i].goodsNo,
+						goodsNum:JSON.stringify(getCarList[i].boxNums * getCarList[i].goodsQuantity),
+						hotSale:getCarList[i].hotSale ? getCarList[i].hotSale : '0',
+					}  	
+					this.newOrderGoods.push(res)  
+				}  
+			},	
+			prePayOrder(){
+				this.perpay()
+				setTimeout(()=>{
+					let vVlue = {
+						"merchNo":this.merchNo,
+						"orderType":1,
+						"orderAmt":this.totalPrice,
+						"remark":this.markText ? this.markText : '无',
+						"orderGoods":JSON.stringify(this.newOrderGoods),
+						}  
+					let sSort = getSortAscii(vVlue) 
+					let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()   
+					
+					this.newOrderGoods = []
+					this.$request.post('prePayOrder',{
+						...vVlue,
+						"sign": sSign
+					},{
+						token:true
+					}).then(res => {  	
+						if(res.code === 200){
+							let changeIsRegular = {"isRegular": 1}
+							uni.setStorageSync('isRegular',changeIsRegular)		 
+							this.$refs.openSumRebate.close() 
+							let orderNo = res.data.orderNo 
+							uni.navigateTo({ 
+								url:`/pages/utility/mall/prepay?status=${this.hasFinalPay}&orderno=${orderNo}`,
+								animationType: 'pop-in',
+								animationDuration: 200,
+							}) 
+						}else if(res.code === 400){
+							uni.showToast({
+								icon:'none',
+								title:res.message
+							})
+						}
+					}).catch()					
+				},0)
+			}, 
+			// closeAd(){
+			// 	this.$refs.openAds.close() 
+			// },
 			getPrevOrder(){
-				let vVlue = {"merchNo":this.merchNo,"orderType":1} //必传 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
+				let vVlue = {"merchNo":this.merchNo,"orderType":1}  
+				let sSort = getSortAscii(vVlue) 
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()    
 				
 				this.$request.post('getPrevOrder',{
 				  ...vVlue, 
 				  "sign": sSign
 				},{
 					token:true
-				}).then((res)=>{ 
-					this.$api.initPage(res.code,res.message)
-					if(res.code == 200){ 
+				}).then((res)=>{  
+					if(res.code == 200 && res.data){ 
+						
 						this.prevOrder = res.data
 						this.$store.dispatch('receive_previous_order',res.data) 
-						
-						if(this.prevOrder.payState == 0){
+						 
+						if(res.data.orderNo){
 							this.hasFinalPay = true 
 						}
 					}
@@ -211,9 +289,9 @@
 			},
 			 // 获取数据
 			getBreakfastGoods(){
-				let vVlue = {"merchNo":this.merchNo} //必传 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
+				let vVlue = {"merchNo":this.merchNo}  
+				let sSort = getSortAscii(vVlue) 
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()    
 				
 				this.$request.post('getBreakfastGoods',{
 				  ...vVlue, 
@@ -267,8 +345,7 @@
 				});
 				 
 				this.tabIndex = active_index   
-			},
-		
+			}, 
 			 
 		}
 	}
@@ -277,11 +354,11 @@
 <style lang="scss"> 
 	.pop_content{   
 		position: relative;
-		left: -30rpx;
+		left: -30rpx; 
 		.title{ 
 			position: absolute;
 			right: -30rpx;
-			top: 0;
+			top: -30px;
 			color: #FFFFFF;
 			border: 1px solid #FFFFFF;
 			border-radius: 50%; 
@@ -290,6 +367,53 @@
 		}
 		
 	}
+	
+	.rebateNum_checked{			
+		background-color: #FFFFFF;
+		border-radius: 8rpx;
+		width: 600rpx;
+		
+		.title{
+			text-align: center; 
+			font-size: 40rpx;
+			font-weight: bold;
+			padding: 50rpx 0;
+			
+			.closePrev{
+				position: absolute;
+				top: -14rpx;
+				right: 0;
+				font-size: 48rpx;
+			}
+		}
+		.content{ 
+			text-align: center;
+			padding: 0 12rpx 60rpx 12rpx;
+		}
+		
+		.checkOnShop{ 
+			display: flex;
+			padding: 32rpx 0; 
+			border-top: 1px solid #ccc;
+			.checkBtn{
+				flex: 1;
+				text-align: center; 
+				&:first-child{
+					border-right: 1px solid #ccc;
+				}
+			} 
+			.yes{
+				color: #09BB07;
+				
+			}
+			.no{
+				color: #f00;
+			}
+		}
+		
+	}
+	
+	
 	.lodingmore{
 		text-align: center;
 		padding: 20rpx;		
@@ -303,7 +427,7 @@
 	}
 	#YYmall{ 
 		width: 100vw; 
-		padding: 16rpx;
+		padding: 24rpx 16rpx 16rpx 12rpx;
 		
 		.mian-wrap{ 
 			position: relative; 
@@ -312,7 +436,7 @@
 			justify-content: space-around;  
 				
 			.navbar-left{ 
-				width: 24vw;  
+				width: 23vw;  
 				height:inherit;
 				
 				.navbar-main{
@@ -332,21 +456,21 @@
 				
 			}
 			.detail-right{   
-				width: 70vw;  
+				width: 68vw;  
 				background-color: #FFFFFF; 
-				height: calc(100vh - 115px); 
+				height: calc(100vh - 84px); 
 				border-radius: 12rpx; 
 			}
 		
 		
 		} 
 		.markTips{ 
-			margin-bottom: 50rpx;
-			padding: 0rpx;
+			margin-bottom: 16rpx;
+			padding: 24rpx;
 			background-color: #FFFFFF; 
-			border-radius: 80rpx;
+			border-radius: 12rpx;
 			font-size: 26rpx;
-			width: 80%;
+			width: 100%;
 		}
 		
 		

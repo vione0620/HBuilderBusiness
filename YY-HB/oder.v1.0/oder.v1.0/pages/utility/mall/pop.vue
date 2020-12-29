@@ -39,10 +39,7 @@
 	}
 </script>
 
-<style scoped lang="scss">
-	.footPopup{
-		// padding: 40rpx 0; 
-	}
+<style scoped lang="scss"> 
 	.prepyPop{
 		padding: 32rpx 0;
 		display: flex; 
@@ -60,11 +57,7 @@
 			.txtbtn{
 				padding-left: 32rpx;
 			}
-		}
-		
-		.right{
-			
-		}
+		} 
 		
 	}
 </style>

@@ -21,7 +21,7 @@
 								<!-- </view>  -->
 							<!-- </template> -->
 						</view>
-						<view class="txt">扫一扫店铺二维码下单</view> 
+						<view class="txt">扫描店铺二维码下单</view> 
 					</view>
 				</view>
 				<view class="downImg">
@@ -127,20 +127,13 @@
 				}).then(res => { 
 					this.$api.initPage(res.code,res.message) 
 					if (res.code === 200) { 		 
-						this.merchPic = res.data.merchPic
-						// this.account = res.data.merchNo
+						this.merchPic = res.data.merchPic 
 					}
 				}).catch() 
 				
 			},
 			makeComplete(e){  
-				this.qcodeImg = e 
-				// console.log(e)
-			// 	if(this.merchNo != this.account){
-					
-			// 	}else{					
-			// 		uni.setStorageSync('makeimg',e) 
-			// 	}
+				this.qcodeImg = e  
 			},
 			getShopCodeImg(){  
 				if(this.qcodeImg){ 

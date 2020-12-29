@@ -131,16 +131,13 @@
 			
 		},
 		methods:{
-			listScroll(w){
-				console.log(w)
+			listScroll(w){ 
 				this.agreeChecked = true
 			},
 			checkBargain(param){
-				if(param === true){
-					console.log('没勾选')
+				if(param === true){ 
 					if(this.agreeChecked){
-						uni.setStorageSync('agreeChecked',true)
-						console.log('勾选了可以')
+						uni.setStorageSync('agreeChecked',true) 
 						uni.showLoading({
 							mask:true,
 							title:'恭喜你成为正式商家！'

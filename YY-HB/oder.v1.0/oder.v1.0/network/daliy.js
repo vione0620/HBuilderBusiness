@@ -45,8 +45,8 @@ function handleWeekDays(){
 	let month = dtime.getMonth()+1
 	let months = parseNumber(month)
 	let day = dtime.getDate() 
-	console.log(dtime,year,month,months,day)
-	console.log(year+'-'+ months+'-'+ parseNumber(day))
+	// console.log(dtime,year,month,months,day)
+	// console.log(year+'-'+ months+'-'+ parseNumber(day))
 	return year+'-'+ months+'-'+ parseNumber(day)
 }
 

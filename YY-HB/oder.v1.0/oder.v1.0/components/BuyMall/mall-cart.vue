@@ -10,8 +10,8 @@
 					<view class="group-wrap"> 
 						<view class="carPop-list" v-for="(food,index) in cartGoods" :key="'4'+index">							
 							<view class="name">{{food.goodsName}} 
-							<text class="red">{{(food.goodsNo === "YP0YWDJ0000014") ? '必选' : ''}}</text>
-							<text class="red">{{(food.hotSale==='0' || food.hotSale === undefined) ? '' : '热门'}}</text>
+							<!-- <text class="red">{{(food.goodsNo === "YP0YWDJ0000014") ? '必选' : ''}}</text> -->
+							<!-- <text class="red">{{(food.hotSale==='0' || food.hotSale === undefined) ? '' : '热门'}}</text> -->
 							</view> 
 							<view class="nums">
 								{{parseFloat(food.merchPrice * food.boxNums * food.goodsQuantity /100).toFixed(2)/1}}元
@@ -32,20 +32,19 @@
 					<view class="cars-btn" @click="showCarsList">
 						<text class="cars iconfont iconcar"></text> 
 						<template v-if="totalCount > 0">							 
-							<uni-badge class="badge" type="error" size="small" :text="totalCount"></uni-badge>
+							<uni-badge class="badge" type="error" :text="totalCount"></uni-badge>
 						</template>
 					</view>
 					<view class="nums-wrap">
 						<view class="prices">{{parseFloat(totalPrice/100).toFixed(2)/1}}<text class="txt">元</text></view>							
-						<view class="info">豆浆数量应不少于食品数量</view>
+						<!-- <view class="info">豆浆数量应不少于食品数量</view> -->
 					</view>
 				</view>
 				
 			</view>
 					
 			<view class="right-btn" @click="goToPay">提交订单</view>
-				<view>		
-					</view>
+							
 		</view>
 		
 		
@@ -85,12 +84,12 @@
 						duration: 2000
 					})
 					return
+				}else if(this.totalPrice < 30000 || this.totalPrice > 0){
+					this.$emit('open-sum-rebate',true)
 				}else{ 
-					uni.redirectTo({
-						url:`/pages/utility/mall/prepay?status=${this.hasFinalPay}`
-					}) 				
-					console.log(this.hasFinalPay)
-						
+					uni.navigateTo({
+						url:`/pages/utility/mall/prepay?status=${this.hasFinalPay}&from=mallcar`
+					}) 				 
 				} 
 			},
 			showCarsList(){
@@ -188,27 +187,27 @@
 			bottom: 0;
 			display: flex;
 			width: 100vw;
-			height: 120rpx;
+			height: 130rpx;
 			margin-bottom: 0;
 			justify-content: space-between;
 			align-items: center;
 			background-color: #FFFFFF;
 			box-shadow: 0 1px 6px rgba(0,0,0,.117647), 0 1px 4px rgba(0,0,0,.117647);
 			
-			padding: 0 32rpx;
+			padding: 0 32rpx 20rpx 32rpx;
 				
 			.left{ 
 				.cars-wrap{ 
 						display: flex;
 						align-items: center;
-					
+						
 					.cars-btn{
 						position: relative;						
 						display: flex;
 						align-items: center;
 						
 						.cars{
-							font-size:80rpx;
+							font-size:85rpx;
 						}
 						
 						.badge{
@@ -218,19 +217,19 @@
 						}
 					}
 					.nums-wrap{
-							
+						padding-top: 18rpx;
 						.prices{
 							font-size: 44rpx;
 							
 							.txt{
-								font-size:26rpx;
+								font-size:32rpx;
 							}
 						}
 						
 						
-						.info{
-							font-size:20rpx;
-						}
+						// .info{
+						// 	font-size:20rpx;
+						// }
 					}					
 					
 				}

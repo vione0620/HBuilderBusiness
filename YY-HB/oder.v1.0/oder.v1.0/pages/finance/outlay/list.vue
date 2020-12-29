@@ -1,6 +1,10 @@
 <template> 
-	<view class="wrap">  
-	 <uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back()" title="商家订单列表" color="#ffffff" background-color="RGBA(70, 184, 91, 1)" />
+	<view class="wrap">   
+	 <uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back()" color="#ffffff" background-color="RGBA(70, 184, 91, 1)" >
+		<view class="navTagBar" v-for="(items,index) in navTag">			
+			<view class="title" :class="tabIndex === index ? 'active':''" @tap="changeTab(index)">{{items}}</view> 
+		</view>
+	 </uni-nav-bar>
  
  
 	<template v-if="isload">
@@ -13,138 +17,234 @@
 	<template v-if="isready">
 
  
-	<view id="oderList"> 
-		
-		<view v-if="!Nothing">
-		<block v-for="(orderItem,index) in orderList"><!-- :key="'orderItem' + index"> -->
-			<view class="group">
-				<view class="head">
-					<view class="tit">  
-						<text class="titIcon iconfont iconstauts-ing"></text> 
-					
-						<template v-if="orderItem.payState==1">
-							<template v-if="orderItem.orderState == 0">
-								<view class="titTxt">商家下单</view> 							
-							</template>
-							<template v-if="orderItem.orderState == 1"><text class="titTxt">工厂接单（配送中）</text></template>
-							<template v-if="orderItem.orderState == 2"><text class="titTxt">已确认收货</text></template> 
+	<view id="oderList">  
+		<view class="orderlist_main">
+			<swiper :style="'height:'+ scrollH +'px;'" :current="this.tabIndex" @change="linktabindex">
+				<swiper-item>
+					<scroll-view scroll-y :style="'height:'+ scrollH +'px;'" @scrolltolower="allOrderList">
+						
+						<template v-if="this.orderList.length > 0">
+							<block v-for="(orderItem,index) in this.orderList">
+								<view class="group">
+									<view class="head">
+										<view class="tit">  
+											<text class="titIcon iconfont iconstauts-ing"></text> 
+										
+											<template v-if="orderItem.payState==1">
+												<template v-if="orderItem.orderState == 0">
+													<view class="titTxt">等待配送</view> 							
+												</template>
+												<template v-if="orderItem.orderState == 1"><text class="titTxt">工厂接单（配送中）</text></template>
+												<template v-if="orderItem.orderState == 2"><text class="titTxt">已确认收货</text></template> 
+											</template>
+											<template v-else>
+												<template v-if="orderItem.payState == 0"><view class="titTxt isright">待付款</view></template>
+												<template v-if="orderItem.payState == 2"><view class="titTxt">支付失败</view></template>
+											</template> 
+													
+										</view><view class="time">{{orderItem.orderTime}}</view>
+									</view>
+									
+									<template v-if="orderItem.subOrder.length > 0"> 
+										<view class="sub_cont">					
+											<view class="itemBlock">
+												<block v-for="(itemList,cindex) in orderItem.subOrder">
+													<view class="subwrap">									
+														<view class="sigleTitle">
+															<view class="title_type">配送 {{cindex +1}}</view> 
+															<view class="btn_type">
+																<view class="btn btn_run" 
+																v-if="itemList.orderState == 1" 
+																@tap="rightBtn({list:itemList.orderNo,from:'suborder',tStates:orderItem.orderType,Pindex:index,Cindex:cindex})">确认收货</view>
+																<view class="btn btn_ok" 
+																v-if="itemList.orderState == 2">完成</view>
+															</view>
+														</view>
+														<view class="sigleWrap" @tap="navTo({page:itemList.orderNo,from:'suborder',tStates:itemList.orderType})">
+															
+															<block v-for="(child,index) in itemList.content.slice(0,3)">							
+																<view class="sigleItem">
+																	<view class="name">{{child.goodsName}}</view>
+																	<view class="unit">{{child.goodsNum}} {{child.goodsUnit}}</view>
+																</view>  
+															</block>
+														</view>	
+														<template v-if="itemList.content.length > 3">
+															<view class="more">						
+																<view class="">···</view>
+																<view class="gotobtn" 
+																@tap="navTo({page:itemList.orderNo,from:'suborder',tStates:itemList.orderType})">查看其余{{itemList.content.length -3}}件</view>
+															</view>
+														</template>					 
+													</view> 
+												</block>
+											</view>
+										</view>	 
+										
+									</template>
+									
+									<template v-if="orderItem.content.length > 0"> 
+										<view class="main_cont" @tap="navTo({page:orderItem.orderNo,from:'parents',tStates:orderItem.orderType})">					
+											<view class="itemBlock">
+												<block v-for="(itemList,index) in orderItem.content.slice(0,3)"> 
+													<view class="sigleItem">
+														<view class="name">{{itemList.goodsName}} <view v-if="itemList.hotSale == 1" class="hots">&nbsp;&nbsp; 热门</view></view>
+														<view class="unit">{{itemList.goodsNum}} {{itemList.goodsUnit}}</view>
+													</view> 
+												</block>
+											</view>
+											<template v-if="orderItem.content.length > 3">
+												<view class="more">	 
+													<view class="">···</view>
+													<view class="gotobtn">查看其余{{orderItem.content.length-3}}件</view>
+												</view>
+											</template>
+										</view>				
+									</template>
+									
+									<view class="footbtn">
+										<view class="left-footbtn" v-if="orderItem.content.length > 0">
+											<template v-if="orderItem.payState==1">
+											<view class="checkOk isfeed" v-if="orderItem.orderState == 2">已完成</view>
+											
+											</template>
+											<template v-if="orderItem.orderState !== 2 && orderItem.orderType !== 2">
+												<view class="checkOk isright" @tap="rightBtn({list:index,from:'parents'})">确认收货</view> 
+											</template>
+											<template v-if="orderItem.payState == 0 && orderItem.orderType !== 2">
+												<view class="checkOk isno" @tap="checkOkBtn(index,'keepon','nopop')">去支付</view> 
+											</template>
+											<template v-if="orderItem.orderType==2">
+												<view class="checkOk isfeed">失效订单</view>							
+											</template>	
+										</view> 
+										
+										<view class="left-footbtn" v-if="orderItem.subOrder.length > 0">	
+											<template v-if="orderItem.payState==1">
+												<view class="checkOk isfeed" v-if="orderItem.orderState == 2">已完成</view> 
+											</template>
+											<template v-if="orderItem.payState == 0 && orderItem.orderType !== 2">
+												<view class="checkOk isno" @tap="checkOkBtn(index,'keepon','nopop')">去支付</view> 
+											</template>		
+											<template v-if="orderItem.orderType == 2">
+												<view class="checkOk isfeed">已失效</view>							
+											</template>				
+											<view class="checkOk isfeed" @tap="navTo({page:orderItem.orderNo,from:'allsub',tStates:orderItem.orderType})">下单详情</view>	
+										</view>  
+										
+										<view class="right-moeny">{{parseFloat(orderItem.realAmt/100).toFixed(2)}} <text class="txt">元</text></view> 
+										
+									</view>
+									
+								</view>
+								
+							</block>
+							
+							<view class="lodingMore" v-if="!Nothing">{{loadmore}}</view>
 						</template>
 						<template v-else>
-							<template v-if="orderItem.payState == 0"><view class="titTxt isright">待付款</view></template>
-							<template v-if="orderItem.payState == 2"><view class="titTxt">支付失败</view></template>
-						</template> 
-								
-					</view><view class="time">{{orderItem.orderTime}}</view>
-				</view>
-				
-				<template v-if="orderItem.subOrder.length > 0"> 
-					<view class="sub_cont">					
-						<view class="itemBlock">
-							<block v-for="(itemList,cindex) in orderItem.subOrder">
-								<view class="subwrap">									
-									<view class="sigleTitle">
-										<view class="title_type">配送 {{cindex +1}}</view> 
-										<view class="btn_type">
-											<view class="btn btn_run" 
-											v-if="itemList.orderState == 1" 
-											@tap="rightBtn({list:itemList.orderNo,from:'suborder',tStates:orderItem.orderType,Pindex:index,Cindex:cindex})">确认收货</view>
-											<view class="btn btn_ok" 
-											v-if="itemList.orderState == 2">订单完成</view>
-										</view>
-									</view>
-									<view class="sigleWrap" @tap="navTo({page:itemList.orderNo,from:'suborder',tStates:itemList.orderType})">
-										
-										<block v-for="(child,index) in itemList.content.slice(0,3)">							
-											<view class="sigleItem">
-												<view class="name">{{child.goodsName}}</view>
-												<view class="unit">{{child.goodsNum}} {{child.goodsUnit}}</view>
-											</view>  
-										</block>
-									</view>	
-									<template v-if="itemList.content.length > 3">
-										<view class="more">						
-											<view class="">···</view>
-											<view class="gotobtn" @tap="navTo({page:itemList.orderNo,from:'suborder',tStates:itemList.orderType})">查看其余{{itemList.content.length -3}}件</view>
-										</view>
-									</template>					 
-								</view> 
-							</block>
-						</view>
-					</view>	
-				</template>
-				
-				<template v-if="orderItem.content.length > 0"> 
-					<view class="main_cont" @tap="navTo({page:orderItem.orderNo,from:'parents',tStates:orderItem.orderType})">					
-						<view class="itemBlock">
-							<block v-for="(itemList,index) in orderItem.content.slice(0,3)"><!-- :key="'itemList' + index"> -->
-								<view class="sigleItem">
-									<view class="name">{{itemList.goodsName}} <view v-if="itemList.hotSale == 1" class="hots">&nbsp;&nbsp; 热门</view></view>
-									<view class="unit">{{itemList.goodsNum}} {{itemList.goodsUnit}}</view>
-								</view> 
-							</block>
-						</view>
-						<template v-if="orderItem.content.length > 3">
-							<view class="more">						<!-- @tap="navTo(orderItem.orderNo)" -->
-								<view class="">···</view>
-								<view class="gotobtn">查看其余{{orderItem.content.length-3}}件</view>
+							<view class="nothing">
+								<image src="@/static/default_null@1x.png" class="img" mode="scaleToFill"></image>
+								<view class="txt">暂无记录</view>
 							</view>
 						</template>
-					</view>				
-				</template>
+					
+					</scroll-view>
+				</swiper-item>
 				
-				<view class="footbtn">
-					<view class="left-footbtn" v-if="orderItem.content.length > 0">
-						<template v-if="orderItem.payState==1">
-						<view class="checkOk isfeed" v-if="orderItem.orderState == 2">订单完成</view>
+				<swiper-item>
+					<scroll-view scroll-y :style="'height:'+ scrollH +'px;'" @scrolltolower="unPaidOrderList"> 
+					
+						<template v-if="this.userUnPayList.length > 0">
+							<block v-for="(orderItem,index) in this.userUnPayList">
+								<view class="group">
+									
+									<view class="head">
+										<view class="tit">  
+											<text class="titIcon iconfont iconstauts-ing"></text> 										
+											<view class="titTxt isright">待结算</view> 	 													
+										</view><view class="time">{{orderItem.orderTime}}</view>
+									</view> 
+									<view class="main_cont" @tap="creditNavto({page:orderItem.orderNo,from:'parents',tStates:orderItem.orderType,navto:'credit'})">
+										<view class="itemBlock">
+											<block v-for="(itemList,index) in orderItem.content.slice(0,3)">
+												<view class="sigleItem">
+													<view class="name">{{itemList.goodsName}} <view v-if="itemList.hotSale == 1" class="hots">&nbsp;&nbsp; 热门</view></view>
+													<view class="unit">{{itemList.goodsNum}} {{itemList.goodsUnit}}</view>
+												</view> 
+											</block>
+										</view>
+										<template v-if="orderItem.content.length > 3">
+											<view class="more">					
+												<view class="">···</view>
+												<view class="gotobtn">查看其余{{orderItem.content.length-3}}件</view>
+											</view>
+										</template>
+									</view>					 
+									
+									<view class="footbtn">
+										<view class="left-footbtn">  
+										<template v-if="orderItem.instantPay == 0">
+											<view v-if="index == 0">
+												<view class="checkOk isno" @tap="checkOkBtn(index,'unPay','nopop')">立即付</view>  												
+											</view>
+											<view v-else>
+												<view class="checkOk isno" @tap="checkOkBtn(index,'unPay','yespop')">立即付</view>  												
+												<view class="checkOk isfeed" @tap="cancelOrder(index)">删除</view>  												
+											</view>
+										</template>
+										<template v-if="orderItem.instantPay == 1">     
+											<template v-if="otherBtn && otherCanCredit">
+												<view class="checkOk isright" @tap="creditOrder(index,'unPay')">先铺货</view>  			
+											</template>  
+											<view class="checkOk isno" @tap="checkOkBtn(index,'unPay','yespop')">立即付</view> 
+											<view class="checkOk isfeed" @tap="cancelOrder(index)">删除</view> 	
+										</template>		 	 
+										</view>  
+										
+										<view class="right-moeny">{{parseFloat(orderItem.realAmt/100).toFixed(2)}} <text class="txt">元</text></view> 
+										
+									</view>
+									
+								</view>
+								
+							</block>
 						
+							<view class="lodingMore" v-if="!Nothing">{{loadmore}}</view>
 						</template>
-						<template v-if="orderItem.orderState !== 2 && orderItem.orderType !== 2">
-							<view class="checkOk isright" @tap="rightBtn({list:index,from:'parents'})">确认收货</view> 
+						<template v-else>
+							<view class="nothing">
+								<image src="@/static/default_null@1x.png" class="img" mode="scaleToFill"></image>
+								<view class="txt">暂无记录</view>
+							</view>
 						</template>
-						<template v-if="orderItem.payState == 0 && orderItem.orderType !== 2">
-							<view class="checkOk isno" @tap="checkOkBtn(index)">继续支付</view> 
-						</template>
-						<template v-if="orderItem.orderType==2">
-							<view class="checkOk isfeed">失效订单</view>							
-						</template>
-					</view> 
-					
-					<view class="left-footbtn" v-if="orderItem.subOrder.length > 0">	
-						<template v-if="orderItem.payState==1">
-							<view class="checkOk isfeed" v-if="orderItem.orderState == 2">订单完成</view> 
-						</template>
-						<template v-if="orderItem.payState == 0 && orderItem.orderType !== 2">
-							<view class="checkOk isno" @tap="checkOkBtn(index)">继续支付</view> 
-						</template>		
-						<template v-if="orderItem.orderType == 2">
-							<view class="checkOk isfeed">失效订单</view>							
-						</template>				
-					</view>  
-					
-					<view class="right-moeny">{{parseFloat(orderItem.realAmt/100).toFixed(2)}} <text class="txt">元</text></view> 
-					
-				</view>
-				
-			</view>
-		</block>
+					</scroll-view>
+				</swiper-item>
+			</swiper>
 		</view>
-		<view class="lodingMore" v-if="!Nothing">{{loadmore}}</view>
+		 
+		 
+		
+		</view>
+		
 		
 		<uni-popup ref="popup" type="bottom" :maskClick="false">
-			<view class="pay_checked" style=""> 
-				<view class="title">合计：{{PayActual}}元</view>
-				<view class="get_coupon">
-					<view class="group"> 
-						<view class="left">满减券/优惠</view>
-						<view class="right" @tap="navtoGetCoupon('thisone')"> 							
-							<view :class="this.got ? 'txt' : ''">{{this.couponid}}</view>
-						</view> 
+			<view class="pay_checked" style="">  
+				<view class="title">合计：{{PayActual}}元<view @tap="closePopup()" class="iconfont iconclose closePrev"></view></view>
+				<template v-if="this.hasGoodness"> 
+					<view class="get_coupon">
+						<view class="group"> 
+							<view class="left">满减券/优惠</view>
+							<view class="right" @tap="navtoGetCoupon('thisone')"> 							
+								<view :class="this.got ? 'txt' : ''">{{this.couponid}}</view>
+							</view> 
+						</view>
 					</view>
-				</view>
-				<view class="totalNum"> 
-					<view class="left">待支付总计：</view> 
-					<view class="right"> {{Payable}}元</view>
-				</view> 
+					<view class="totalNum"> 
+						<view class="left">待支付总计：</view> 
+						<view class="right"> {{Payable}}元</view>
+					</view> 
+				</template>
 				<view class="totalNum" v-if="this.getCouponId || this.clock">
 					<view class="left">实际应支付：</view>
 					<view class="right"> {{PayActual}}元</view>
@@ -159,12 +259,52 @@
 						<view slot="radioPay"><radio :value="checktype[1]" color="#09BB07" /></view>
 					</pop-up>
 				</radio-group>
-				<btn-foot title="去支付" class="topayBtn" @tap="toPayBtn()"></btn-foot> 
+				<template v-if="this.tabIndex === 0">
+					<btn-foot title="去支付" class="topayBtn" @tap="toPayBtn('keepon')"></btn-foot> 
+				</template>
+				<template v-else>
+					<btn-foot title="去支付" class="topayBtn" @tap="toPayBtn('unPay')"></btn-foot> 
+				</template>
 			</view>
 		</uni-popup>
-		 
 		
-		</view>
+		
+		<!-- 有订单未结清 -->
+		<uni-popup ref="hasUnpaid" type="center" :maskClick="false">
+			<view class="unpaid_checked" style="">
+				<view class="title">您有一笔未结清订单！ <view @tap="closePrev()" class="iconfont iconclose closePrev"></view></view> 
+				<scroll-view :scroll-top="scrollTop" style="height: 160px; width: 260px" show-scrollbar="true"
+				class="unpaid-list" scroll-y="true">  
+					<view class="conten_list" v-for="(foods,index) in this.UnPaidData.content">  
+						<view class="group">
+							<view class="tit">{{foods.goodsName}} * {{foods.goodsNum}}</view>
+							<view class="cont">
+								<view class="price">{{parseFloat(foods.merchPrice * foods.goodsNum / 100).toFixed(2)/1}}元</view>
+								<view class="unit">{{foods.goodsQuantity}}{{foods.goodsUnit}} * {{foods.goodsNum / foods.goodsQuantity}}</view>
+							</view>
+						</view>
+					</view>
+					<view class="info_detail">
+						<view class="group"><view class="">订单号</view><view class="txt">{{this.UnPaidData.orderNo}}</view></view>
+						<view class="group"><view class="">下单时间</view><view class="txt">{{this.UnPaidData.orderTime}}</view></view>
+						<view class="group"><view class="">商户名称</view><view class="txt">{{this.UnPaidData.merchName}}</view></view>
+						<view class="group"><view class="">收货地址</view><view class="txt">{{this.UnPaidData.busiAddr}}</view></view> 
+					</view>    
+				</scroll-view> 
+				<view class="listmore down">﹀ 向下滑动查看更多</view> 
+				<view class="totalNum"><view class="left">实际应支付：</view><view class="right">{{prePayActual}}元</view></view>
+				<radio-group @change="radioChange">
+					<pop-up names="支付宝支付" iconImg="alipay">
+						<view slot="radioPay"><radio :value="checktype[0]" color="#09BB07" /></view>
+					</pop-up>
+					<pop-up names="微信支付" iconImg="weixin">
+						<view slot="radioPay"><radio :value="checktype[1]" color="#09BB07" /></view>
+					</pop-up>
+				</radio-group>
+				<btn-foot title="立即结清" class="topayBtn" @tap="getUnpaidOrder()"></btn-foot> 
+			</view>
+		</uni-popup>
+		<!-- 有订单未结清 end-->
 		
 	
 	</template>
@@ -183,8 +323,7 @@
 	
 	import BtnFoot from '@/components/basic/btn-foot.vue'
 	import PopUp from '@/components/BuyMall/rk-pop.vue'
-	import DefaultPage from '@/components/basic/default-page.vue'
-	 
+	import DefaultPage from '@/components/basic/default-page.vue' 
 	
 	export default {
 		data() {
@@ -192,53 +331,90 @@
 				loginWhether:'',//登陆状态 
 				merchNo:'', //商户号
 				orderList:[], 
+				unOrderList:[], 
 				pages:1,
 				loadmore:'上拉加载更多',
 				btnIndex:'',
-				totalPrice:'', 
+				totalPriceN:'', 
 				Nothing:false,
 				navtoDetail:'',
 				navtoIndex:'',
 				checktype:['alipay','weixin'],
 				chooseType:'', 
-				isload:false,
+				isload:true,
 				isnohave:false,
 				isready:false, 
 				couponid:'',
 				actualPay:'', 
 				got:false, 
 				clock:false,
+				navTag:['全部订单','待结算'],
+				tabIndex:0,
+				scrollH:0,
+				scrollTop:0, 
+				toPayOrderNo:'',
+				hasFinalPay:false,
+				UnPaidData:[],
+				instantPay:'',
+				popShow:false, //上一笔是否弹出
+				hasGoodness:false,//是否可享优惠
+				otherBtn:false, //其它待支付状态
+				otherCanCredit:false,//铺货总开关
 			}
 		},
 		onLoad() { 			 
 			this.loginWhether = uni.getStorageSync('status')  
-			this.merchNo = uni.getStorageSync('user').merchNo		 
+			this.merchNo = uni.getStorageSync('user').merchNo		
+			uni.getSystemInfo({
+				success:res=>{
+					this.scrollH = res.windowHeight
+				}
+			})			
 			
-			this.getBreakfastOrder()
+			this.getListData('allOrderList','getBreakfastOrder')
+			this.getListData('unPaidOrderList','getUnpaidMerchOrder')
+			this.getPrevOrder()
 			
 			this.$store.dispatch('get_coupon_id','')
 			this.$store.dispatch('get_cart_amt','') 
 		},
 		computed:{ 
-			...mapState(['userOrderList','getCouponId','getCartAmt','getUnusualAmt','getUnusualNo']), 
+			...mapState(['userOrderList','userUnPayList','getCouponId','getCartAmt','getUnusualAmt','getUnusualNo','canCredit']),  
+			...mapGetters(['totalCount','totalPrice','prevOrderPrice']),  
 			Payable:function(){
-				return this.numFloat(this.totalPrice).toFixed(2)
+				this.totalPriceN = this.totalPrice
+				return this.numFloat(this.totalPriceN).toFixed(2)
 			},
 			PayActual:function(){
+				this.totalPriceN = this.totalPrice
 				let actualNums = ''
 				if(this.clock){					
-					let org = this.totalPrice,
+					let org = this.totalPriceN,
 						now = this.getUnusualAmt ? this.getUnusualAmt : 0; 
 					actualNums = this.numFloat(org - now).toFixed(2) 
 				}else{
-					let org = this.totalPrice,
+					let org = this.totalPriceN,
 						now = this.getCartAmt ? this.getCartAmt : 0 ;
 					
 					actualNums = this.numFloat(org -now).toFixed(2) 					
 				}
 				
 				return actualNums
-			},
+			},			
+			prePayActual:function(){
+				this.totalPriceN = this.totalPrice
+				let actualNums = ''
+				if(this.clock || this.prevOrderPrice){	 
+					let org = this.prevOrderPrice,
+						now = this.getUnusualAmt ? this.getUnusualAmt : 0;
+					actualNums = this.numFloat(org - now).toFixed(2) / 1 
+				}else{ 
+					let org = this.totalPriceN,
+						now = this.getCartAmt ? this.getCartAmt : 0 ;
+						actualNums = this.numFloat(org - now).toFixed(2) / 1 
+				} 
+				return actualNums
+			}, 
 		},
 		onShow() { 
 			if(this.getCouponId){  
@@ -247,14 +423,13 @@
 					
 				this.got = true
 				this.couponid = `满${c_one}减${c_two}`
+				this.totalPriceN = this.totalPrice
 				
-				this.actualPay = this.numFloat(this.totalPrice - this.getCouponId.couponAmt) 		
+				this.actualPay = this.numFloat(this.totalPriceN - this.getCouponId.couponAmt) 		
 			
 			}else{ 
 				this.couponid = '不使用优惠券'
-			}
-			
-			
+			} 
 		},
 		components:{ 
 			UniPopup,
@@ -262,50 +437,70 @@
 			PopUp,
 			BtnFoot,
 			DefaultPage
-		},  
-		onReachBottom(){
-			let initPages = this.pages+1
-			let morePages = initPages++
-			this.pages = morePages 
-			
-			uni.showLoading({
-				title: '加载中'
-			}) 
-			let vVlue = {"merchNo":this.merchNo,"pageNum":morePages,"pageLimt":'20',} //必传 
-			let sSort = getSortAscii(vVlue) ///排序
-			let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 
-			 
-			this.$request.post('getBreakfastOrder',{
-				...vVlue, 
-				"sign": sSign
-			},{
-				token:true
-			}).then(res => {   
-				this.$api.initPage(res.code,res.message)
-				if(res.code === 200){
-					setTimeout(()=>{											
-						uni.hideLoading()	 
-						if(res.data.length){  
-							this.orderList = [...this.orderList,...res.data]   							
-						}else{
-							this.pages-- 
-							this.loadmore  = res.data.length < 20 ? '没有更多了' : '上拉加载更多';
-						} 
-						
-					},500)	  
-				}
-			}).catch(err=>{  
-				this.page--; 
-			}) 
 		},
-		methods: {	  
+		
+		methods: {
+			allOrderList(e){
+				this.scrolltolower('allOrderList','getBreakfastOrder')
+			},			
+			closePopup(){
+				this.$store.dispatch('get_unusual_amt','')
+				this.$refs.popup.close()
+			}, 
+			unPaidOrderList(){				
+				this.scrolltolower('unPaidOrderList','getUnpaidMerchOrder')
+			},
+			scrolltolower(type,url){
+				let initPages = this.pages+1
+				let morePages = initPages++
+				this.pages = morePages 
+				
+				uni.showLoading({
+					title: '加载中'
+				})
+				let vVlue = {"merchNo":this.merchNo,"pageNum":morePages,"pageLimt":'20',}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()
+				 
+				this.$request.post(url,{
+					...vVlue, 
+					"sign": sSign
+				},{
+					token:true
+				}).then(res => {   
+					this.$api.initPage(res.code,res.message)
+					if(res.code === 200){
+						setTimeout(()=>{											
+							uni.hideLoading()	 
+							if(res.data.length){  
+								this.orderList = [...this.orderList,...res.data]   							
+							}else{
+								this.pages-- 
+								this.loadmore  = res.data.length < 20 ? '没有更多了' : '上拉加载更多';
+							}
+						},500)
+					}
+				}).catch(err=>{  
+					this.page--; 
+				})
+			},
+			linktabindex(e){ 
+				this.tabIndex = e.detail.current
+			},
+			changeTab(index){ 
+			 	if (this.tabIndex === index) {
+			 		return
+			 	} 
+			 	this.tabIndex = index 
+			}, 
 			numFloat(param){
 				return parseFloat(param / 100)
 			},
 			navtoGetCoupon(){ 
+				this.totalPriceN = this.totalPrice
 				if(!this.clock){
 					uni.navigateTo({
-						url:'../../account/coupon/usable?type='+ this.totalPrice,
+						url:'../../account/coupon/usable?type='+ this.totalPriceN,
 					})					
 				}else{
 					uni.showLoading({
@@ -323,101 +518,116 @@
 			radioChange(e){
 				this.chooseType = e.target.value  
 			},
-			toPayBtn(){				 
-				let getPayType = this.chooseType				
-				switch (getPayType){
-					case 'alipay':
-						this.payAlipay() 
-					break;
-					case 'weixin':
-						this.payWeixin() 
-					break;					
-				} 				
+			toPayBtn(type){				 
+				let getPayType = this.chooseType 
+				if(this.hasFinalPay && type == 'unPay' && this.popShow){
+					this.$refs.hasUnpaid.open()
+				}else{
+					switch (getPayType){
+						case 'alipay':
+							this.payAlipay(type) 
+						break;
+						case 'weixin':
+							this.payWeixin(type) 
+						break;					
+					}					
+				}		
 			}, 
-			payAlipay(){  
-				let oderInfo = this.userOrderList 
-				
+			payAlipay(type){   
+				let unpaidOderInfo = this.userUnPayList  
 				let vVlue = '' 
 				if(this.getCouponId.couponNo && !this.clock){ 
 					vVlue = {
 						"merchNo":this.merchNo,
-						"orderNo":oderInfo[this.btnIndex].orderNo,
-						"couponNo":this.getCouponId.couponNo ? this.getCouponId.couponNo : ''
-						} //必传 
-				}else if(this.clock){
-					// getUnusualNo 
+						"orderNo":this.toPayOrderNo,
+						"couponNo":this.getCouponId.couponNo ? this.getCouponId.couponNo : '',
+						"instantPay":this.instantPay
+						}
+				}else if(this.clock){ 
 					vVlue = {
 						"merchNo":this.merchNo,
-						"orderNo":oderInfo[this.btnIndex].orderNo,
-						"couponNo":this.getUnusualNo ? this.getUnusualNo : ''
-						} //必传 
+						"orderNo":this.toPayOrderNo,
+						"couponNo":this.getUnusualNo ? this.getUnusualNo : '',
+						"instantPay":this.instantPay
+						}
 					
 				}else{  
 					vVlue = {
 						"merchNo":this.merchNo,
-						"orderNo":oderInfo[this.btnIndex].orderNo, 
-						} //必传 
+						"orderNo":this.toPayOrderNo,
+						"instantPay":this.instantPay
+						}
 				}
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码  
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() 
 				this.$request.post('aliPayOrder',{
 					...vVlue,
 					"sign":sSign
 				},{
 					token:true
-				}).then(res => { 
-					let ordinfo = res.data.toString() 
-					uni.requestPayment({
-						provider: 'alipay',
-						orderInfo: ordinfo,
-						success: (res)=>{ 
-							uni.reLaunch({ 
-								url:'../../utility/index/index'
-							})
-							this.clock = false
-						},
-						fail: (err)=>{ 
-							this.$refs.popup.close()
-							uni.showToast({
-								icon:'none',
-								title:'支付失败',
-								duration: 2000
-							}) 
-						},
-						complete:()=>{
-							this.$store.dispatch('get_coupon_id','')
-							this.$store.dispatch('get_cart_amt','')								
-						},
-						
-					});
+				}).then(res => {
+					if(res.code == 200){
+						let ordinfo = res.data.toString()
+						uni.requestPayment({
+							provider: 'alipay',
+							orderInfo: ordinfo,
+							success: (res)=>{ 
+								this.$refs.popup.close()
+								if(type == 'unPay'){					
+									unpaidOderInfo.splice(this.tabIndex,1)	
+									this.toPayOrderNo = ''
+								}
+								this.clock = false
+								this.getListData('unPaidOrderList','getUnpaidMerchOrder')
+							},
+							fail: (err)=>{ 
+								uni.showToast({
+									icon:'none',
+									title:'支付失败',
+									duration: 2000
+								}) 
+							},
+							complete:()=>{
+								this.$store.dispatch('get_coupon_id','')
+								this.$store.dispatch('get_cart_amt','')								
+							}
+						})
+					}else{
+						uni.showToast({
+							icon:'none',
+							title:res.message,
+							duration: 2000
+						}) 
+					}
+					
 				}).catch()
 			},
-			payWeixin(){  
-				let oderInfo = this.userOrderList 
-				 
+			payWeixin(type){   
+				let unpaidOderInfo = this.userUnPayList 
 				let vVlue = ''
 				if(this.getCouponId.couponNo){
 					vVlue = {
 						"merchNo":this.merchNo,
-						"orderNo":oderInfo[this.btnIndex].orderNo,
-						"couponNo":this.getCouponId.couponNo ? this.getCouponId.couponNo : ''
-						} //必传 
-				}else if(this.clock){
-					// getUnusualNo 
+						"orderNo":this.toPayOrderNo,
+						"couponNo":this.getCouponId.couponNo ? this.getCouponId.couponNo : '',
+						"instantPay":this.instantPay
+						}
+				}else if(this.clock){ 
 					vVlue = {
 						"merchNo":this.merchNo,
-						"orderNo":oderInfo[this.btnIndex].orderNo,
-						"couponNo":this.getUnusualNo ? this.getUnusualNo : ''
-						} //必传 
-					
+						"orderNo":this.toPayOrderNo,
+						"couponNo":this.getUnusualNo ? this.getUnusualNo : '',
+						"instantPay":this.instantPay
+						} 
 				}else{ 
 					vVlue = {
 						"merchNo":this.merchNo,
-						"orderNo":oderInfo[this.btnIndex].orderNo, 
-						} //必传 
+						"orderNo":this.toPayOrderNo,
+						"instantPay":this.instantPay
+						}
 				}
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 	 
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()	 
 				this.$request.post('wxPayOrder',{
 					...vVlue,
 					"sign":sSign
@@ -440,13 +650,14 @@
 						    provider: 'wxpay',
 						    orderInfo: getOrderInfo,
 							success: (res)=>{ 
-								uni.reLaunch({ 
-									url:'../../utility/index/index'
-								}) 
+								this.$refs.popup.close() 
+								if(type == 'unPay'){					
+									unpaidOderInfo.splice(this.btnIndex,1)																	
+								}			
 								this.clock = false
+								this.getListData('unPaidOrderList','getUnpaidMerchOrder')
 							},
 							fail: (err)=>{ 
-								this.$refs.popup.close()
 								uni.showToast({
 									icon:'none',
 									title:'支付失败',
@@ -459,25 +670,119 @@
 							},
 						}) 
 						
+					}else{
+						uni.showToast({
+							icon:'none',
+							title:res.message,
+							duration: 2000
+						}) 
 					} 
 					 
 				}).catch() 
 			},
-			checkOkBtn(index){  
-				//当前页继续支付  
-				let orderInfo = this.userOrderList  
-				this.totalPrice = orderInfo[index].realAmt
-				this.btnIndex = index; 
+			checkOkBtn(index,type,other){  
+				this.totalPriceN = this.totalPrice
+				//当前页继续支付   
+				if(type == 'keepon'){
+					let orderInfo = this.userOrderList  
+					this.totalPriceN = orderInfo[index].realAmt
+					this.btnIndex = index;  
+					this.instantPay = orderInfo[index].instantPay
+					this.toPayOrderNo = orderInfo[index].orderNo 
+					
+				}else if(type== 'unPay'){
+					let orderInfo = this.unOrderList  
+					this.totalPriceN = orderInfo[index].realAmt
+					this.btnIndex = index;
+					this.instantPay = orderInfo[index].instantPay
+					this.toPayOrderNo = orderInfo[index].orderNo 		 
+				} 
+				if(other =='nopop'){
+					this.popShow = false 
+					this.hasGoodness = false
+				}else if(other =='yespop'){
+					this.popShow = true 	
+					this.hasGoodness = true
+				} 
+				//获取不寻常订单信息getUnusual  			 
+				this.getOrderCoupon(this.toPayOrderNo) 				 
+			},
+			//铺货
+			creditOrder(index,type){
 				
-				let getoNo = orderInfo[index].orderNo 
-				//获取不寻常订单信息getUnusual 
-				this.getOrderCoupon(getoNo) 				 
-			},	 
+				let orderInfo = this.unOrderList   
+				this.toPayOrderNo = orderInfo[index].orderNo 
+				
+				let vVlue = {"merchNo":this.merchNo,"orderNo":this.toPayOrderNo} 
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()
+				this.$request.post('creditOrder',{
+					...vVlue,
+					"sign": sSign
+				},{
+					token:true
+				}).then(res => {  						
+					if(res.code == 200){
+						 uni.showLoading({
+							mask:true,
+							title:'恭喜您，铺货成功！'
+						 })
+						orderInfo[index].instantPay = 1
+						this.getListData('unPaidOrderList','getUnpaidMerchOrder')
+						setTimeout(()=>{
+							uni.hideLoading()
+						},1000)
+					}else{				
+						uni.showToast({
+							icon:'none',
+							title:res.message,
+							duration: 2000
+						}) 	
+					}
+				}).catch()
+			}, 
+			//取消订单
+			cancelOrder(index){
+				let orderInfo = this.userUnPayList 
+				let getOno = orderInfo[index].orderNo
+				let vVlue = {"merchNo":this.merchNo,"orderNo":getOno,}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码
+				 
+				uni.showLoading({
+					mask:true,
+				})				  
+				
+				this.$request.post('cancelOrder',{
+					...vVlue, 
+					"sign": sSign
+				},{
+					token:true
+				}).then(res => {    
+					setTimeout(()=>{
+						uni.hideLoading() 
+						uni.showToast({
+							icon:'none',
+							title:res.message,
+							duration: 2000
+						})	
+						if(res.code == 200){ 	
+							setTimeout(()=>{	
+								let del = orderInfo.filter(items => {
+									items == orderInfo[index]
+									return items
+								}) 
+								orderInfo.splice(index,1)  
+							},100)  
+						}
+					},2000)  			
+				}).catch() 
+			},
 			//获取不寻常订单信息
 			getOrderCoupon(option){
-				let vVlue = {"merchNo":this.merchNo,"orderNo":option} //必传 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 
+				let vVlue = {"merchNo":this.merchNo,"orderNo":option}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()
 				this.$request.post('getOrderCoupon',{
 					...vVlue,
 					"sign": sSign
@@ -497,8 +802,13 @@
 								let unusual = {
 									amt:resData.coupon[0].couponAmt,
 									no:resData.coupon[0].couponNo
-								} //resData.coupon[0].couponAmt
+								}
 								this.$store.dispatch('get_unusual_amt',unusual)
+							}else{
+								this.clock = false
+								this.couponid = '不使用优惠券'
+								this.$store.dispatch('get_unusual_amt','')
+								
 							}
 							//继续支付							
 							this.$refs.popup.open()
@@ -517,9 +827,9 @@
 				if(type.from == "parents"){					
 					this.reachConfirm(type.list)				
 				}else if(type.from == "suborder"){ 
-					let vVlue = {"merchNo":this.merchNo,"orderNo":type.list} //必传 
-					let sSort = getSortAscii(vVlue) ///排序
-					let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 	 	
+					let vVlue = {"merchNo":this.merchNo,"orderNo":type.list}
+					let sSort = getSortAscii(vVlue)
+					let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()	 	
 					
 					let pindex = this.orderList[type.Pindex].subOrder
 					let cindex = pindex[type.Cindex]
@@ -560,9 +870,9 @@
 			reachConfirm(type){ 
 				
 				let oderInfo = this.userOrderList
-				let vVlue = {"merchNo":this.merchNo,"orderNo":oderInfo[type].orderNo} //必传 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 	 				
+				let vVlue = {"merchNo":this.merchNo,"orderNo":oderInfo[type].orderNo}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()	 				
 				
 				uni.showModal({
 					title: '确认收货',
@@ -594,11 +904,12 @@
 					}
 				}) 
 			},
-			getBreakfastOrder(){   
-				let vVlue = {"merchNo":this.merchNo,"pageNum":'1',"pageLimt":'20',} //必传 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 		  
-				this.$request.post('getBreakfastOrder',{
+			
+			getListData(type,url){
+				let vVlue = {"merchNo":this.merchNo,"pageNum":'1',"pageLimt":'20',}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()		  
+				this.$request.post(url,{
 					...vVlue, 
 					"sign": sSign
 				},{
@@ -606,38 +917,102 @@
 				}).then(res => {  
 					this.$api.initPage(res.code,res.message)
 					if(res.code == 200){
-						let resData = res.data	 
-						setTimeout(()=>{								
-							this.isload = false
-							this.isready = true
+						let resData = res.data 
+						setTimeout(()=>{
+								this.isload = false
+								this.isready = true	
 							if(resData.length){
-							 
-								this.orderList = resData 
-								this.$store.dispatch('receive_order_list',resData)  
-								this.loadmore  = res.data.length < 20 ? '没有更多了' : '上拉加载更多';
-							}else{
-							 	this.isload = false
-							 	this.isnohave = true
+								if(type == 'allOrderList'){ 
+									this.orderList = resData
+									this.$store.dispatch('receive_order_list',resData)
+								}
+								this.loadmore  = res.data.length < 20 ? '没有更多了' : '上拉加载更多';  
 							}
-						},300)	
-					} 										
+							if(type == 'unPaidOrderList'){ 
+								let resDataUn = resData.unpaidOrder 
+								this.unOrderList = resDataUn 
+								if(resDataUn[0].instantPay == 0){ 
+									this.otherBtn = false
+								}else if(resDataUn[0].instantPay == 1){
+									this.otherBtn = true 
+								}
+								this.$store.dispatch('receive_unpay_order_list',resDataUn)	 
+								//铺货总开关
+								if(res.data.canCredit == 0){
+									this.otherCanCredit = true 
+								}else if(res.data.canCredit == 1){
+									this.otherCanCredit == false
+								}
+							} 
+						},1000)	
+						
+					}									
 				}).catch() 
-			}, 
+			},
 			
-			navTo(option) {  
+			//获取上一笔订单
+			getPrevOrder(){
+				let vVlue = {"merchNo":this.merchNo,"orderType":1}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()  
+				
+				this.$request.post('getPrevOrder',{
+				  ...vVlue, 
+				  "sign": sSign
+				},{
+					token:true
+				}).then((res)=>{   
+					if(res.code == 200 && res.data){ 
+						
+						this.prevOrder = res.data
+						this.$store.dispatch('receive_previous_order',res.data) 
+						 
+						if(res.data.orderNo){
+							this.hasFinalPay = true 
+							this.getBreakfastOrderDetail(res.data.orderNo)
+						}
+					}
+				})
+			},
+				
+			getBreakfastOrderDetail(option){   
+				let vVlue = {"merchNo":this.merchNo,"orderNo":option}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()  
+				
+				this.$request.post('getBreakfastOrderDetail',{
+				  ...vVlue, 
+				  "sign": sSign
+				},{
+					token:true
+				}).then((res)=>{  
+					if(res.code == 200){  
+						this.UnPaidData = res.data  
+					}
+				}) 
+			},	
+			closePrev(){ 
+				this.$refs.hasUnpaid.close()
+			},				
+			navTo(option) {   
 				if(option.from == "suborder"){
 					if(option.tStates !== 2){		 
 						uni.navigateTo({ 
-							url:`./list_detail?orderNo=${option.page}&from=${option.from}`
+							url:`./list_detail?orderNo=${option.page}&from=${option.from}&navto=keepon`
 						})
-					}
+					} 
 				}else{
 					if(option.tStates !== 2){						
 						uni.navigateTo({ 
-							url:`./list_detail?orderNo=${option.page}&from=parents` 
+							url:`./list_detail?orderNo=${option.page}&from=${option.from}&navto=keepon` 
 						})
 					}					
 				}
+			},
+			creditNavto(option){
+				uni.navigateTo({
+					url:`./list_detail?orderNo=${option.page}&navto=${option.navto}`
+				})
 			},
 		},
 	}
@@ -647,9 +1022,177 @@
 	page{
 		width: 100vw;
 	}
+	
+	.unpaid_checked{
+			padding: 40rpx;
+			position: relative; padding-bottom: 140rpx;
+		
+		.title{
+			text-align: left; 
+			font-size: 36rpx;
+			border-bottom: 1px solid #eeeeee;
+			padding-bottom: 20rpx;
+			position: relative;
+			
+			.closePrev{
+				position: absolute;
+				top: -14rpx;
+				right: 0;
+				font-size: 48rpx;
+			}
+		}
+		
+		.unpaid-list{
+			padding: 20rpx 0;  
+			.conten_list{
+				font-size: 24rpx;
+				border-bottom:1px dashed #eeeeee;
+				padding-bottom: 20rpx;
+				.group{
+					width: 100%;
+					display: flex;
+					justify-content: space-between;
+					padding: 16rpx 8rpx; 
+					align-items: center; 
+					
+					.tit{
+						font-size: 32rpx;
+					}
+					
+					.cont{
+						text-align: right;
+						.price{
+							font-size: 32rpx; 
+						}
+						.unit{
+							font-size: 20rpx;
+							color: #777777;
+						}
+					}
+				} 
+				
+			}
+			.info_detail{ 
+				font-size: 24rpx;
+				.group{
+					width: 100%;
+					display: flex;
+					justify-content: space-between;
+					padding: 16rpx 8rpx;
+					
+					.txt{
+						width: 80%;
+						text-align: right;
+					}
+				}
+			}
+		}
+		
+		.get_coupon{
+			border-top:1px solid #eeeeee;
+			padding: 24rpx 0;
+			border-bottom:1px solid #eeeeee;
+			.group{
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				.left{
+					color: #666;
+					font-size: 30rpx;
+				}
+				.right{
+					color: #999;
+					font-size: 30rpx;
+					.txt{
+						color: #f00;
+					}
+				}
+			}
+		}
+		
+		
+		.listmore{
+			color: #999999;
+			font-size: 20rpx;
+			text-align: right;
+			padding: 12rpx 0; 
+		} 
+		.totalNum{				
+				font-size: 30rpx;
+				padding: 20rpx 0;
+				text-align: left;
+				display: flex; 
+				border-bottom: 1px dashed #f2f2f2;
+				justify-content: space-between;
+				align-items: center;
+				.left{
+					font-size: 30rpx;
+				}
+				.right{
+					color: #f00;
+				}
+		}
+		.topayBtn{
+			position: absolute; bottom: 0; left: 0; right: 0;
+		}
+		.prepyPop{
+			padding: 24rpx 0;
+			display: flex; 
+			align-items: center;
+			width: 100%;
+			
+			.img{
+				width: 36rpx;
+				height: 36rpx;
+			} 
+			.txtbtn{
+				padding-left: 32rpx;
+			}
+			
+		}
+	}
+	.navTagBar{
+		width: 50%; 
+		text-align: center;
+		&:last-child{
+			text-align: left;
+		}
+		.title{			
+			color: #9ddeaa; 
+			font-size: 30rpx;
+			// background-color: #F0AD4E;
+			
+		}
+		.active{ 
+			color: #FFFFFF;
+			font-weight: 500; 
+		}
+	}
 	#oderList{
 		padding: 32rpx;
 		width: 100%;
+		
+		
+		// .navTagBar{
+		// 	padding-bottom: 20rpx; 
+		// 	display: flex;
+		// 	justify-content: center;
+			
+		// 	.title{
+		// 		padding: 0 0 10rpx 0;
+		// 		margin: 0 40rpx;
+		// 		color: #333333; 
+		// 		border-bottom: 2px solid #F2F2F2; 
+		// 		color: #999999;				
+		// 	}
+		// 	.active{
+		// 		color: #46B85B;
+		// 		font-weight: 500;
+		// 		border-bottom: 2px solid #46B85B;
+		// 	}
+		// }
+		
+		
 		
 		.Nothing{
 			height: 200rpx;
@@ -658,7 +1201,14 @@
 			align-items: center;
 			color: #999999;
 			font-size: 38rpx;
-			padding: 80rpx; 
+			padding: 80rpx;  
+		}
+		.nothing{
+			text-align: center;
+			.txt{
+				padding-top: 20rpx;
+				text-align: center;
+			}
 		}
 		
 		.group{
@@ -708,22 +1258,22 @@
 							background-color: #f9f9f9;
 							border-bottom: 1px dashed #dddddd;
 							.title_type{
-								color: #F00;
+								color: #3cb552;
 							}
 							.btn_type{  
 								.btn{
 									border-radius: 4rpx;
-									width: 160rpx;
+									max-width: 160rpx;
 									font-size: 28rpx;
-									padding: 8rpx 0;
+									padding: 8rpx 16rpx;
 								}
 								.btn_ok{ 
 									color: #777;
 									border:1px solid #cccccc;
 								}
 								.btn_run{ 
-									background-color: #46b85b;
-									border:1px solid #46b85b;
+									background-color: #3cb552;
+									border:1px solid #3cb552;
 									color: #FFFFFF;
 								}
 							}
@@ -817,7 +1367,8 @@
 					color: #fff;
 					font-size: 30rpx;
 					text-align: center; 
-					width: 180rpx;
+					max-width: 180rpx;
+					padding:0 20rpx;
 					height: 60rpx; 
 					line-height: 60rpx;
 					border-radius: 6rpx;
@@ -852,9 +1403,9 @@
 				.left-footbtn{
 					display: flex;
 					.checkOk{
-						
+						margin-left: 20rpx;
 						&:first-child{
-							margin-right: 20rpx;
+							margin-left: 0;
 						}
 					}
 				}
@@ -875,84 +1426,88 @@
 			text-align: center;
 			color: #999999;
 		}
-		
-		
 		 
-		.pay_checked{
-			padding: 40rpx;
-			position: relative; padding-bottom: 160rpx; 
-			
-			.title{
-				text-align: center;
-				font-size: 48rpx;
-				padding-bottom: 30rpx;
-			}
-			.totalNum{
-				font-size: 30rpx;
-				padding: 20rpx 0;
-				text-align: left;
-				display: flex;  
-				justify-content: space-between;
-				align-items: center;
-				.left{
-					font-size: 30rpx;
-				}
-				.right{
-					color: #f00;
-				}
-			
-				&:last-child{
-					border-bottom: 1px solid #f2f2f2;
-				}
-			}
-			.topayBtn{
-				position: absolute; bottom: 0; left: 0; right: 0;
-			}
-			.prepyPop{
-				padding: 32rpx 0;
-				display: flex; 
-				align-items: center;
-				width: 100%;
-				
-				.img{
-					width: 48rpx;
-					height: 48rpx;
-				} 
-				.txtbtn{
-					padding-left: 32rpx;
-				}
-				
-			}
-			
-			.get_coupon{
-				border-top:1px solid #eeeeee;
-				padding: 24rpx 0;
-				.group{
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-					margin: 0;
-					padding: 0;
-					.left{
-						color: #666;
-						font-size: 30rpx;
-					}
-					.right{
-						color: #999;
-						font-size: 30rpx;
-						.txt{
-							color: #f00;
-						}
-					}
-				}
-			}
-			
-				
-		}
-		
-
 	}
  
+ .pay_checked{
+ 	padding: 40rpx;
+ 	position: relative; padding-bottom: 160rpx; 
+ 	
+ 	.title{
+ 		text-align: center;
+ 		font-size: 48rpx;
+ 		padding-bottom: 30rpx;
+		position: relative;
+		
+		.closePrev{ 
+			position: absolute;
+			top: -8rpx;
+			right: 0;
+			font-size: 48rpx;
+		}
+ 	}
+ 	.totalNum{
+ 		font-size: 30rpx;
+ 		padding: 20rpx 0;
+ 		text-align: left;
+ 		display: flex;  
+ 		justify-content: space-between;
+ 		align-items: center;
+ 		.left{
+ 			font-size: 30rpx;
+ 		}
+ 		.right{
+ 			color: #f00;
+ 		}
+ 	
+ 		&:last-child{
+ 			border-bottom: 1px solid #f2f2f2;
+ 		}
+ 	}
+ 	.topayBtn{
+ 		position: absolute; bottom: 0; left: 0; right: 0;
+ 	}
+ 	.prepyPop{
+ 		padding: 32rpx 0;
+ 		display: flex; 
+ 		align-items: center;
+ 		width: 100%;
+ 		
+ 		.img{
+ 			width: 48rpx;
+ 			height: 48rpx;
+ 		} 
+ 		.txtbtn{
+ 			padding-left: 32rpx;
+ 		}
+ 		
+ 	}
+ 	
+ 	.get_coupon{
+ 		border-top:1px solid #eeeeee;
+ 		padding: 24rpx 0;
+ 		.group{
+ 			display: flex;
+ 			justify-content: space-between;
+ 			align-items: center;
+ 			margin: 0;
+ 			padding: 0;
+ 			.left{
+ 				color: #666;
+ 				font-size: 30rpx;
+ 			}
+ 			.right{
+ 				color: #999;
+ 				font-size: 30rpx;
+ 				.txt{
+ 					color: #f00;
+ 				}
+ 			}
+ 		}
+ 	}
+ 	
+ 		
+ }
 
 
 </style>

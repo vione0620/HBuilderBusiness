@@ -26,8 +26,7 @@
 		onLoad() {						
 			const platform = uni.getSystemInfoSync().platform
 			const ready = plus.navigator.hasSplashscreen()
-			if(platform == "android"){ 
-				// console.log('anananna')
+			if(platform == "android"){  
 				this.androidPage = true
 				setTimeout(()=>{
 					this.showLoad()
@@ -47,23 +46,18 @@
 			showLoad(){				
 				const ready = plus.navigator.hasSplashscreen()
 				const platform = uni.getSystemInfoSync().platform 
-				if(ready && !this.iswelcome){
-					console.log(ready,this.iswelcome)
-					 console.log('非首次安装')  
+				if(ready && !this.iswelcome){ 
 				}else{
 					this.loadExecution()  
-					console.log('首次安装')
 				} 
 			},
 			loadpage(){   
 				const platform = uni.getSystemInfoSync().platform
-				if(platform == "android"){
-					console.log('androidandroidandroid')
+				if(platform == "android"){ 
 					if(this.androidPage && !this.iswelcome){
 						uni.redirectTo({
 							url:'../index/index', 
-						})
-						// console.log('zhelizheli')
+						}) 
 					}else{
 						this.androidPage = false
 						this.iswelcome = true
@@ -106,14 +100,14 @@ page{
 	
 	.close{
 		position: absolute;
-		right: 40rpx;
+		right: 60rpx;
 		top: 80rpx;
 		background-color: #FFFFFF;
 		opacity: .5;
 		// width: 120rpx;
 		text-align: center;
 		// height: 48rpx;
-		padding:12rpx 24rpx;
+		padding:6rpx 16rpx;
 		border-radius: 30rpx;
 	}
 }

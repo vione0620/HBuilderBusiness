@@ -21,7 +21,7 @@
 				</view>
 			</view> 
 			<view class="footer">
-				<view class="left"><text class="tit">用券</text><text class="txt">-{{number}}</text>元</view>
+				<view class="left"><text class="tit">用券</text><text class="txt">{{number}}</text>元</view>
 				<view class="right">
 					<view class="btn" @tap="checed_back()">确定</view>
 				</view>

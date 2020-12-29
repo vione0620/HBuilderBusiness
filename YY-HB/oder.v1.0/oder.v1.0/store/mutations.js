@@ -16,6 +16,7 @@ import {
 	STOCK_TOP_SCROLL,
 	RECEIVE_STOCK_GOODS,
 	RECEIVE_ORDER_LIST,
+	RECEIVE_UNPAY_ORDER_LIST,
 	RECEIVE_USER_UNITY_LIST,
 	RECEIVE_GET_MONEY_RECORD,
 	RECEIVE_AGENT_LIST,
@@ -29,7 +30,9 @@ import {
 
 export default { 
 	//接收商家下单页面数据
-	[RECEIVE_MALL_GOODS](state,goods){ 
+	[RECEIVE_MALL_GOODS](state,goods){  
+		//商品分类排序 end
+		
 		const breakfastGoods = goods.breakfastGoods 
 		//需要追加必买项的类目
 		// state.addDrink =  Object.values(goods.mustBuyGoods) 
@@ -40,8 +43,10 @@ export default {
 		//购买限制量
 		state.limitNum = goods.limitNum
 		state.limitAmt = goods.limitAmt
+		state.canCredit = goods.canCredit
+		
 		state.mallSrot = Object.keys(breakfastGoods)
-		state.mallFoods = Object.values(breakfastGoods)		
+		state.mallFoods = Object.values(breakfastGoods)
 		 
 		// 分别必加项
 		// const mfoods = [].concat.apply([],state.mallFoods) 		 
@@ -249,7 +254,7 @@ export default {
 		// } 
 		
 	},
-	
+	//上热门
 	[SET_HOT_SALE](state,isfood){ 
 		if(!isfood.hotSale){
 			Vue.set(isfood,'hotSale','1')    
@@ -257,7 +262,7 @@ export default {
 			isfood.hotSale = '0'			
 		}else{
 			isfood.hotSale = '1'
-		} 
+		}  
 	},
 	//清空
 	[CLEAR_CART](state){
@@ -284,12 +289,22 @@ export default {
 	}, 	 
 	//接收庫存頁面的数据
 	[RECEIVE_STOCK_GOODS](state,stock){  
+		// console.log('stockstockstockstock',stock)
 		state.stockStock = stock.sort
-		state.stockFoods = stock.goods 
+		state.stockFoods = stock.goods
+		// console.log(stock.sort[0])
+		// state.hotStock = stock.goods[0]
+		// console.log(stock.goods[0])
 	},
 	//接收商家订单列表数据
 	[RECEIVE_ORDER_LIST](state,order){
+		// console.log(order)
 		state.userOrderList = order
+	},
+	//商家未结算订单列表数据
+	[RECEIVE_UNPAY_ORDER_LIST](state,order){
+		state.userUnPayList = order
+		// console.log(order)
 	},
 	
 	//接收用户购买订单列表数据
@@ -309,7 +324,7 @@ export default {
 	
 	//接收未支付订单数据
 	[RECEIVE_PREVIOUS_ORDER](state,unpaid){
-		console.log('未支付weizhifudingdan',unpaid)
+		// console.log('未支付weizhifudingdan',unpaid)
 		state.previousOrder = unpaid
 	},
 	

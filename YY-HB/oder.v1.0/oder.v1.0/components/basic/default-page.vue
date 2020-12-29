@@ -15,7 +15,7 @@
 			<view class="cont">
 				<image src="@/static/default_null@1x.png" class="img" mode="scaleToFill"></image>
 				<view class="txt">当前无库存</view>
-				<view class="txt txt-red">请在有效时间内订购商品</navigator></view>
+				<!-- <view class="txt txt-red">请在有效时间内订购商品</navigator></view> -->
 			</view>
 		</view>
 		
@@ -60,8 +60,12 @@
 			text-align: center;
 			padding-top: 200rpx;
 			.img{
-				width: 512rpx;
-				height: 332rpx; 
+				width: 320rpx;
+				height: 240rpx; 
+			}
+			uni-image{
+				width: 400rpx;
+				height: 300rpx;
 			}
 			.gifimg{
 				max-width: 100%;

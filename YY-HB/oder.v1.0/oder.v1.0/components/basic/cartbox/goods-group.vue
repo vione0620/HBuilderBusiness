@@ -9,18 +9,18 @@
 					<view class="text-item"> 
 						<view class="title">
 							<view class="name">{{goodsItem.goodsName}}</view>  
-							<view class="hotbtn" @tap="HotSale(goodsItem)"  
+							<!-- <view class="hotbtn" @tap="HotSale(goodsItem)"  
 							:class="(goodsItem.hotSale==='0' || goodsItem.hotSale === undefined) ? '' : 'hotbtn-active'" >
-							{{(goodsItem.hotSale==='0' || goodsItem.hotSale === undefined) ? '上热门' : '热门'}}</view>
-						</view>
-						<view class="etalon">重量：{{goodsItem.goodsWeight}} 克</view> 
-						<view class="etalon">规格：{{goodsItem.goodsQuantity}} {{goodsItem.goodsUnit}}</view> 
-						<template>
+							{{(goodsItem.hotSale==='0' || goodsItem.hotSale === undefined) ? '上热门' : '热门'}}</view> -->
+						</view> 
+						<template v-if="goodsItem.onSale == 0">
+							<view class="etalon">重量：{{goodsItem.goodsWeight}} 克</view> 
+							<view class="etalon">规格：{{goodsItem.goodsQuantity}} {{goodsItem.goodsUnit}}</view> 
 							<view class="boot">
-								<view class="price">{{parseFloat((goodsItem.merchPrice * goodsItem.goodsQuantity)/100).toFixed(2)/1}}<text>元</text></view>  
+								<view class="price">{{parseFloat((goodsItem.merchPrice * goodsItem.goodsQuantity)/100).toFixed(2)/1}}<text style="font-size: 20rpx;">元</text></view>  
 								<get-btn-item :foods="goodsItem"></get-btn-item> 
 							</view> 
-						</template>
+						</template> 
 					</view>
 				</view> 
 			</view>
@@ -47,9 +47,9 @@ export default {
 		this._gdsScrollY() 
 	},
 	methods:{
-		HotSale(isHot){			 
-			this.$store.commit('set_hot_sale',isHot) 
-		},
+		// HotSale(isHot){			 
+		// 	this.$store.commit('set_hot_sale',isHot) 
+		// },
 		_gdsScrollY(){  
 			let selectorQuery = uni.createSelectorQuery(); 
 			selectorQuery.selectAll('.goodslist-group').boundingClientRect((rects)=> {
@@ -62,6 +62,10 @@ export default {
 </script>
 
 <style lang="scss">
+.infotxt{
+	color: #FF0000;
+	font-size: 26rpx;
+}
 
  .goodslist-group{
 	 

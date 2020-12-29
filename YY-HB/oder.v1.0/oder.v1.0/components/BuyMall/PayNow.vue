@@ -52,14 +52,7 @@
 				
 				checktype:this.PayNowData.checktype ,
 			};
-		},
-		created() { 
-			console.log(this.PayNowData)
-		},
-		// radioChange(e){ 
-		// 	// this.$emit('choose-type',e.target.value)
-		// 	console.log(e)
-		// },
+		}, 
 	}
 </script>
 

@@ -100,7 +100,6 @@ export default {
 		uni.getLocation({
 			type:'gcj02',
 			success: (res=> {			 
-				console.log(res)
 				let longNums = JSON.stringify(res.longitude)
 				let latNums = JSON.stringify(res.latitude)
 				

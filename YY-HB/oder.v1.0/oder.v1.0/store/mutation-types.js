@@ -16,6 +16,7 @@ export const GOODS_TOP_SCROLL = 'goods_top_scroll'  //接收每个商品分类�
 export const STOCK_TOP_SCROLL = 'stock_top_scroll'  //接收每个商品分类距顶部的距离
 export const RECEIVE_STOCK_GOODS = 'receive_stock_goods' //接收库存页面数据
 export const RECEIVE_ORDER_LIST = 'receive_order_list' //接收商家订单页面数据
+export const RECEIVE_UNPAY_ORDER_LIST = 'receive_unpay_order_list' //接收商家未结算订单数据receive_unpay_order_list
 export const RECEIVE_USER_UNITY_LIST = 'receive_user_unity_list' //接收买家个人用户订单页面数据
 export const RECEIVE_GET_MONEY_RECORD = 'receive_get_money_record' //接收买家个人用户订单页面数据
 export const RECEIVE_AGENT_LIST = 'receive_agent_list' //代放管理页面数据

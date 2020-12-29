@@ -231,7 +231,7 @@
 			},
 			setConfirm(){				
 				uni.redirectTo({
-					url:'../../payment/setup?type=setup'
+					url:'../../payment/setup?type=setup&page=check'
 				})
 			},
 			authidConfirm(){

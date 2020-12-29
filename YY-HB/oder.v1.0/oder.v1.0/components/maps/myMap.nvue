@@ -98,8 +98,7 @@
 				point1,
 				point2,
 				(event)=>{
-					var distance = event.distance;  // 转换后的距离值  
-					// console.log(Math.ceil(distance))
+					var distance = event.distance;  // 转换后的距离值   
 					
 					this.myMapSetZoom(Math.ceil(distance))
 				},(err)=>{ 

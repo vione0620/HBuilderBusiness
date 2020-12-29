@@ -11,12 +11,16 @@
 		<template v-if="isready">
 			<block v-for="(item,index) in workData" :key="'4'+index">
 				<view class="group">
-					<view class="area">{{item.areaName}}</view>
+					<view class="area">{{item.cityName}}</view>
 					<image :src="item.avatar + '?imageView2/1/w/160/h/160' ? item.avatar : '../../../static/noImg.png'" class="urlImg" mode="widthFix"></image>
 					<view class="info">
-						<view class="name">姓名：{{item.busiManager}}</view>
-						<view class="txt">职务：{{item.workPosition}}</view>
-						<view class="txt" @tap="callNo(item.busiPhone)" v-if="item.busiPhone">联系电话：<text class="color-green">{{item.busiPhone}}</text></view>
+						<view class="name">{{item.busiManager}}</view>
+						<view class="txt">职位：{{item.workPosition}}</view>
+						<view class="txt">区域：{{item.areaName}}</view>
+						<view class="txt" 
+						@tap="callNo(item.busiPhone)" 
+						v-if="item.busiPhone">电话：<text class="iconfont icondianhua-copy color-green"></text>
+						<text class="color-green txt_line">{{item.busiPhone}}</text>  </view>
 					</view>
 				</view> 
 			</block>
@@ -92,7 +96,7 @@
 		
 		.color-green{
 			color: #46B85B;
-		}
+		} 
 		
 		.group{ 
 			margin: 20rpx;
@@ -114,7 +118,7 @@
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				background-color: #46B85B;
+				background-color: #9CC670;
 				border-adius: 12rpx;
 				font-size: 32rpx;
 				padding: 0 10rpx 6rpx 30rpx; 
@@ -140,6 +144,9 @@
 					color: #666666;
 					padding-bottom: 20rpx;
 				}
+			}
+			.txt_line{
+				text-decoration: underline;
 			}
 		}
 		

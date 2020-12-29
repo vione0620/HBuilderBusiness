@@ -2,9 +2,11 @@
 	<view class="stock-group">  
 		<view class="title stock-title">{{category}}</view>
 		<block v-for="(child,index) in goods" :key="'4'+index"> 
-			<view class="item-wrap"> 
-				<goods-stock :goods-item="child" :goods-index="index"
-				></goods-stock> 
+			<view class="item-wrap">
+				<view class="" v-if="index === 0">
+					<goods-stock :goods-item="child" :goods-index="index" @hot-sell="SetHotSell" @i-show="iShow" @is-down="isDown"
+					></goods-stock> 
+				</view>
 			</view>
 		</block>
 	</view>   
@@ -26,11 +28,28 @@
 			}
 		  },
 		  category:[String],
+		  iShow:{
+			  type:Boolean,
+			  default(){
+				  return true
+			  },
+		  },
+		  isDown:{
+			  type:Boolean,
+			  default(){
+				  return false
+			  },
+		  },
 		},
 		mounted() {
 			this._gdsScrollY() 
 		}, 
-		methods:{   			
+		methods:{   				  
+			SetHotSell(isHot){
+				// console.log(isHot)
+				this.$emit('set-hot-sell',isHot)
+				// this.$store.commit('set_hot_sale',isHot) 
+			},
 			_gdsScrollY(){  
 				let selectorQuery = uni.createSelectorQuery(); 
 				selectorQuery.selectAll('.stock-group').boundingClientRect((rects)=> {
@@ -42,21 +61,19 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
- .goodslist-group{
+ .stock-group{
 	 
-	 padding: 20rpx; 
-	 background-color: #FFFFFF;
-	 margin-bottom: 20rpx; 
+	 padding: 20rpx 0; 
+	 background-color: #FFFFFF; 
 	 border-radius: 12rpx;
 	 
 	 
 	 .title{
-		 font-size: 36rpx; 
-		 padding-bottom: 20rpx;
-		 
-	 }  
+		 font-size: 36rpx;  
+		 padding: 20rpx 0; 
+	 } 
 	 
  }
 </style>

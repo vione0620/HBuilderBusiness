@@ -206,19 +206,33 @@
 				},{
 					token:true
 				}).then(res=>{  
-					uni.showToast({
-						icon:'none',
-						title: res.message,
-						duration: 2000
-					})
 					if(res.code == 200){
+						if(type == 'change'){
+							uni.showToast({
+								icon:'none',
+								title: `${res.message},请重新登录`,
+								duration: 2000
+							})								
+						}else if(type == 'forget'){								
+							uni.showToast({
+								icon:'none',
+								title: `${res.message},即可登录`,
+								duration: 2000
+							})		
+						}
 						setTimeout(()=>{
 							uni.reLaunch({
 								url:'../login/login'
-							})
-						},300)	
+							}) 
+						},3000)	
 						this.$store.commit('logout') 
 						this.$store.commit('logStatus',false)
+					}else{
+						uni.showToast({
+							icon:'none',
+							title: `${res.message}`,
+							duration: 2000
+						})						
 					}
 					
 				}).catch()	

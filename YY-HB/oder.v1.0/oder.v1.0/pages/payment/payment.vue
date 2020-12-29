@@ -1,7 +1,9 @@
 <template>
 	<view class="wrap">
 		<view class="group"> 
-			<!-- <uni-list-item title="设置密码"  @click="navTo('./setup?type=setup')"></uni-list-item> -->
+			<view v-if="firstTimeGetMoney == 0">
+				<uni-list-item title="设置密码"  @click="navTo('./setup?type=setup&page=prev')"></uni-list-item>				
+			</view>
 			<uni-list-item title="修改密码"  @click="navTo('./setup?type=change')"></uni-list-item>
 			<uni-list-item title="忘记密码"  @click="navTo('./setup?type=forget')"></uni-list-item> 
 		</view>
@@ -16,8 +18,11 @@
 		},
 		data() {
 			return {
-				
+				firstTimeGetMoney:1,
 			}
+		},
+		onLoad() { 			
+			this.firstTimeGetMoney = uni.getStorageSync('initPayPaswd')
 		},
 		methods: {
 			navTo(urls){

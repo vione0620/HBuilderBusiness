@@ -51,8 +51,7 @@
 			this.current_year = handleYear()
 			this.m_month_week(this.rkYear)
 			this.w_week_interval(this.rkYear)
-			this.anchor_m() 
-			// console.log(this.rkYear,this.current_year)
+			this.anchor_m()  
 		}, 
 		props: {
 		  is_child_week:Object, 
@@ -60,8 +59,7 @@
 		methods:{ 
 			anchor_m(){
 				let current_month = handleMonth() 
-				this.myscroll = current_month 
-				console.log(current_month)
+				this.myscroll = current_month  
 			}, 
 			m_month_week(rkYear){
 				//一年中每个月多少周列表渲染 
@@ -77,8 +75,7 @@
 				//一年中所有区间周的数据
 				this.weeksInterval = handleWeeksInterval(rkYear)	 
 			},
-			chooesWeeks(month){  
-				console.log((+month.month),month.week_index,this.is_child_week.week)
+			chooesWeeks(month){   
 				if(this.myscroll === (+month.month) && month.week_index > this.is_child_week.week-1){ 
 					return
 				}

@@ -141,7 +141,8 @@
 					newpwd:'',
 					checkpwd:'',
 				}, 
-				islock:''
+				islock:'',
+				fristime:'',
 			}
 		}, 
 		onLoad(option) { 
@@ -170,8 +171,8 @@
 			}
 			this.loginWhether = uni.getStorageSync('status')  
 			this.merchNo = uni.getStorageSync('user').merchNo		
-			
-			
+			this.fristime = option.page 
+				
 		}, 
 		methods: {					 
 			matchFormat(type,param){  
@@ -252,14 +253,7 @@
 							title:'至少6位数字',
 							duration:2000
 						})
-						return false
-					// }else if(param.identCard.length < 15 || param.identCard.length > 18){ 
-					// 	uni.showToast({
-					// 		icon:'none',
-					// 		title:'请核对身份证号码',
-					// 		duration:2000
-					// 	})
-					// 	return false 
+						return false 
 					}else if(!paymentPaswd(param.newPayPwd) || !paymentPaswd(param.newPayPwd2)){ 
 						uni.showToast({
 							icon:'none',
@@ -416,12 +410,20 @@
 					})
 					if(res.code == 200){						
 						if(type == 'set'){			 
-							uni.setStorageSync('initPayPaswd',1)	 
-							setTimeout(()=>{ 									
-								uni.redirectTo({ 
-									url:'../wallet/moeny/check?seted=true'
+							uni.setStorageSync('initPayPaswd',1)	
+							if(this.fristime == 'prev'){
+								uni.navigateBack({
+									delta:1,
+									animationType: 'pop-out',
+									animationDuration: 200
 								})
-							},500) 
+							}else{
+								setTimeout(()=>{ 									
+									uni.redirectTo({ 
+										url:'../wallet/moeny/check?seted=true'
+									})
+								},1000) 								 
+							}
 						}else if(type == 'forget'){		
 							setTimeout(()=>{ 
 								uni.navigateBack({
@@ -429,7 +431,7 @@
 									animationType: 'pop-out',
 									animationDuration: 200
 								})
-							},500) 	
+							},1000) 	
 						} 
 					}
 				}).catch()	

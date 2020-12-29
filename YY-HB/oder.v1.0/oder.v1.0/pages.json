@@ -21,9 +21,11 @@
 								"color":"#FFFFFF",
 								"colorPressed":"#46e66c",
 								"float":"right",
-								"fontSize":"24px",
+								"fontSize":"28px",
 								"fontSrc":"/static/iconfont.ttf",
-								"text":"\ue667"
+								"text":"\ue667",
+								"width":"70px"
+								
 							}
 						],
 						"autoBackButton":false

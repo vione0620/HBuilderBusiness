@@ -4,12 +4,7 @@
 			<scroll-view scroll-y scroll-with-animation show-scrollbar="true" :style="'height:'+ scrollH +'px;'">
 				<!-- 预支付商品列表 -->
 				<pre-pay-list :pre-pay-list="PrePayListData"></pre-pay-list>
-				<!-- 预支付商品列表 end-->
-				
-				<view class="editMark">		
-					<view class="name">备注</view>
-					<textarea class="markArea" :value="markText" @blur="bindTextAreaBlur" auto-height placeholder-style="color:#777" placeholder="请准时送到"></textarea>
-				</view>
+				<!-- 预支付商品列表 end--> 
 			</scroll-view>
 			<btn-foot title="确认订单" @tap="btnClick" :fixd="true"></btn-foot> 
 		</view>
@@ -18,7 +13,7 @@
 		<uni-popup ref="popup" type="bottom"> 
 			<view class="pay_checked" style="">
 				<view class="title">合计：{{PayActual}}元</view>
-				<view v-if="disablepay" class="oncredit">您选择了先铺货再付款</view> 
+				<view v-if="disablepay" class="oncredit">您选择了先铺货后付款</view> 
 				<view class="get_coupon" v-if="!disablepay">
 					<view class="group">
 						<view class="left">满减券/优惠</view>
@@ -53,7 +48,7 @@
 					<btn-foot title="确认下单" class="topayBtn" @tap="toOnCredit()"></btn-foot> 
 				</template>
 				<template v-if="!disablepay"> 
-					<btn-foot title="立即结清" class="topayBtn" @tap="toPayBtnPre()"></btn-foot> 
+					<btn-foot title="立即结清" class="topayBtn" @tap="getUnpaidOrder('nowPay')"></btn-foot> 
 				</template>
 			</view>
 		</uni-popup>
@@ -62,14 +57,14 @@
 		<!-- 有订单未结清 -->
 		<uni-popup ref="hasUnpaid" type="center" :maskClick="false">
 			<view class="unpaid_checked" style="">
-				<view class="title">您有一笔未结清订单！</view> 
+				<view class="title">您有一笔未结清订单！ <view @tap="closePrev()" class="iconfont iconclose closePrev"></view></view> 
 				<scroll-view :scroll-top="scrollTop" style="height: 160px; width: 260px" show-scrollbar="true"
 				class="unpaid-list" scroll-y="true">  
 					<view class="conten_list" v-for="(foods,index) in this.UnPaidData.content">  
 						<view class="group">
 							<view class="tit">{{foods.goodsName}} * {{foods.goodsNum}}</view>
 							<view class="cont">
-								<view class="price">{{parseFloat(foods.merchPrice * foods.goodsNum / 100).toFixed(2)}}元</view>
+								<view class="price">{{parseFloat(foods.merchPrice * foods.goodsNum / 100).toFixed(2)/1}}元</view>
 								<view class="unit">{{foods.goodsQuantity}}{{foods.goodsUnit}} * {{foods.goodsNum / foods.goodsQuantity}}</view>
 							</view>
 						</view>
@@ -81,17 +76,7 @@
 						<view class="group"><view class="">收货地址</view><view class="txt">{{this.UnPaidData.busiAddr}}</view></view> 
 					</view>    
 				</scroll-view> 
-				<view class="listmore down">﹀ 向下滑动查看更多</view>
-				
-				<view class="get_coupon">
-					<view class="group">  
-						<view class="left">满减券/优惠</view>
-						<view class="right" @tap="navtoGetCoupon('prev')"> 							
-							<view :class="this.got ? 'txt' : ''">{{this.couponid}}</view>
-						</view>
-					</view>
-				</view>
-				<view class="totalNum"><view class="left">待支付总计：</view><view class="right">{{prePayable}}元</view></view> 
+				<view class="listmore down">﹀ 向下滑动查看更多</view> 
 				<view class="totalNum"><view class="left">实际应支付：</view><view class="right">{{prePayActual}}元</view></view>
 				<radio-group @change="radioChange">
 					<pop-up names="支付宝支付" iconImg="alipay">
@@ -101,26 +86,25 @@
 						<view slot="radioPay"><radio :value="checktype[1]" color="#09BB07" /></view>
 					</pop-up>
 				</radio-group>
-				<btn-foot title="立即结清" class="topayBtn" @tap="getUnpaidOrder()"></btn-foot> 
+				<btn-foot title="立即结清" class="topayBtn" @tap="getUnpaidOrder('prevPay')"></btn-foot> 
 			</view>
 		</uni-popup>
 		<!-- 有订单未结清 end-->
 		 
 		<!-- 预支付选择支付方式 -->
-		<uni-popup ref="onCredit" type="center" :maskClick="false">
+		<uni-popup ref="onCredit" type="center">
 			<view class="credit_checked" style="">
 				<view class="title">您可以先铺货后付款！</view> 
 				<view class="content"> 
 					本次订单款项于下次进货前结清
 				</view>  
-				<view class="checkOnCredit">
+				<view class="checkOnCredit"> 
 					<view class="checkBtn yes" @tap="checkOnCredit(true)">后付款</view>
 					<view class="checkBtn no" @tap="checkOnCredit(false)">立即付款</view>
-				</view>
+				</view> 
 			</view>
 		</uni-popup>
-		<!-- 预支付选择支付方式 end-->
-		
+		<!-- 预支付选择支付方式 end-->	
 		
 	</view>
 </template>
@@ -141,8 +125,7 @@
 		data(){
 			return { 
 				loginWhether:'',//登陆状态
-				merchNo:'', //商户号
-				
+				merchNo:'', //商户号				
 				newOrderGoods:[], //预支付下单时的商品数据
 				markText:'', 
 				getOrderNo:'', 
@@ -160,6 +143,8 @@
 				got:false,
 				prevTime:false,
 				clock:false,
+				PreStatus:false,
+				prePOrder:'',
 			}
 		},
 		components:{
@@ -170,33 +155,32 @@
 			PrePayList,
 		}, 
 		computed:{ 
-			...mapState(['cartGoods','previousOrder','getCouponId','getCartAmt','limitAmt','getUnusualAmt','getUnusualNo']),
+			...mapState(['cartGoods','previousOrder','getCouponId','getCartAmt','limitAmt','canCredit','getUnusualAmt','getUnusualNo']),
 			...mapGetters(['totalCount','totalPrice','prevOrderPrice']), 
 			
 			Payable:function(){
-				return this.numFloat(this.totalPrice).toFixed(2)
+				return this.numFloat(this.totalPrice).toFixed(2) / 1
 			},
 			PayActual:function(){
 				let org = this.totalPrice, 
 					now = this.getCartAmt ? this.getCartAmt : 0 ,
-					actualNums = this.numFloat(org -now).toFixed(2) 
+					actualNums = this.numFloat(org -now).toFixed(2) / 1
 				return actualNums
 			},
 			prePayable:function(){
-				return this.numFloat(this.prevOrderPrice).toFixed(2)
+				return this.numFloat(this.prevOrderPrice).toFixed(2) / 1
 			},
 			prePayActual:function(){
 				let actualNums = ''
-				if(this.clock){			
+				if(this.clock || this.prevOrderPrice){	 
 					let org = this.prevOrderPrice,
 						now = this.getUnusualAmt ? this.getUnusualAmt : 0;
-					actualNums = this.numFloat(org - now).toFixed(2) 
-				}else{
+					actualNums = this.numFloat(org - now).toFixed(2) / 1
+				}else{ 
 					let org = this.totalPrice,
-						now = this.getCartAmt ? this.getCartAmt : 0 ,
-						actualNums = this.numFloat(org - now).toFixed(2) 	
-				}
-					
+						now = this.getCartAmt ? this.getCartAmt : 0 ;
+						actualNums = this.numFloat(org - now).toFixed(2) / 1 
+				} 
 				return actualNums
 			}, 
 		}, 
@@ -205,16 +189,19 @@
 			this.merchNo = uni.getStorageSync('user').merchNo				
 			this.perpay() 
 			
-			this.$nextTick(()=>{
-				if(option.status == 'true'){ 					
-					this.getBreakfastOrderDetail()					
-					let getoNo = this.previousOrder.orderNo
-					
-					this.getOrderCoupon(getoNo)
-					
-					this.$refs.hasUnpaid.open()
-				}
-			}) 
+			this.prePOrder = option.orderno 
+			if(option.status == 'true' && option.from != 'mallcar'){ 	
+				// 滞后弹出 begin
+				// this.PreStatus = true
+				// this.getPrevOrder()		
+				// 滞后弹出 end
+				// 预先弹出 begin
+				this.getPrevOrder()
+				this.$nextTick(()=>{
+					this.$refs.hasUnpaid.open()	
+				})		
+				// 预先弹出 end
+			} 
 		},
 		
 		onShow() {			
@@ -242,6 +229,12 @@
 			this.$store.dispatch('get_coupon_id','')
 		},
 		methods:{ 
+			closePrev(){ 
+				this.$refs.hasUnpaid.close()
+			},
+			closePopup(){
+				this.$refs.popup.close()
+			},
 			//预支付处理 begin
 			perpay(){ 
 				//转换商品数据，准备支付时调用
@@ -255,11 +248,19 @@
 					this.newOrderGoods.push(res) 
 				} 
 			},			
-			bindTextAreaBlur(e){ 
-				this.markText = e.detail.value ? e.detail.value : '无' 
-			},
-			btnClick(){  
-				this.$refs.onCredit.open() 
+			// bindTextAreaBlur(e){ 
+			// 	this.markText = e.detail.value ? e.detail.value : '无' 
+			// },
+			btnClick(){   
+				// if(this.PreStatus){
+				// 	this.getPrevOrder()
+				// 	this.$refs.hasUnpaid.open()					
+				// }else 
+				if(this.canCredit == 1){ 
+					this.$refs.popup.open()	
+				}else{
+					this.$refs.onCredit.open()
+				} 
 			},			
 			checkOnCredit(option){
 				this.$refs.onCredit.close()
@@ -272,7 +273,7 @@
 								content:`当前购买限额${this.limitAmt / 100}`,
 								showCancel:false,
 								success:(res)=> {
-									uni.navigateBack({
+									uni.navigateTo({ 
 										delta:1
 									})
 								},
@@ -310,13 +311,11 @@
 				let amt = ''
 				let page = ''
 				if(urls == "thisone"){ 
-					this.prevTime = false
-					
+					this.prevTime = false					
 					uni.navigateTo({
 						url:`../../account/coupon/usable?type=${this.totalPrice}&page=thisone`,
 					}) 
-				}else{ 
-					
+				}else{
 					if(!this.clock){	
 						this.prevTime = true
 						uni.navigateTo({
@@ -330,144 +329,36 @@
 						})
 					}
 				} 
-			},
-			toPayBtnPre(){
-				let getPayType = this.chooseType	 
-				switch (getPayType){
-					case 'alipay':
-						this.downOrderPay(2) 
-					break;
-					case 'weixin':
-						this.downOrderPay(1)
-					break;					
-				} 
-			}, 
-			downOrderPay(type_pay){ 
-				let vVlue = ''
-				if(this.getCouponId.couponNo){ 
-					vVlue = {
-						"merchNo":this.merchNo,
-						"orderType":1,
-						"orderAmt":this.totalPrice,
-						"couponNo":this.getCouponId.couponNo,
-						"remark":this.markText ? this.markText : '无',
-						"orderGoods":JSON.stringify(this.newOrderGoods),
-						"payType":type_pay,
-						} //必传  
-				}else{ 
-					vVlue = {
-					"merchNo":this.merchNo,
-					"orderType":1,
-					"orderAmt":this.totalPrice,
-					"remark":this.markText ? this.markText : '无',
-					"orderGoods":JSON.stringify(this.newOrderGoods),
-					"payType":type_pay,
-					} //必传  
-				}
-			
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 		 
-				
-				this.$request.post('downOrderPay',{
-					...vVlue,
-					"sign": sSign
-				},{
-					token:true
-				}).then(res => { 	
-					
-					this.$refs.popup.close()
-					let changeIsRegular = {"isRegular": 1}
-					if(res.code === 200){ 
-						if(type_pay == 2){
-							let ordinfo = res.data.toString() 
-							uni.requestPayment({
-								provider: 'alipay',
-								orderInfo: ordinfo, 
-								success: (res) => {									
-									uni.setStorageSync('isRegular',changeIsRegular)		 
-									uni.reLaunch({
-										url:'../index/index'
-									})
-									// this.$store.dispatch('get_coupon_id','')
-								},
-								fail: (err)=>{ 			
-									uni.setStorageSync('isRegular',changeIsRegular)		
-									uni.showToast({
-										icon:'none',
-										title:'支付失败',
-										duration: 2000
-									}) 
-									uni.redirectTo({ 
-										url:'../../finance/outlay/list'
-									})
-								},								
-								complete:()=>{
-									this.$store.dispatch('get_coupon_id','')
-									this.$store.dispatch('get_cart_amt','')								
-								},
-							});
-						}else if(type_pay == 1){	
-							let getRes = res.data 
-							let getOrderInfo = {
-								"appid": getRes.appId,
-								"noncestr": getRes.nonceStr,
-								"package": getRes.packageValue,
-								"partnerid": getRes.partnerId,
-								"prepayid": getRes.prepayId,
-								"timestamp": getRes.timeStamp,
-								"sign":getRes.sign,
-							}  
-												
-							uni.requestPayment({
-								provider: 'wxpay',
-								orderInfo: getOrderInfo,
-								success: (res) => {							 
-									uni.setStorageSync('isRegular',changeIsRegular)				 
-									uni.reLaunch({ 
-										url:'../index/index'
-									})
-									// this.$store.dispatch('get_coupon_id','')
-								},
-								fail: (err)=>{ 			 
-									uni.setStorageSync('isRegular',changeIsRegular)		
-									uni.showToast({
-										icon:'none',
-										title:'支付失败',
-										duration: 2000
-									}) 
-									
-									uni.redirectTo({ 
-										url:'../../finance/outlay/list'
-									})
-								},								
-								complete:()=>{
-									this.$store.dispatch('get_coupon_id','')
-									this.$store.dispatch('get_cart_amt','')								
-								},
-							})  
-						} 
-					}else if(res.code == 400){ 
-						uni.showToast({ 
-							icon:'none', 
-							title:res.message, 
-							duration: 2000 
-						}) 	
-						setTimeout(()=>{
-							uni.redirectTo({
-								url:'../../finance/outlay/list'
-							})							
-						},2000)
-					}
-				}).catch()
-			},
+			},			
 			//预支付处理 end
 			
-			//有为结清订单
-			
+			//有未结清订单			
+			getPrevOrder(){
+				let vVlue = {"merchNo":this.merchNo,"orderType":1} 
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()  
+				
+				this.$request.post('getPrevOrder',{
+				  ...vVlue, 
+				  "sign": sSign
+				},{
+					token:true
+				}).then((res)=>{  
+					if(res.code == 200 && res.data){  
+						this.prevOrder = res.data
+						this.$store.dispatch('receive_previous_order',res.data)  
+						if(res.data.orderNo){
+							this.hasFinalPay = true  
+							this.getBreakfastOrderDetail()
+							this.getOrderCoupon(res.data.orderNo) 							
+						}
+					}
+				})
+			},
 			getBreakfastOrderDetail(){   
-				let vVlue = {"merchNo":this.merchNo,"orderNo":this.previousOrder.orderNo} //必传 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
+				let vVlue = {"merchNo":this.merchNo,"orderNo":this.previousOrder.orderNo} 
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()  
 				
 				this.$request.post('getBreakfastOrderDetail',{
 				  ...vVlue, 
@@ -481,15 +372,15 @@
 					}
 				}) 
 			},		
-			getUnpaidOrder(){ 
-				this.toPayBtn()   
+			getUnpaidOrder(type){ 
+				this.toPayBtn(type)   
 			},  
 			
 			//获取不寻常订单信息
 			getOrderCoupon(option){
-				let vVlue = {"merchNo":this.merchNo,"orderNo":option} //必传 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 
+				let vVlue = {"merchNo":this.merchNo,"orderNo":option} 
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()
 				this.$request.post('getOrderCoupon',{
 					...vVlue,
 					"sign": sSign
@@ -511,173 +402,181 @@
 									no:resData.coupon[0].couponNo
 								} 
 								this.$store.dispatch('get_unusual_amt',unusual) 
-							}
-							//继续支付							
-							this.$refs.popup.open()
+							} 
 						}
-					}else{
-							
+					}else{							
 						uni.showToast({
 							icon:'none',
 							title:res.message,
 							duration: 2000
-						})
-					
+						})					
 					}
 				}).catch() 
 			},
 			//有为结清订单end
 			
 			
-			//先铺货后付款
-			
+			//先铺货后付款			
 			toOnCredit(){  
-			
-				this.prePayOrder()	
+				if(this.canCredit == 0){
+					this.creditOrder()	 
+				}
 			}, 
-			prePayOrder(){ 
-				 
-					
-				let vVlue = {
-					"merchNo":this.merchNo,
-					"orderType":1,
-					"orderAmt":this.totalPrice,
-					"remark":this.markText,
-					"orderGoods":JSON.stringify(this.newOrderGoods),
-					} //必传 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码  
-				
-				this.$request.post('prePayOrder',{
+			creditOrder(){ 
+				let vVlue = {"merchNo":this.merchNo,"orderNo":this.prePOrder}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()
+				this.$request.post('creditOrder',{
 					...vVlue,
 					"sign": sSign
 				},{
 					token:true
-				}).then(res => { 
-					uni.showToast({
-						icon:'none',
-						title:res.message,
-						duration: 2000
-					}) 	
-					if(res.code === 200){
-						let changeIsRegular = {"isRegular": 1}
-						uni.setStorageSync('isRegular',changeIsRegular)		
-						this.getOrderNo = res.data;	 
+				}).then(res => {  						
+					if(res.code == 200){
 						 uni.showLoading({
 							mask:true,
 							title:'恭喜您，下单成功！'
-						 })					
-						 this.$refs.popup.close()
-						 this.$store.dispatch('get_coupon_id','')
+						 }) 
 						 setTimeout(()=>{
-							uni.hideLoading()
-							uni.reLaunch({ 
-								url:'../index/index',
-							})
-						 },2000) 				
-					}else if(res.code == 400){
-						setTimeout(()=>{
-							uni.redirectTo({
-								url:'../../finance/outlay/list'
-							})							
-						},2000)
+							 uni.hideLoading()
+						 },1500)
+						 uni.redirectTo({ 
+							url:'../../finance/outlay/list'
+						 })
+					}else{				
+						uni.showToast({
+							icon:'none',
+							title:res.message,
+							duration: 2000
+						}) 	
 					}
-				}).catch()		 
-			}, 
-			
+				}).catch()
+				
+			},
 			//先铺货后付款 end
 			 
-			toPayBtn(){								
-				let getPayType = this.chooseType				
+			toPayBtn(type){								
+				let getPayType = this.chooseType	 
 				switch (getPayType){
-					case 'alipay':
-						this.payAlipay()
+					case 'alipay': 
+						this.payAlipay(type)
 					break;
 					case 'weixin':
-						this.payWeixin()
-					break;					
-				} 				
+						this.payWeixin(type)
+					break;
+				}				 
 			}, 
 			 
-			payAlipay(){
+			payAlipay(type){ 
 				let vVlue = ''
-				
+				let thisOrderNo = ''
+				let instantPay = ''
+				if(type == 'prevPay'){
+					thisOrderNo = this.previousOrder.orderNo
+					instantPay = 0
+				}else if(type == 'nowPay'){ 
+					thisOrderNo = this.prePOrder
+					instantPay = 1
+				} 
 				if(this.getCouponId.couponNo){
 					vVlue = {
 					"merchNo":this.merchNo,
-					"orderNo":this.previousOrder.orderNo,
+					"orderNo":thisOrderNo,
 					"couponNo":this.getCouponId.couponNo ? this.getCouponId.couponNo : '',
-					} //必传 
+					"instantPay":instantPay,
+					} 
 				}else if(this.clock){ 
 					vVlue = {
 						"merchNo":this.merchNo,
-						"orderNo":this.previousOrder.orderNo,
-						"couponNo":this.getUnusualNo ? this.getUnusualNo : ''
-						} //必传  
+						"orderNo":thisOrderNo,
+						"couponNo":this.getUnusualNo ? this.getUnusualNo : '',
+						"instantPay":instantPay,
+						}  
 				}else{
 					vVlue = {
-					"merchNo":this.merchNo,
-					"orderNo":this.previousOrder.orderNo, 
-					} //必传 
-				}	 
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码  
+						"merchNo":this.merchNo,
+						"orderNo":thisOrderNo,
+						"instantPay":instantPay,
+					} 
+				}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() 
 				this.$request.post('aliPayOrder',{
 					...vVlue,
 					"sign":sSign
 				},{
 					token:true
 				}).then(res => { 
-					let ordinfo = res.data.toString() 
-					uni.requestPayment({
-						provider: 'alipay',
-						orderInfo: ordinfo,
-						success: (res) => { 
-							this.$refs.hasUnpaid.close() 
-							// this.$store.dispatch('get_coupon_id','')
-						},
-						fail: (err)=>{ 
-							uni.showToast({
-								icon:'none',
-								title:'支付失败',
-								duration: 2000
-							})  
-							setTimeout(()=>{
-								uni.redirectTo({
-									url:'../index/index'
-								})
-							},2000)
-						},
-						complete:()=>{
-							this.$store.dispatch('get_coupon_id','')
-							this.$store.dispatch('get_cart_amt','')								
-						},
-					});
+					if(res.code == 200){
+						let ordinfo = res.data.toString()
+						uni.requestPayment({
+							provider: 'alipay',
+							orderInfo: ordinfo,
+							success: (res) => { 
+								this.$refs.hasUnpaid.close() 
+								this.PreStatus = false  
+								if(type == 'nowPay'){
+									setTimeout(()=>{
+										uni.redirectTo({
+											url:'../index/index'
+										})
+									},2000)								 					
+								}
+							},
+							fail: (err)=>{ 
+								uni.showToast({
+									icon:'none',
+									title:'支付失败',
+									duration: 2000
+								})    
+							},
+							complete:()=>{
+								this.$store.dispatch('get_coupon_id','')
+								this.$store.dispatch('get_cart_amt','')								
+							},
+						});
+					}else if(res.code == 400){
+						this.getPrevOrder()
+						this.$refs.hasUnpaid.open()			
+					}
 				}).catch()
 			},
 			
-			payWeixin(){   
+			payWeixin(type){  
 				let vVlue = ''
+				let thisOrderNo = ''
+				let instantPay = ''
+				if(type == 'prevPay'){
+					thisOrderNo = this.previousOrder.orderNo
+					instantPay = 0
+				}else if(type == 'nowPay'){
+					thisOrderNo = this.prePOrder
+					instantPay = 1
+				}
+				
 				if(this.getCouponId.couponNo && !this.clock){
 					vVlue = {
 					"merchNo":this.merchNo,
-					"orderNo":this.previousOrder.orderNo,
-					"couponNo":this.getCouponId.couponNo ? this.getCouponId.couponNo : ''
-					} //必传 
+					"orderNo":thisOrderNo,
+					"couponNo":this.getCouponId.couponNo ? this.getCouponId.couponNo : '',
+					"instantPay":instantPay,
+					} 
 				}else if(this.clock){ 
 					vVlue = {
 						"merchNo":this.merchNo,
-						"orderNo":this.previousOrder.orderNo,
-						"couponNo":this.getUnusualNo ? this.getUnusualNo : ''
-						} //必传  
+						"orderNo":thisOrderNo,
+						"couponNo":this.getUnusualNo ? this.getUnusualNo : '',
+						"instantPay":instantPay,
+						}  
 				}else{
 					vVlue = {
 					"merchNo":this.merchNo,
-					"orderNo":this.previousOrder.orderNo, 
-					} //必传 					
+					"orderNo":thisOrderNo,
+					"instantPay":instantPay,
+					} 					
 				}
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 	 
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()	 
 				this.$request.post('wxPayOrder',{
 					...vVlue,
 					"sign":sSign
@@ -700,19 +599,22 @@
 						    orderInfo: getOrderInfo, 
 							success: (res) => { 
 								this.$refs.hasUnpaid.close() 
+								this.PreStatus = false 
 								this.$store.dispatch('get_coupon_id','')
+								if(type == 'nowPay'){
+									setTimeout(()=>{
+										uni.redirectTo({
+											url:'../index/index'
+										})
+									},2000)		 					 					
+								} 
 							},
 							fail: (err)=>{ 
 								uni.showToast({
 									icon:'none',
 									title:'支付失败',
 									duration: 2000
-								})  
-								setTimeout(()=>{
-									uni.redirectTo({
-										url:'../index/index'
-									})
-								},2000)
+								})   
 							},							
 							complete:()=>{
 								this.$store.dispatch('get_coupon_id','')
@@ -723,6 +625,7 @@
 					 
 				}).catch() 
 			},
+			 
 			
 		},
 	}
@@ -732,71 +635,7 @@
 	.prePayOrder{ 
 		width: 100vw;  
 		padding: 20rpx;
-		 
-		.gopay-main{
-				
-			background-color: #FFFFFF;
-			border-radius: 8px;
-			padding: 20rpx;
-			 
-				.gopay-group{
-					padding: 20rpx;
-					display: flex;
-					justify-content: space-between;
-					border-bottom: 1px dashed #d4d4d4;
-					align-items: center;
-					
-					.name{
-						flex: 1;
-						font-size: 30rpx;
-						.red{
-							color: #f00;
-							font-size: 22rpx;
-							vertical-align: text-top;
-						}
-						.hots{
-							font-size: 22rpx;
-							color: #FF0000;
-							vertical-align: text-top;
-							padding-left: 8rpx;
-						}
-					}
-					.unit{
-						flex: 1;
-						font-size: 30rpx;
-						
-					}
-					.info{
-						flex: 1;
-						text-align: right; 
-						
-						.price{
-							font-size: 30rpx;
-						}
-						.nums{
-							font-size: 26rpx;
-							color: #999;
-						}
-					}
-					
-					 
-					
-				}  
-			
-		 .group-wrap-tot{
-			 padding: 20rpx;
-			 display: flex;
-			 justify-content: flex-end; 
-			 align-items: center;
-			.price{ 
-				font-size: 50rpx; 
-			}
-			.txt{
-				font-size: 26rpx; 
-			} 
-		 }
-		 
-		}
+		
 		
 		 
 		.editMark{  
@@ -828,6 +667,14 @@
 				text-align: center;
 				font-size: 48rpx;
 				padding-bottom: 30rpx;
+				position: relative;
+				.closePrev{
+					
+					position: absolute;
+					top: -8rpx;
+					right: 0;
+					font-size: 48rpx;
+				}
 			}
 			.totalNum{
 				font-size: 30rpx;
@@ -902,10 +749,18 @@
 				position: relative; padding-bottom: 140rpx;
 			
 			.title{
-				text-align: center; 
+				text-align: left; 
 				font-size: 36rpx;
 				border-bottom: 1px solid #eeeeee;
 				padding-bottom: 20rpx;
+				position: relative;
+				
+				.closePrev{
+					position: absolute;
+					top: -14rpx;
+					right: 0;
+					font-size: 48rpx;
+				}
 			}
 			
 			.unpaid-list{

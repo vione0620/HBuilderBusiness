@@ -1,31 +1,27 @@
 <template>
-	<view id="oderIndex"> 
-	<!-- <template v-if="iswelcome">
-		<welcome></welcome>
-	</template> -->
-	
+	<view id="oderIndex">  
 	<template v-if="isload">
 		<default-page :load="true"></default-page>
 	</template>
 	
-	<template v-if="isready">   
-		<!-- <uni-nav-bar :status-bar="true" :fixed="true" right-icon="uni-icon-settings" @clickRight="clickOption"
-		title="今日收款" color="#ffffff" background-color="RGBA(70, 184, 91, 1)"/> -->
+	<template v-if="isready">    
 		<view id="mian">
-			<view class="total">{{parseFloat(recAmt/100).toFixed(2)}}<text class="txt">元</text></view>
+			<view class="total">{{parseFloat(recAmt/100).toFixed(2)/1}}<text class="txt">元</text></view>
 			<view class="getMoney">
 				<navigator class="btn" url="../../wallet/moeny/moeny">提现</navigator> 
 			</view>
 
-			<view class="count">
-				<view class="item">
-					<text class="txt">今日付款数</text>
-					<view class="txt">{{payOrderNum}}</view>
-				</view>
-				|
-				<view class="item">
-					<text class="txt">今日访客量</text>
-					<view class="txt">{{visitorNum}}</view>
+			<view class="count-wrap">
+				<view class="count">
+					<view class="item main_title">
+						<text class="txt">今日付款数</text>
+						<view class="txt">{{payOrderNum}}</view> 
+					</view>
+					<view class="line">|</view>
+					<view class="item main_title">
+						<view class="txt">{{visitorNum}}</view>
+						<text class="txt">今日访客量</text>
+					</view>
 				</view>
 			</view>
  
@@ -40,7 +36,7 @@
 				</view>
 				<view class="item" @tap="openUserList">
 					<view class="icon iconfont iconorderlist"></view>
-					<text class="txt">用户订单</text>
+					<text class="txt">买家订单</text>
 				</view> 
 			</view>
 
@@ -69,20 +65,77 @@
 		</view>
   
 
+
 	</template>
+	
+	<uni-popup ref="openAds" type="center" :backbg="false" :maskClick="false" :adsb="true" style="top: -100px;">
+		<view class="pop_content">
+			<image src="../../../static/popbg.png" mode="aspectFit" class="adimg"></image>
+			<view class="title iconfont iconclose" @tap="closeAd()"></view>  
+		</view>
+	</uni-popup>
+	
+	<!-- 有订单未结清 -->
+	<uni-popup ref="hasUnpaid" type="center" :maskClick="false">
+		<view class="unpaid_checked" style="">
+			<view class="title">您有一笔未结清订单！ <view @tap="closePrev()" class="iconfont iconclose closePrev"></view></view> 
+			<scroll-view :scroll-top="scrollTop" style="height: 160px; width: 260px" show-scrollbar="true"
+			class="unpaid-list" scroll-y="true">  
+				<view class="conten_list" v-for="(foods,index) in this.UnPaidData.content">  
+					<view class="group">
+						<view class="tit">{{foods.goodsName}} * {{foods.goodsNum}}</view>
+						<view class="cont">
+							<view class="price">{{parseFloat(foods.merchPrice * foods.goodsNum / 100).toFixed(2)/1}}元</view>
+							<view class="unit">{{foods.goodsQuantity}}{{foods.goodsUnit}} * {{foods.goodsNum / foods.goodsQuantity}}</view>
+						</view>
+					</view>
+				</view>
+				<view class="info_detail">
+					<view class="group"><view class="">订单号</view><view class="txt">{{this.UnPaidData.orderNo}}</view></view>
+					<view class="group"><view class="">下单时间</view><view class="txt">{{this.UnPaidData.orderTime}}</view></view>
+					<view class="group"><view class="">商户名称</view><view class="txt">{{this.UnPaidData.merchName}}</view></view>
+					<view class="group"><view class="">收货地址</view><view class="txt">{{this.UnPaidData.busiAddr}}</view></view> 
+				</view>    
+			</scroll-view> 
+			<view class="listmore down">﹀ 向下滑动查看更多</view>
+			
+			<!-- <view class="get_coupon">
+				<view class="group">  
+					<view class="left">满减券/优惠</view>
+					<view class="right" @tap="navtoGetCoupon('prev')"> 							
+						<view :class="this.got ? 'txt' : ''">{{this.couponid}}</view>
+					</view>
+				</view>
+			</view> -->
+			<!-- <view class="totalNum"><view class="left">待支付总计：</view><view class="right">{{prePayable}}元</view></view> -->
+			<view class="totalNum"><view class="left">实际应支付：</view><view class="right">{{prePayActual}}元</view></view>
+			<radio-group @change="radioChange">
+				<pop-up names="支付宝支付" iconImg="alipay">
+					<view slot="radioPay"><radio :value="checktype[0]" color="#09BB07" /></view>
+				</pop-up>
+				<pop-up names="微信支付" iconImg="weixin">
+					<view slot="radioPay"><radio :value="checktype[1]" color="#09BB07" /></view>
+				</pop-up>
+			</radio-group>
+			<btn-foot title="立即结清" class="topayBtn" @tap="getUnpaidOrder()"></btn-foot> 
+		</view>
+	</uni-popup>
+	<!-- 有订单未结清 end-->
 
 	</view>
 </template>
 
 <script>
-	import {mapState,mapMutations} from 'vuex'
+	import {mapState,mapMutations,mapGetters} from 'vuex'
 	import {b64Md5,hexMD5,} from '@/network/md5.js'
 	import {getSortAscii} from '@/common/util/utils.js'
 
 	import UniNavBar from '@/components/uni/uni-nav-bar.vue'
 	import UniBadge from '@/components/uni/uni-badge.vue' 
-	import DefaultPage from '@/components/basic/default-page.vue'
-	// import Welcome from '@/components/basic/welcome.vue'
+	import DefaultPage from '@/components/basic/default-page.vue' 
+	import UniPopup from '@/components/uni/uni-popup.vue' 
+	import PopUp from '@/components/BuyMall/rk-pop.vue'	
+	import BtnFoot from '@/components/basic/btn-foot.vue'
 	
 	const gotolist = [{
 			"icon": 'iconfont iconorder-report',
@@ -101,12 +154,12 @@
 		},
 		{
 			"icon": 'iconfont iconmanage',
-			"text": "运营管理",
+			"text": "服务商家",
 			"urls": "../../utility/manage/manage"
 		},
 		{
 			"icon": 'iconfont iconoder-entry',
-			"text": "商家订单",
+			"text": "我的订单",
 			"urls": "../../finance/outlay/list"
 		},
 		{
@@ -128,7 +181,7 @@
 	const serVer = [{
 			"icon": 'iconfont iconcontact',
 			"text": "客服",
-			"phone": " "
+			"phone":[]
 		}, 
 	]
 
@@ -137,9 +190,11 @@
 	export default {
 		components: {
 			UniBadge, 
-			DefaultPage,
-			// Welcome,
+			DefaultPage, 
 			UniNavBar,
+			UniPopup,
+			PopUp,
+			BtnFoot,
 		},
 		data() {
 			return { 
@@ -154,26 +209,50 @@
 				getScan:'',//扫码 
 				isload:false,
 				isnohave:false,
-				isready:false, 
-				// iswelcome:true,//欢迎页
+				isready:true,  
 				refreshed:'',
 				fromlogin:false,
+				//关于上一笔订单
+				prevOrder:[],
+				checktype:['alipay','weixin'],
+				chooseType:'', 
+				scrollTop:0,
+				couponid:String, 
+				got:false,
+				PreStatus:false,
+				UnPaidData:Object,//有订单未结清
+				FirstOrder:false,
+				isAds:0,//优惠开关
 			}
 		}, 
-		onLoad(option) {   
-			// this.loadExecution() 
+		computed:{ 
+			...mapState(['cartGoods','previousOrder','getCouponId','getCartAmt','limitAmt','getUnusualAmt','getUnusualNo']),
+			...mapGetters(['totalCount','totalPrice','prevOrderPrice']),   
+			prePayActual:function(){
+				let actualNums = ''
+				if(this.clock || this.prevOrderPrice){	 
+					let org = this.prevOrderPrice,
+						now = this.getUnusualAmt ? this.getUnusualAmt : 0;
+					actualNums = this.numFloat(org - now).toFixed(2) / 1 
+				}else{ 
+					let org = this.totalPrice,
+						now = this.getCartAmt ? this.getCartAmt : 0 ;
+						actualNums = this.numFloat(org - now).toFixed(2) / 1 
+				} 
+				return actualNums
+			}, 
+		},
+		onLoad(option) {    
 			this.loginWhether = uni.getStorageSync('status') 
 			this.userStore = uni.getStorageSync('user')
 			this.merchNo = uni.getStorageSync('user').merchNo		
 			
-			let login_type = option.loginType 
-			// if(!this.iswelcome){ 			
-				if(login_type === 'login'){ 
-					this.fromLogin() 
-				}else{ 
-					this.initUser() 
-				}
-			// }  
+			let login_type = option.loginType  
+			if(login_type === 'login'){ 
+				this.fromLogin() 
+			}else{ 
+				this.initUser() 
+			} 
 		}, 
 		onNavigationBarButtonTap(tap){
 			if(tap.index === 0){
@@ -184,34 +263,306 @@
 				})
 			}
 		}, 
-		methods: {  
+		methods: {
+			getUnpaidOrderDetail(refreshKey){ 
+				let vVlue = {"merchNo":this.merchNo}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + refreshKey).toUpperCase()   
+				
+				this.$request.post('getUnpaidOrderDetail',{
+				  ...vVlue, 
+				  "sign": sSign
+				},{
+					token:true
+				}).then((res)=>{   
+					if(res.code == 200){ 
+						this.isAds = res.data.actionSwitch						
+					}
+				})
+			},
+			openAds(){
+				setTimeout(()=>{
+					this.$refs.openAds.open()
+				},500) 
+			},
+			//获取上一笔订单begin
+			getPrevOrder(refreshKey){
+				let vVlue = {"merchNo":this.merchNo,"orderType":1}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + refreshKey).toUpperCase()   
+				
+				this.$request.post('getPrevOrder',{
+				  ...vVlue, 
+				  "sign": sSign
+				},{
+					token:true
+				}).then((res)=>{   
+					if(res.code == 200){ 
+						this.prevOrder = res.data
+						if(res.data.orderNo){ 
+							this.getOrderCoupon(res.data.orderNo,refreshKey)
+							// //3.获取上一订单信息
+							this.getBreakfastOrderDetail(res.data.orderNo,refreshKey)							
+						}
+						this.$store.dispatch('receive_previous_order',res.data)  
+					}
+				})
+			},
+			getBreakfastOrderDetail(option,refreshKey){   
+				let vVlue = {"merchNo":this.merchNo,"orderNo":option}
+				let sSort = getSortAscii(vVlue)
+				let sSign = hexMD5(sSort + "&key=" + refreshKey).toUpperCase()   
+				
+				this.$request.post('getBreakfastOrderDetail',{
+				  ...vVlue, 
+				  "sign": sSign
+				},{
+					token:true
+				}).then((res)=>{ 
+					this.$api.initPage(res.code,res.message)
+					if(res.code == 200){  
+						this.UnPaidData = res.data 
+						// //4.显示弹窗
+						this.$refs.hasUnpaid.open()
+					}
+				}) 
+			},	
+			//获取不寻常订单信息
+			getOrderCoupon(option,refreshKey){
+				let vVlue = {"merchNo":this.merchNo,"orderNo":option}
+				let sSort = getSortAscii(vVlue) 
+				let sSign = hexMD5(sSort + "&key=" + refreshKey).toUpperCase() 
+				this.$request.post('getOrderCoupon',{
+					...vVlue,
+					"sign": sSign
+				},{
+					token:true
+				}).then(res => {  						
+					if(res.code == 200){
+						let resData = res.data
+						if(resData.fristPay == 0){
+							//首次支付
+							this.$refs.popup.open()
+						}else{
+							//下单成功-锁定单 
+							if(resData.coupon.length){ 
+								this.clock = true
+								this.couponid = `满${resData.coupon[0].limitAmt / 100}减${resData.coupon[0].couponAmt / 100}`
+								let unusual = {
+									amt:resData.coupon[0].couponAmt,
+									no:resData.coupon[0].couponNo
+								} 
+								this.$store.dispatch('get_unusual_amt',unusual) 
+							} 
+						}
+					}else{
+							
+						uni.showToast({
+							icon:'none',
+							title:res.message,
+							duration: 2000
+						})
+					
+					}
+				}).catch() 
+			},
+			//立即结算
+			getUnpaidOrder(){
+				this.toPayBtn()
+			},			
+			toPayBtn(){
+				let getPayType = this.chooseType	
+				let keys = this.refreshed ? this.refreshed : this.loginWhether.md5key  
+				switch (getPayType){
+					case 'alipay':
+						this.payAlipay(keys)
+					break;
+					case 'weixin':
+						this.payWeixin(keys)
+					break;
+				}				 
+			},
+			 
+			payAlipay(refreshKey){ 
+				let vVlue = ''
+				
+				if(this.getCouponId.couponNo){
+					vVlue = {
+					"merchNo":this.merchNo,
+					"orderNo":this.previousOrder.orderNo,
+					"couponNo":this.getCouponId.couponNo ? this.getCouponId.couponNo : '',
+					"instantPay":0,
+					}
+				}else if(this.clock){ 
+					vVlue = {
+						"merchNo":this.merchNo,
+						"orderNo":this.previousOrder.orderNo,
+						"couponNo":this.getUnusualNo ? this.getUnusualNo : '',
+						"instantPay":0,
+						} 
+				}else{
+					vVlue = {
+					"merchNo":this.merchNo,
+					"orderNo":this.previousOrder.orderNo, 
+					"instantPay":0,
+					}
+				}	 
+				let sSort = getSortAscii(vVlue) 
+				let sSign = hexMD5(sSort + "&key=" + refreshKey).toUpperCase()   
+				this.$request.post('aliPayOrder',{
+					...vVlue,
+					"sign":sSign
+				},{
+					token:true
+				}).then(res => { 
+					let ordinfo = res.data.toString() 
+					uni.requestPayment({
+						provider: 'alipay',
+						orderInfo: ordinfo,
+						success: (res) => { 
+							this.$refs.hasUnpaid.close() 
+							this.PreStatus = false  
+						},
+						fail: (err)=>{ 
+							uni.showToast({
+								icon:'none',
+								title:'支付失败',
+								duration: 2000
+							})   
+						},
+						complete:()=>{
+							this.$store.dispatch('get_coupon_id','')
+							this.$store.dispatch('get_cart_amt','')								
+						},
+					});
+				}).catch()
+			},
+			
+			payWeixin(refreshKey){   
+				let vVlue = ''
+				if(this.getCouponId.couponNo && !this.clock){
+					vVlue = {
+					"merchNo":this.merchNo,
+					"orderNo":this.previousOrder.orderNo,
+					"couponNo":this.getCouponId.couponNo ? this.getCouponId.couponNo : '',
+					"instantPay":0,
+					}
+				}else if(this.clock){ 
+					vVlue = {
+						"merchNo":this.merchNo,
+						"orderNo":this.previousOrder.orderNo,
+						"couponNo":this.getUnusualNo ? this.getUnusualNo : '',						
+						"instantPay":0,
+						} 
+				}else{
+					vVlue = {
+					"merchNo":this.merchNo,
+					"orderNo":this.previousOrder.orderNo, 
+					"instantPay":0,
+					}					
+				}
+				let sSort = getSortAscii(vVlue)  
+				let sSign = hexMD5(sSort + "&key=" + refreshKey).toUpperCase() 	 
+				this.$request.post('wxPayOrder',{
+					...vVlue,
+					"sign":sSign
+				},{
+					token:true
+				}).then(res => { 
+					let getRes = res.data
+					if(res.code === 200){  						
+						let getOrderInfo = {
+							"appid": getRes.appId,
+							"noncestr": getRes.nonceStr,
+							"package": getRes.packageValue,
+							"partnerid": getRes.partnerId,
+							"prepayid": getRes.prepayId,
+							"timestamp": getRes.timeStamp,
+							"sign":getRes.sign,
+						}   
+						uni.requestPayment({
+						    provider: 'wxpay',
+						    orderInfo: getOrderInfo, 
+							success: (res) => { 
+								this.$refs.hasUnpaid.close() 
+								this.PreStatus = false
+								this.$store.dispatch('get_coupon_id','')				 
+							},
+							fail: (err)=>{ 
+								uni.showToast({
+									icon:'none',
+									title:'支付失败',
+									duration: 2000
+								})  
+							},							
+							complete:()=>{
+								this.$store.dispatch('get_coupon_id','')
+								this.$store.dispatch('get_cart_amt','')								
+							},
+						})
+					} 
+					 
+				}).catch() 
+			},
+			//关于上一笔订单
+			async aboutPrevOrder(refreshKey){
+				//1.是否有上一笔订单
+				await this.getPrevOrder(refreshKey)
+				// console.log(refreshKey,this.prevOrder.orderNo,this.previousOrder.orderNo)
+				// //2.是否满足使用优惠券条件(不寻常订单)
+				// await this.getOrderCoupon(this.previousOrder.orderNo)
+				// //3.获取上一订单信息
+				// this.getBreakfastOrderDetail()
+				// //4.显示弹窗
+				// this.$refs.hasUnpaid.open()
+			},			
+			closePrev(){ 
+				this.$refs.hasUnpaid.close()
+			},			
+			navtoGetCoupon(urls){ 
+				let amt = ''
+				let page = ''
+				if(urls == "thisone"){ 
+					this.prevTime = false
+					
+					uni.navigateTo({
+						url:`../../account/coupon/usable?type=${this.totalPrice}&page=thisone`,
+					}) 
+				}else{ 
+					
+					if(!this.clock){	
+						this.prevTime = true
+						uni.navigateTo({
+							url:`../../account/coupon/usable?type=${this.prevOrderPrice}&page=prevtime`,
+						}) 
+					}else{
+						uni.showLoading({
+							icon:'none',
+							title:'已选，不可修改',
+							duration: 2000
+						})
+					}
+				} 
+			},
+			//获取上一笔订单 end
+			
+			numFloat(param){
+				return parseFloat(param / 100)
+			},
+			closeAd(){
+				this.$refs.openAds.close() 
+			},
+			radioChange(e){ 
+				this.chooseType = e.target.value
+				 console.log(e.target.value)
+			},
 			clickOption(){
 				uni.navigateTo({
 					url:'../../account/option/option',
 					animationType: 'pop-in',
 					animationDuration: 200
 				})
-			},
-			// loadExecution(){ 
-			// 	try { 
-			// 		const value = uni.getStorageSync('launchFlag') 
-			// 		if (value) { 
-			// 			this.iswelcome = false 
-			// 		} else { 
-			// 			this.iswelcome = true
-			// 		}
-			// 	} catch(e) { 
-			// 		uni.setStorage({ 
-			// 			key: 'launchFlag', 
-			// 			data: true, 
-			// 			success:()=> {
-			// 				// console.log('error时存储launchFlag')
-			// 			} 
-			// 		})
-			// 		this.iswelcome = true
-			// 	}
-			// 	return 
-			// }, 
+			}, 
 			fromLogin(){				  
 				this.getDayBusiStat('getDayBusiStat',this.loginWhether.md5key) 
 				this.getServiceMobile('getServiceMobile',this.loginWhether.md5key)  
@@ -220,10 +571,21 @@
 				this.ownPaypwd('ownPaypwd',this.loginWhether.md5key)
 				this.fromlogin = true
 				this.isRegular() //是否新用户
+				this.aboutPrevOrder(this.loginWhether.md5key)
+				
+				//获取优惠开关 begin
+				this.getUnpaidOrderDetail(this.loginWhether.md5key)				
+				if(this.isAds == 0){
+					this.openAds()
+				}
+				//获取优惠开关 end
+				// console.log('this.loginWhether.md5kethis.loginWhether.md5ke',this.loginWhether.md5key)
+				// this.getPrevOrder(this.loginWhether.md5key)
+				// this.refreshKey = this.loginWhether.md5key
 			}, 
 			initUser() {  
-				let vVlue = {"merchNo": this.merchNo} //必传
-				let sSort = getSortAscii(vVlue) ///排序   		
+				let vVlue = {"merchNo": this.merchNo} 
+				let sSort = getSortAscii(vVlue)   		
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()	
 				
 				this.$request.post('refresh',{
@@ -247,9 +609,19 @@
 							uni.setStorageSync('status',haslogin)  
 							this.fromlogin = false 
 							this.refreshed = res.data.md5key 
-							
 							this.getDayBusiStat('getDayBusiStat',this.refreshed) 
 							this.getServiceMobile('getServiceMobile',this.refreshed) 
+							
+							//获取优惠开关 begin
+							this.getUnpaidOrderDetail(this.refreshed)
+							if(this.isAds == 0){
+								this.openAds()
+							}
+							//获取优惠开关 end
+							
+							//走一遍未接订单流程 
+							this.aboutPrevOrder(res.data.md5key)	
+							
 							
 						}else if(res.code === 500){
 							uni.showToast({ 
@@ -275,8 +647,8 @@
 					}) 
 			},
 			getServiceMobile(post,key){
-				let vVlue = {"merchNo": this.merchNo} //必传
-				let sSort = getSortAscii(vVlue) ///排序   		
+				let vVlue = {"merchNo": this.merchNo} 
+				let sSort = getSortAscii(vVlue)   		
 				let sSign = hexMD5(sSort + "&key=" + key).toUpperCase()	
 				this.$request.post('getServiceMobile', {
 					...vVlue,
@@ -286,21 +658,20 @@
 				}).then((res) => {   
 					if (res.code === 200) { 		
 						let newNo = JSON.parse(res.data.serviceMobile)  									
-						this.serVer[0].phone = [].concat.apply([], newNo) 
+						this.serVer[0].phone = [].concat.apply([], newNo)  
 					}
 				}).catch()  
 			},
 			getDayBusiStat(post,key){
-				let vVlue = {"merchNo": this.merchNo} //必传
-				let sSort = getSortAscii(vVlue) ///排序
+				let vVlue = {"merchNo": this.merchNo} 
+				let sSort = getSortAscii(vVlue)
 				let sSign = hexMD5(sSort + "&key=" + key).toUpperCase() 			
 				this.$request.post('getDayBusiStat', {
 					...vVlue,
 					"sign": sSign
 				},{
 					token:true
-				}).then((res) => { 	
-					this.$api.initPage(res.code,res.message)  
+				}).then((res) => { 	 
 					if(res.code === 200){	
 						let resData = res.data
 						setTimeout(()=>{	
@@ -315,8 +686,8 @@
 				}).catch()
 			},
 			ownPaypwd(post,key){ 
-				let vVlue = {"merchNo": this.merchNo} //必传
-				let sSort = getSortAscii(vVlue) ///排序   		
+				let vVlue = {"merchNo": this.merchNo} 
+				let sSort = getSortAscii(vVlue)   		
 				let sSign = hexMD5(sSort + "&key=" + key).toUpperCase()	 
 				this.$request.post('ownPaypwd', {
 					...vVlue,
@@ -339,8 +710,8 @@
 					"merchNo": this.merchNo,
 					"devType":userSystem.platform,
 					"cid":userSystem.cid,
-				} //必传 
-				let sSort = getSortAscii(vVlue) ///排序    
+				}
+				let sSort = getSortAscii(vVlue)    
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() 
 				
 				if(userSystem.platform || userSystem.cid){				
@@ -355,8 +726,8 @@
 			isRegular(){		
 				let vVlue = {
 					"merchNo": this.merchNo, 
-				} //必传 
-				let sSort = getSortAscii(vVlue) ///排序    
+				}
+				let sSort = getSortAscii(vVlue)    
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() 
 				this.$request.post('isRegular', {	
 					...vVlue,
@@ -364,9 +735,10 @@
 				},{
 					token:true
 				}).then(res=>{
+					this.FirstOrder = true
 					uni.setStorageSync('isRegular',res.data)
 				}).catch()  
-			},
+			}, 
 			navTo(path) { 
 				uni.navigateTo({ 
 					url:path,
@@ -467,13 +839,164 @@
 </script>
 
 <style lang="scss">
+	 
+	
+	.unpaid_checked{
+			padding: 40rpx;
+			position: relative; padding-bottom: 140rpx;
+		
+		.title{
+			text-align: left; 
+			font-size: 36rpx;
+			border-bottom: 1px solid #eeeeee;
+			padding-bottom: 20rpx;
+			position: relative;
+			
+			.closePrev{
+				position: absolute;
+				top: -14rpx;
+				right: 0;
+				font-size: 48rpx;
+			}
+		}
+		
+		.unpaid-list{
+			padding: 20rpx 0;  
+			.conten_list{
+				font-size: 24rpx;
+				border-bottom:1px dashed #eeeeee;
+				padding-bottom: 20rpx;
+				.group{
+					width: 100%;
+					display: flex;
+					justify-content: space-between;
+					padding: 16rpx 8rpx; 
+					align-items: center; 
+					
+					.tit{
+						font-size: 32rpx;
+					}
+					
+					.cont{
+						text-align: right;
+						.price{
+							font-size: 32rpx; 
+						}
+						.unit{
+							font-size: 20rpx;
+							color: #777777;
+						}
+					}
+				} 
+				
+			}
+			.info_detail{ 
+				font-size: 24rpx;
+				.group{
+					width: 100%;
+					display: flex;
+					justify-content: space-between;
+					padding: 16rpx 8rpx;
+					
+					.txt{
+						width: 80%;
+						text-align: right;
+					}
+				}
+			}
+		}
+		
+		.get_coupon{
+			border-top:1px solid #eeeeee;
+			padding: 24rpx 0;
+			border-bottom:1px solid #eeeeee;
+			.group{
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				.left{
+					color: #666;
+					font-size: 30rpx;
+				}
+				.right{
+					color: #999;
+					font-size: 30rpx;
+					.txt{
+						color: #f00;
+					}
+				}
+			}
+		}
+		
+		
+		.listmore{
+			color: #999999;
+			font-size: 20rpx;
+			text-align: right;
+			padding: 12rpx 0; 
+		} 
+		.totalNum{				
+				font-size: 30rpx;
+				padding: 20rpx 0;
+				text-align: left;
+				display: flex; 
+				border-bottom: 1px dashed #f2f2f2;
+				justify-content: space-between;
+				align-items: center;
+				.left{
+					font-size: 30rpx;
+				}
+				.right{
+					color: #f00;
+				}
+		}
+		.topayBtn{
+			position: absolute; bottom: 0; left: 0; right: 0;
+		}
+		.prepyPop{
+			padding: 24rpx 0;
+			display: flex; 
+			align-items: center;
+			width: 100%;
+			
+			.img{
+				width: 36rpx;
+				height: 36rpx;
+			} 
+			.txtbtn{
+				padding-left: 32rpx;
+			}
+			
+		}
+	}
+	
+	.pop_content{   
+		position: relative;
+		left:0; 
+		text-align: center;
+		display: flex;
+		justify-content: center;
+		padding-bottom: 80px;
+		.title{ 
+			position: absolute; 
+			bottom: 40rpx;
+			color: #FFFFFF;
+			border: 1px solid #FFFFFF;
+			border-radius: 50%; 
+			font-size: 40rpx;
+			padding: 8rpx 10rpx;
+		}
+		.adimg{
+			height: 500rpx;
+		}
+	}
 	#oderIndex {
 		#mian {
 			width: 100%;
 			height: 330rpx;
 			background-color: #46B85B;
 			position: relative;
-			margin-bottom: 90rpx;
+			margin-bottom: 94rpx;
 		}
 
 		.total {
@@ -504,32 +1027,48 @@
 		}
 
 
-
-		.count {
+		
+		.count-wrap {
 			display: flex;
-			color: #FFFFFF;
-			padding: 20rpx 0 0 0;
+			padding: 28rpx 28rpx 20rpx 28rpx;
+			// padding: 28rpx 0 8px 0;
 			font-size: 26rpx;
-			line-height: 1;
-
-			.item {
-				flex: 1;
+			// line-height: 1;
+			// width: 80%; 
+			justify-content: center;
+			.count{
+				width: 90%;
 				display: flex;
-				align-items: center;
-				padding-left: 20rpx;
-
-				.txt {
-					justify-content: space-between;
+				justify-content: space-between;
+				.line{
+					color: #FFFFFF;
+					
+				}
+				.item {
 					flex: 1;
-					text-align: center;
-					font-weight: bolder;
-				}
+					
+					display: flex;
+					align-items: center;
+					color: #FFFFFF;
+					// padding-left: 20rpx;
 
-				.txt:first-child {
-					width: 70%;
-					font-weight: normal;
-				}
+					.txt {
+						justify-content: space-between;
+						flex: 1;
+						text-align: center;
+						// font-weight: bolder;
+					// 	font-weight: normal;
+					}
 
+					// .txt:first-child {
+					// 	width: 70%;
+					// }
+
+				}
+				.main_title{
+					font-size: 30rpx;
+				}
+				
 			}
 
 		}
@@ -542,7 +1081,7 @@
 			width: 84%;
 			left: 8%;
 			right: 8%;
-			bottom: -18%;
+			bottom: -21%;
 			box-shadow: 0 3px 4px #e1e5e9;
 			border-radius: 12rpx;
 			padding: 20rpx 12rpx;

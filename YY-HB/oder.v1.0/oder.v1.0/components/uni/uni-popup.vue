@@ -1,7 +1,7 @@
 <template>
 	<view class="">
 		<template v-if="showPopup"> 
-			<view class="uni-popup" :class="car ? 'carbtn' : ''">
+			<view class="uni-popup" :class="car ? 'carbtn' : '' || adsb ? 'adsbtn' : ''">
 				<view :class="[ani, animation ? 'ani' : '', !custom ? 'uni-custom' : '']" class="uni-popup__mask" @click="close(true)" />
 				<view :class="[type, ani, animation ? 'ani' : '', !custom ? 'uni-custom' : '']" class="uni-popup__wrapper" @click="close(true)">
 					<view class="uni-popup__wrapper-box" :class="backbg ? 'backbg' : ''" @click.stop="clear">
@@ -17,7 +17,13 @@
 	export default {
 		name: 'UniPopup',
 		props: {
+			//购物车弹窗
 			car:{
+				type:Boolean,
+				default:false,
+			},
+			//adsbtn广告弹窗
+			adsb:{
 				type:Boolean,
 				default:false,
 			},
@@ -100,16 +106,19 @@
 	.uni-popup {
 		position: fixed;
 		top: 0;
-		top: 0;
+		top: -75px;
 		bottom:0;
 		left: 0;
 		right: 0;
 		z-index: 9998;
 		overflow: hidden
 	}
-	
+	.adsbtn{
+		overflow: initial !important;
+	}
 	.carbtn{
-		bottom: 121rpx !important;
+		bottom: 132rpx !important;
+		overflow: hidden;
 	}
 
 	.uni-popup__mask {
@@ -190,7 +199,7 @@
 	.uni-popup__wrapper.uni-custom.bottom .uni-popup__wrapper-box,
 	.uni-popup__wrapper.uni-custom.top .uni-popup__wrapper-box {
 		width: 100%;
-		max-height: 500px;
+		/* max-height: 500px; */
 		overflow-y: scroll
 	}
 

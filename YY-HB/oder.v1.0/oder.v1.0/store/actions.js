@@ -7,10 +7,10 @@ import {
 	CLEAR_CART,
 	GET_MOENY_QUOTA,
 	RECEIVE_ORDER_LIST,
+	RECEIVE_UNPAY_ORDER_LIST,
 	RECEIVE_USER_UNITY_LIST,
 	RECEIVE_GET_MONEY_RECORD,
 	RECEIVE_AGENT_LIST,
-	
 	RECEIVE_PREVIOUS_ORDER,
 	// RECEIVE_PREVIOUS_DETAIL,
 	GET_COUPON_ID,
@@ -31,6 +31,10 @@ export default {
 	//商家订单
 	[RECEIVE_ORDER_LIST]({commit},order){
 		commit('receive_order_list',order)
+	},
+	//商家未结算订单列表数据
+	[RECEIVE_UNPAY_ORDER_LIST]({commit},order){
+		commit('receive_unpay_order_list',order)
 	},
 	//用户购买订单
 	[RECEIVE_USER_UNITY_LIST]({commit},unity){
@@ -58,12 +62,12 @@ export default {
 	}, 
 	//实付金额getCartAmt
 	[GET_CART_AMT]({commit},cartAmt){ 
-		console.log(cartAmt)
+		// console.log(cartAmt)
 		commit('get_cart_amt',cartAmt)
 	}, 
 	//实付金额GET_UNUSUAL_AMT
 	[GET_UNUSUAL_AMT]({commit},unusualAmt){ 
-		console.log(unusualAmt)
+		// console.log(unusualAmt)
 		commit('get_unusual_amt',unusualAmt)
 	}, 
 } 

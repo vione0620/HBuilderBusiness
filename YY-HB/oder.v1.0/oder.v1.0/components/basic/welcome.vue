@@ -26,7 +26,7 @@
 			return {
 				indicatorDots: true, 
 				interval: 2000,
-				duration: 500 
+				duration: 800 
 			}
 		},
 		methods:{

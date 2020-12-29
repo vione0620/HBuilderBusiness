@@ -9,18 +9,23 @@
 	
 	<template v-if="isready">
 	
-	<view class="" v-if="currentItem.orderState == 1">
+	<view class="" v-if="currentItem.orderState == 1 && !this.maphide">
 		<my-map :order-map-data="orderMapData"></my-map>
 	</view> 
-	<view class="" v-if="currentItem.orderState == 1">
+	<view class="" v-if="currentItem.orderState == 1 && !this.maphide">
 		<view class="bg-mapspace"></view>
 	</view>	
-	<template v-if="currentItem.orderState != 1"> 
+	<template v-if="currentItem.orderState != 1 || this.maphide"> 
 		<uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back" color="#ffffff" background-color="RGBA(70, 184, 91, 1)"/>
 	</template>
 	<view class="goods-detail"> 
 		<view class="header">
-			<view class="status">{{orderStatus}}</view> 
+			<template v-if="this.credit">
+			<view class="status">未支付订单</view> 
+			</template>
+			<template v-else>
+				<view class="status">{{orderStatus}}</view> 
+			</template>
 			<template v-if="currentItem.orderState == 0"> 
 				<view class="txt">您的订单等待配送</view>
 			</template>
@@ -40,7 +45,7 @@
 				<block v-for="(items,index) in currentItem.content" :key="'4'+index">	 
 					<view class="goods-group">
 						<view class="tit">{{items.goodsName}} <text class="hot">{{(items.hotSale === '0') ? '' : '热卖' }}</text></view> 
-						<view class="cont"  v-if="preicePart">
+						<view class="cont"  v-if="preicePart || maphide">
 							<view class="price">{{parseFloat(items.merchPrice * items.goodsNum / items.goodsQuantity * items.goodsQuantity / 100).toFixed(2)/1}} 元</view>
 							<view class="unit">{{items.goodsQuantity}} {{items.goodsUnit}} * {{items.goodsNum/items.goodsQuantity}}</view>
 						</view>
@@ -81,16 +86,15 @@
 			</view>   
 			 
 			<view class="orderList">
-				<template v-if="currentItem.orderState == 1">
+				<template v-if="this.currentItem.deliverPhone && this.currentItem.deliverName">
 					<view class="order-group">
-						<view class="tit">配送人手机号</view>
-						<!-- <view class="cont callNo" @tap="driverPhone(currentItem.deliverPhone)">{{currentItem.deliverPhone}}</view> -->
+						<view class="tit">配送人手机号</view> 
 						<view class="cont callNo" @tap="driverPhone(currentItem.deliverPhone)">
 							<view class="callText"><text class="iconfont icondianhua-copy"></text>联系配送</view>
 						</view>
 						
 					</view>
-					<view class="order-group" v-if="currentItem.orderState == 1">
+					<view class="order-group">
 						<view class="tit">配送人名字</view>
 						<view class="cont">{{currentItem.deliverName}}</view>
 					</view>
@@ -137,9 +141,6 @@
 				</view>
 			</view>
 			 
-			<view class="btnwrap" v-if="currentItem.payState != 1 && currentItem.orderState == 0">
-				<view class="btncancel" @tap="cancelOrder()">取消订单</view>
-			</view> 
 			
 		</view>
 	  
@@ -177,6 +178,8 @@
 				orderMapData:'', 
 				mapDistance:'',
 				preicePart:false,
+				credit:false,
+				maphide:false,
 			};
 		},
 		components:{
@@ -193,14 +196,21 @@
 			}  
 			
 			this.loginWhether = uni.getStorageSync('status')  
-			this.merchNo = uni.getStorageSync('user').merchNo		
-			 
-			this.getDetail()	
+			this.merchNo = uni.getStorageSync('user').merchNo		 
+			if(option.navto == 'keepon'){				
+				this.getDetail('getBreakfastOrderDetail')	
+			}else{		
+				this.credit = true
+				this.getDetail('getUnpaidOrderDetail')	 
+			}
 			
 			
 			if(this.orderArg.from == 'parents'){
 				this.preicePart = true 
-			}	 
+			}
+			if(this.orderArg.from == 'allsub'){
+				this.maphide = true   
+			}
 		},
 		computed:{  
 			...mapState(['userOrderList'],),
@@ -272,48 +282,17 @@
 					phoneNumber: option
 				})
 			},
-			cancelOrder(){ 
+			getDetail(urls){ 			 
 				let vVlue = ''
 				if(this.pushMsg){ 
-					vVlue = {"merchNo":this.merchNo,"orderNo":this.pushMsg,} //必传 
+					vVlue = {"merchNo":this.merchNo,"orderNo":this.pushMsg,}  
 				}else{  
-					vVlue = {"merchNo":this.merchNo,"orderNo":this.orderArg.orderNo,} //必传 
-				}  
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 		 
-				this.$request.post('cancelOrder',{
-					...vVlue, 
-					"sign": sSign
-				},{
-					token:true
-				}).then(res => {
-					this.$api.initPage(res.code,res.message) 
-					if(res.code == 200){ 						
-						setTimeout(()=>{
-							uni.showLoading({
-								icon:'none',
-								title:'订单取消成功'
-							})
-						},500) 
-					}else{
-						uni.showLoading({
-							icon:'none',
-							title:res.message
-						})
-					}
-				})
-			},
-			getDetail(){ 			 
-				let vVlue = ''
-				if(this.pushMsg){ 
-					vVlue = {"merchNo":this.merchNo,"orderNo":this.pushMsg,} //必传 
-				}else{  
-					vVlue = {"merchNo":this.merchNo,"orderNo":this.orderArg.orderNo,} //必传 
+					vVlue = {"merchNo":this.merchNo,"orderNo":this.orderArg.orderNo,}  
 				}  
 				
-				let sSort = getSortAscii(vVlue) ///排序
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 		 
-				this.$request.post('getBreakfastOrderDetail',{
+				let sSort = getSortAscii(vVlue) 
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()		  
+				this.$request.post(urls,{
 					...vVlue, 
 					"sign": sSign
 				},{
@@ -338,7 +317,7 @@
 					}
 				}).catch() 
 				
-			},			
+			},	
 		}
 	}
 </script>

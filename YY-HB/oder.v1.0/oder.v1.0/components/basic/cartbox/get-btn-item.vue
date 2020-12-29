@@ -39,7 +39,7 @@
 		align-items: center;  
 		
 		.iconfont {
-			font-size: 40rpx;
+			font-size: 56rpx;
 		}
 	
 		.btn-less {
@@ -48,8 +48,8 @@
 	
 		.btn-nums {
 			font-weight: 500;
-			padding: 0 16rpx;
-			max-width: 80rpx;
+			padding: 0 10rpx;
+			max-width: 150rpx;
 			text-align: center;  
 		}
 	

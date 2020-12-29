@@ -3,18 +3,30 @@
 		<image :src="goodsItem.goodsPic ?  goodsItem.goodsPic + '?imageView2/0/w/160/h/160' : '../../../static/noImg.png' " mode="aspectFill" class="urlImg-item"></image>
 		<view class="text-item"> 
 			<view class="title">
-				<view class="name">{{goodsItem.goodsName}}</view> 
+				<view class="name">{{goodsItem.goodsName}}</view>  
+				<view class="hotbtn" 
+				@tap="HotSale(goodsItem)" 
+				v-if="this.iShow && goodsItem.hotSale == 0">上热门</view>
+				<view class="hotbtn hotbtn-active" 
+				@tap="HotSale(goodsItem)" 
+				v-if="this.isDown && goodsItem.hotSale == 1">取消</view>
 			</view>
-			<view class="etalon">{{goodsItem.goodsWeight}} 克</view>
+			<!-- <view class="etalon">{{goodsItem.goodsWeight}} 克</view> -->
 			<view class="stockfoot">
-				<view class="tit red" :class="goodsItem.storeNum == 0 ? 'green' : 'red'">剩余</view>
-				<view class="nums" :class="goodsItem.storeNum == 0 ? 'green' : 'red'">{{goodsItem.storeNum}} 
-				<text class="unit">{{goodsItem.goodsUnit}}</text></view> 
+				<view class="tit">建议售价</view>				
+				<view class="nums">{{goodsItem.goodsPrice/100}}元</view>
+			</view>
+			<view class="stockfoot">
+				<view class="tit">本店售价</view>
+				<view class="nums">{{goodsItem.goodsPrice/100}}元</view>				
+			</view>
+			<view class="stockfoot">
+				<view class="tit red">仓库剩余</view>
+				<view class="nums red">{{goodsItem.storeNum}}<text class="unit">{{goodsItem.goodsUnit}}</text></view>
 			</view> 
 			<view class="stockfoot"> 
-				<view class="tit" :class="goodsItem.saleNum == 0 ? 'red' : 'green'">售出</view>
-				<view class="nums" :class="goodsItem.saleNum == 0 ? 'red' : 'green'">{{goodsItem.saleNum}} 
-				<text class="unit">{{goodsItem.goodsUnit}}</text></view>
+				<view class="tit green">仓库售出</view>
+				<view class="nums green">{{goodsItem.saleNum}}<text class="unit">{{goodsItem.goodsUnit}}</text></view>
 			</view>  
 		</view> 
 
@@ -39,14 +51,30 @@
 		  return {}
 		}
 	  },
+	  iShow:{
+		  type:Boolean,
+		  default(){
+			  return true
+		  },
+	  },
+	  isDown:{
+		  type:Boolean,
+		  default(){
+			  return true
+		  },
+	  }, 
 	},  
 	data() {
 		return { 	  
-			msg:'库存'
+			msg:'库存',
+			showSet:true,
 		}
 	}, 
-	methods:{ 		 
-		 
+	methods:{ 		  
+		HotSale(isHot){  
+			this.$emit('hot-sell',isHot)
+			this.$store.commit('set_hot_sale',isHot) 
+		},
 	}, 
   }
 </script>
@@ -62,10 +90,11 @@
 		display: flex;
 		padding: 20rpx 0;
 		width: 100%; 
+		border-bottom: 1px solid #f0f0f0;
 
 		.urlImg-item {
-			width: 160rpx;
-			height: 160rpx; 
+			width: 200rpx;
+			height: 200rpx; 
 			border-radius: 6rpx;
 		}
 
@@ -73,19 +102,21 @@
 		.text-item { 
 			flex: 1;
 			padding-left: 20rpx;
+			align-items: center;
 
 			.title{
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
+				padding: 6rpx 0;
 			}
 			.name {
 				font-size: 30rpx;
 			}
 			.hotbtn{
 				font-size: 24rpx;
-				border: 1px solid #666;
-				color:#666;
+				color: #49B75D;
+				border: 1px solid #49B75D;
 				width: 100rpx;
 				height: 44rpx;
 				border-radius: 22rpx; 
@@ -93,8 +124,8 @@
 				line-height:44rpx;
 			}
 			.hotbtn-active{
-				color: #FF0000;
-				border: 1px solid #FF0000;
+				border: 1px solid #666;
+				color:#666;
 			} 
 			.etalon {
 				font-size: 20rpx;
@@ -122,7 +153,7 @@
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				font-size: 30rpx;
+				font-size: 26rpx;
 				padding-top: 12rpx;
 				// .tit{
 				// 	color: #999999; 

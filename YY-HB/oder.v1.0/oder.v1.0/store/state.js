@@ -10,6 +10,8 @@ export default {
 	mustBuyItem:{},// 把必加项分别出来
 	limitNum:[], //购买限制量
 	limitAmt:0, //购买金额设置
+	canCredit:'',//是否能赊账 0不可 1可
+	closeDownOrder:'',//是否关闭下单
 	addDrink:{}, //get追加必的编号
 	mustSortTot:[] ,//需要追加豆浆的类目
 	mustAddItemNums:0, //必买类目的总数等于必买项的总数
@@ -21,6 +23,7 @@ export default {
 	stockFoods:[], //庫存分類
 	stockStock:[],//庫存商品
 	userOrderList:[],//商家订单列表
+	userUnPayList:[],//商家未结算订单列表
 	userUnityList:[],//买家订单列表
 	getAgentList:[],//代放管理
 	
@@ -30,4 +33,6 @@ export default {
 	getCartAmt:'', //实付金额
 	getUnusualAmt:'',//已选券无需再减券的金额
 	getUnusualNo:'',//已选券无需再减券的券号
+	
+	// hotStock:[]//设置热门
 }

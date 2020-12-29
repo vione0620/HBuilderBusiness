@@ -110,6 +110,12 @@
 					"loginNo": this.account,
 					"sign": sSign
 				}).then(res=>{   
+					if(res.code != 200){
+						setTimeout(()=>{
+							this.firstcode = '重新获取'
+							this.codeTime = 0
+						},5000)
+					} 
 					uni.showToast({
 						icon:'none',
 						title:res.message,

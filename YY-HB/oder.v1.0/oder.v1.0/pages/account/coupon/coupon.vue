@@ -51,7 +51,7 @@
 						
 						<swiper-item>
 							<scroll-view scroll-y :style="'height:'+ scrollH +'px;'"> 
-								<template v-if="this.exprires.length > 0">
+								<template v-if="this.exprires.length > 0"> 
 									<view class="exprires" v-for="(group,index) in exprires"> 
 										<coupon-item :receive-data="group" @get-coupon="sendCoupon" :type="0"></coupon-item>
 									</view>   
@@ -85,8 +85,7 @@
 			return {
 				loginWhether:'',//登陆状态
 				merchNo:'', //商户号
-				isload:true,
-				isnostore:false, 
+				isload:true, 
 				isready:false, 
 				tabIndex:0,
 				scrollH:0,
@@ -134,13 +133,13 @@
 				  "sign": sSign
 				},{
 					token:true
-				}).then((res)=>{
- 					console.log('getMerchCoupon',res)
+				}).then((res)=>{ 
 					this.$api.initPage(res.code,res.message) 
-					setTimeout(()=>{
-						if(res.code == 200 && res.data.length){  
+					
+					if(res.code == 200){      
+						setTimeout(()=>{
 							this.isload = false
-							this.isready = true		
+							this.isready = true
 							let handleCoupon = res.data 
 							
 							let c_one = handleCoupon.filter(coupon => {
@@ -158,9 +157,9 @@
 							 
 							this.validity = c_one
 							this.normalUsed = c_two
-							this.exprires = c_three   
-						}
-					},300)	
+							this.exprires = c_three 
+						},300)	  
+					}
 					
 					
 				}) 

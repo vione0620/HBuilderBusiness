@@ -49,10 +49,7 @@
 		},
 		components:{
 			EvanCheckbox
-		},
-		// created() {
-		// 	console.log(this.type)
-		// },
+		}, 
 		methods:{
 			returnParam(e){ 
 				this.$emit('get-coupon',e) 
