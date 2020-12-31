@@ -8,10 +8,10 @@
     </div> 
     <ul class="info">
       <li><div class="title">店铺名称：</div><div class="cont">{{sharesData.merchName}}</div></li>
-      <li><div class="title">商家编号：</div><div class="cont">{{sharesData.joinNo}}</div></li>
+      <!-- <li><div class="title">商家编号：</div><div class="cont">{{sharesData.joinNo}}</div></li> -->
       <li><div class="title">上线时间：</div><div class="cont">{{sharesData.onlineDate}}</div></li>
       <li><div class="title">活动时间：</div><div class="cont">{{(`${sharesData.startDate} 至 ${sharesData.endDate}`)}}</div></li>
-      <li><div class="title">上线时间：</div><div class="cont">{{sharesData.merchPhone}}</div></li>
+      <li><div class="title">联系电话：</div><div class="cont">{{sharesData.merchPhone}}</div></li>
       <li><div class="title">店铺地址：</div><div class="cont">{{sharesData.merchAddr}}</div></li>
     </ul>   
     <div class="ticket" :class="isGot ? 'ticket-got' : ''" @click="getTicket()"> 

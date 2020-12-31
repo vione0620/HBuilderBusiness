@@ -385,7 +385,7 @@
 			...mapGetters(['totalCount','totalPrice','prevOrderPrice']),  
 			Payable:function(){
 				// this.totalPriceN = this.totalPrice
-				return this.numFloat(this.totalPrice).toFixed(2)
+				return this.numFloat(this.totalPriceN).toFixed(2)
 			},
 			PayActual:function(){
 				// console.log(this.totalPriceN,this.getUnusualAmt)
@@ -581,6 +581,7 @@
 									this.toPayOrderNo = ''
 								}
 								this.clock = false
+								this.getListData('allOrderList','getBreakfastOrder')
 								this.getListData('unPaidOrderList','getUnpaidMerchOrder')
 							},
 							fail: (err)=>{ 
@@ -658,6 +659,7 @@
 									unpaidOderInfo.splice(this.btnIndex,1)																	
 								}			
 								this.clock = false
+								this.getListData('allOrderList','getBreakfastOrder')
 								this.getListData('unPaidOrderList','getUnpaidMerchOrder')
 							},
 							fail: (err)=>{ 
@@ -685,7 +687,7 @@
 			},
 			checkOkBtn(index,type,other){  
 				let orderInfo = this.unOrderList   
-				console.log(this.totalPrice,this.totalPriceN,orderInfo[index].realAmt)
+				// console.log(this.totalPrice,this.totalPriceN,orderInfo[index].realAmt)
 				// this.totalPrice = this.totalPrice
 				//当前页继续支付   
 				if(type == 'keepon'){
@@ -773,10 +775,10 @@
 						})	
 						if(res.code == 200){ 	
 							setTimeout(()=>{	
-								let del = orderInfo.filter(items => {
-									items == orderInfo[index]
-									return items
-								}) 
+								// let del = orderInfo.filter(items => {
+								// 	items == orderInfo[index]
+								// 	return items
+								// }) 
 								orderInfo.splice(index,1)  
 							},100)  
 						}

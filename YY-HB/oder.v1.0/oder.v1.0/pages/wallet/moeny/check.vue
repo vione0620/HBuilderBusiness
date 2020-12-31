@@ -254,7 +254,8 @@
 				let vVlue = {
 					"merchNo": this.merchNo,
 					"cashAmt":parseFloat(moeny).toFixed(0),
-					"cashType":this.typeNo,"payPwd":this.passwd,
+					"cashType":this.typeNo,
+					"payPwd":this.passwd,
 					} //必传
 				let sSort = getSortAscii(vVlue) ///排序 
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码

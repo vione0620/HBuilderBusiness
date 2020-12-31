@@ -7,13 +7,13 @@
 		</view> 
 		<view class="pageCont" v-if="nohave">
 			<view class="cont">
-				<image src="@/static/default_order@1x.png" class="img" mode="scaleToFill"></image>
+				<image src="@/static/default_order@1x.png" class="gifimg" mode="scaleToFill"></image>
 				<view class="txt">暂无数据</view>
 			</view>
 		</view>
 		<view class="pageCont" style="height: calc(100vh - 80px)" v-if="nostore">
 			<view class="cont">
-				<image src="@/static/default_null@1x.png" class="img" mode="scaleToFill"></image>
+				<image src="@/static/default_null@1x.png" class="gifimg" mode="scaleToFill"></image>
 				<view class="txt">当前无库存</view>
 				<!-- <view class="txt txt-red">请在有效时间内订购商品</navigator></view> -->
 			</view>

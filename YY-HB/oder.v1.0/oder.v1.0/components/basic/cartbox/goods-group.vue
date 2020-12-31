@@ -20,7 +20,10 @@
 								<view class="price">{{parseFloat((goodsItem.merchPrice * goodsItem.goodsQuantity)/100).toFixed(2)/1}}<text style="font-size: 20rpx;">元</text></view>  
 								<get-btn-item :foods="goodsItem"></get-btn-item> 
 							</view> 
-						</template> 
+						</template>
+						<template v-if="goodsItem.onSale != 0">
+							<view class="infotxt">敬请期待</view>
+						</template>
 					</view>
 				</view> 
 			</view>
@@ -66,6 +69,7 @@ export default {
 	color: #FF0000;
 	font-size: 26rpx;
 }
+
 
  .goodslist-group{
 	 

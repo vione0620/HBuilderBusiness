@@ -153,7 +153,7 @@
 				this.setGoodsHot(setpram)
 			},
 			setGoodsHot(option){
-				console.log('设置热门商品',option)
+				// console.log('设置热门商品',option)
 								
 				let vVlue = option 
 				let sSort = getSortAscii(vVlue) 
@@ -203,7 +203,7 @@
 								this.isload = false
 								this.isnostore = false  
 								this.isready = true
-								console.log(resDataStore)
+								// console.log(resDataStore)
 								let result = resDataStore  		
 								let nKeys = []
 								let nValue = []
