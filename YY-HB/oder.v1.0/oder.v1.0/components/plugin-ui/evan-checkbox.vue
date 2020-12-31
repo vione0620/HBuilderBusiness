@@ -4,7 +4,7 @@
 		<template v-else>
 			<uni-icons v-if="icon" :type="icon" :size="iconSize" :color="iconColor"></uni-icons>
 			<view v-else class="evan-checkbox__inner" :class="['evan-checkbox__inner--'+shape]" :style="{width:iconSize+4+'px',height:iconSize+4+'px',backgroundColor:innerBackgroundColor,borderColor:innerBorderColor}">
-				<uni-icons v-if="currentValue" type="checkmarkempty" :size="iconSize" :color="isDisabled?'#c8c9cc':'#fff'"></uni-icons>
+				<uni-icons v-if="currentValue" type="checkmarkempty" :size="iconSize" :color="isDisabled?'#c8c9cc':'#fff'" :checkRight="true"></uni-icons>
 			</view>
 		</template>
 		<text v-if="$slots.default" class="evan-checkbox__label" :style="mTitleStlye">
@@ -58,6 +58,10 @@
 			preventClick: {
 				type: Boolean,
 				default: false
+			},
+			checkRight:{
+				type:Boolean,
+				default:false,
 			}
 		},
 		computed: {

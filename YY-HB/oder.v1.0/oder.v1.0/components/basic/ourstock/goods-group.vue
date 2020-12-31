@@ -1,12 +1,10 @@
 <template>   
 	<view class="stock-group">  
 		<view class="title stock-title">{{category}}</view>
-		<block v-for="(child,index) in goods" :key="'4'+index"> 
-			<view class="item-wrap">
-				<view class="" v-if="index === 0">
-					<goods-stock :goods-item="child" :goods-index="index" @hot-sell="SetHotSell" @i-show="iShow" @is-down="isDown"
-					></goods-stock> 
-				</view>
+		<block v-for="(child,index) in goods" :key="'4'+index">  
+			<view class="item-wrap"> 
+				<goods-stock :goods-item="child" :goods-index="index" @hot-sell="SetHotSell" @i-show="iShow" @is-down="isDown"
+				></goods-stock>  
 			</view>
 		</block>
 	</view>   
@@ -72,7 +70,7 @@
 	 
 	 .title{
 		 font-size: 36rpx;  
-		 padding: 20rpx 0; 
+		 // padding: 20rpx 0; 
 	 } 
 	 
  }

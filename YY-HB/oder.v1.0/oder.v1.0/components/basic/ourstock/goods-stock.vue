@@ -1,6 +1,7 @@
 <template>
 	<view class="goods-group-item"> 
-		<image :src="goodsItem.goodsPic ?  goodsItem.goodsPic + '?imageView2/0/w/160/h/160' : '../../../static/noImg.png' " mode="aspectFill" class="urlImg-item"></image>
+		<image :src="goodsItem.goodsPic ?  goodsItem.goodsPic + '?imageView2/0/w/160/h/160' : '../../../static/noImg.png' " 
+		mode="aspectFill" class="urlImg-item"></image>
 		<view class="text-item"> 
 			<view class="title">
 				<view class="name">{{goodsItem.goodsName}}</view>  
@@ -11,21 +12,13 @@
 				@tap="HotSale(goodsItem)" 
 				v-if="this.isDown && goodsItem.hotSale == 1">取消</view>
 			</view>
-			<!-- <view class="etalon">{{goodsItem.goodsWeight}} 克</view> -->
+			<view class="etalon">{{goodsItem.goodsWeight}} 克</view> 
 			<view class="stockfoot">
-				<view class="tit">建议售价</view>				
-				<view class="nums">{{goodsItem.goodsPrice/100}}元</view>
-			</view>
-			<view class="stockfoot">
-				<view class="tit">本店售价</view>
-				<view class="nums">{{goodsItem.goodsPrice/100}}元</view>				
-			</view>
-			<view class="stockfoot">
-				<view class="tit red">仓库剩余</view>
+				<view class="tit red">库存剩余</view>
 				<view class="nums red">{{goodsItem.storeNum}}<text class="unit">{{goodsItem.goodsUnit}}</text></view>
 			</view> 
 			<view class="stockfoot"> 
-				<view class="tit green">仓库售出</view>
+				<view class="tit green">库存售出</view>
 				<view class="nums green">{{goodsItem.saleNum}}<text class="unit">{{goodsItem.goodsUnit}}</text></view>
 			</view>  
 		</view> 
@@ -93,8 +86,8 @@
 		border-bottom: 1px solid #f0f0f0;
 
 		.urlImg-item {
-			width: 200rpx;
-			height: 200rpx; 
+			width: 160rpx;
+			height: 160rpx; 
 			border-radius: 6rpx;
 		}
 

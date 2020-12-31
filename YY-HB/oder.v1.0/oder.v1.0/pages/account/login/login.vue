@@ -164,6 +164,12 @@
 						}
 						this.$store.commit('logStatus',haslogin)
 						uni.setStorageSync('userAccount',this.account)
+						uni.setStorageSync('isRegular',res.data.isRegular)  
+						if(res.data.isRegular == 1){
+							uni.setStorageSync('agreeChecked',false) 
+						}else if(res.data.isRegular == 0){
+							uni.setStorageSync('agreeChecked',true) 	 
+						}
 						setTimeout(()=>{
 							uni.hideLoading()
 							uni.reLaunch({ 

@@ -27,7 +27,7 @@
 						<view class="txt">4.选购时点击商品右上角“上热门”，可将设置为本店的热门分类。*注意常设的热门会根据订购时候的设置变化</view>
 						<view class="tit">确认收货</view>
 						<view class="txt">1.请确保自己准确无误收货，即可查看当日库存。</view>
-						<view class="txt">2.如未收到商品请及时联系<text class="links" @tap="navTo('../manage/manage')"> 区域经理</text></view>  
+						<view class="txt">2.如未收到商品请及时联系<text class="links" @tap="navTo('../manage/manage')"> 服务商家</text></view>  
 						<view class="tit">营业</view>
 						<view class="txt">1.首先确认收货，才可开启营业</view>
 						<view class="txt">2.每日允许开店一次，不可重复开店</view>

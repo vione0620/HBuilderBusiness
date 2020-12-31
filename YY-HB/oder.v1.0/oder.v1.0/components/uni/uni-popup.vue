@@ -128,7 +128,7 @@
 		left: 0;
 		right: 0;
 		z-index: 998;
-		background: rgba(0, 0, 0, .4);
+		background: rgba(0, 0, 0, .5);
 		opacity: 0
 	}
 

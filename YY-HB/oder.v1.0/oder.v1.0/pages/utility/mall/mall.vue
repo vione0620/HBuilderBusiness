@@ -110,9 +110,9 @@
 				hasFinalPay:false, 
 				webview:false,//电子合同
 				prevOrder:[],//上一笔订单
-				prevOrderDetail:[],//上一笔订单详情
-				isRegular:0,//是否新用户
+				prevOrderDetail:[],//上一笔订单详情 
 				isAds:0,//优惠开关
+				eContract:false,//是否签合同
 			}
 		}, 
 		onLoad() {  
@@ -120,15 +120,11 @@
 			this.userStore = uni.getStorageSync('user')
 			this.merchNo = uni.getStorageSync('user').merchNo
 			
-			this.$nextTick(()=>{ 
-				this.isRegular = uni.getStorageSync('isRegular').isRegular 
-				if(this.isRegular == 1){ 
-					this.getPrevOrder() 
-				}else{					
-					this.openEcontract()
-				}
+			this.$nextTick(()=>{  
+				this.getPrevOrder() 
+				this.handleFunc()  
 			})
-			this.getUnpaidOrderDetail()
+			this.getPlatParam()
 		},  
 		onReady() {  
 			uni.getSystemInfo({
@@ -146,9 +142,9 @@
 				})				
 			} 
 		},  
-		created() {
-			this.handleFunc() 
-		},
+		// created() {
+		// 	this.handleFunc() 
+		// },
 		methods: {
 			openEcontract(){
 				this.webview = true
@@ -175,12 +171,12 @@
 					this.prePayOrder() 
 				}
 			},  
-			getUnpaidOrderDetail(){				
+			getPlatParam(){				
 				let vVlue = {"merchNo":this.merchNo}
 				let sSort = getSortAscii(vVlue)
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()  
 				
-				this.$request.post('getUnpaidOrderDetail',{
+				this.$request.post('getPlatParam',{
 				  ...vVlue, 
 				  "sign": sSign
 				},{
@@ -223,9 +219,7 @@
 					},{
 						token:true
 					}).then(res => {  	
-						if(res.code === 200){
-							let changeIsRegular = {"isRegular": 1}
-							uni.setStorageSync('isRegular',changeIsRegular)		 
+						if(res.code === 200){	 
 							this.$refs.openSumRebate.close() 
 							let orderNo = res.data.orderNo 
 							uni.navigateTo({ 

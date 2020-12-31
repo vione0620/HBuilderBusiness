@@ -24,8 +24,8 @@
                     position: {
                         left: 15,
                         top: 25,
-                        width: 30,
-                        height: 30
+                        width: 35,
+                        height: 35
                     },
                     iconPath: '/static/icon-goback.png',
                     clickable: true
@@ -99,7 +99,7 @@
 				point2,
 				(event)=>{
 					var distance = event.distance;  // 转换后的距离值   
-					
+					console.log(distance,'distancedistancedistance')
 					this.myMapSetZoom(Math.ceil(distance))
 				},(err)=>{ 
 					console.log("err:"+JSON.stringify(err))
@@ -120,7 +120,7 @@
 					this.scale = 6
 				}else if(range >= 15000 && range <= 35000){
 					this.scale = 3
-				}else if(range >= 35000 && range <= 50000){
+				}else if(range >= 35000){
 					this.scale = 3
 				}   
 			},

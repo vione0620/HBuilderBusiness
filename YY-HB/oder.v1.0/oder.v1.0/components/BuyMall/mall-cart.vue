@@ -84,7 +84,7 @@
 						duration: 2000
 					})
 					return
-				}else if(this.totalPrice < 30000 || this.totalPrice > 0){
+				}else if(this.totalPrice < 30000 && this.totalPrice > 0){
 					this.$emit('open-sum-rebate',true)
 				}else{ 
 					uni.navigateTo({

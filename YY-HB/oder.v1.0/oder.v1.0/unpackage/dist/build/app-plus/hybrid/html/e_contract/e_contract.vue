@@ -82,7 +82,7 @@
 					<li>本协议一式贰份，甲乙双方各执一份。本协议自双方签字或盖章之日起生效。未尽事宜，双方另行协商并签订补充协议。本协议如需备案，相关费用按照政府规定缴纳，政府无规定的各半分担。</li> 
 				</ol> 
 				<h2 class="h2_part">授权方（甲方）：<view class="txt">顶有鸣（福建）健康科技有限公司</view> </h2>
-				<h2 class="h2_part">加盟商（乙方）：<view class="txt">{{this.mearchName}}（{{this.joinNo}}）</view></h2>
+				<h2 class="h2_part">加盟商（乙方）：<view class="txt">{{mearchName}}（{{joinNo}}）</view></h2>
 				<ol>
 					<li></li> 
 				</ol>
@@ -94,7 +94,7 @@
 		<view class="checked-wrap">
 			<view class="btn-cont"> 
 				<evan-checkbox v-model="agreeChecked" shape="square"
-				 :iconSize="13" primaryColor="#09BB07">我已阅读并同意</evan-checkbox> 
+				 :iconSize="18" primaryColor="#09BB07" :checkRight="true">我已阅读并同意</evan-checkbox> 
 			</view>
 			<view class="checkOnCredit">
 				<view class="checkBtn" @tap="checkBargain(false)">取消</view>
@@ -105,6 +105,8 @@
 </template>
 
 <script>
+	import {b64Md5,hexMD5} from '@/network/md5.js'	
+	import {getSortAscii} from '@/common/util/utils.js'	 
 	import EvanCheckbox from '../../../components/plugin-ui/evan-checkbox.vue'
 	export default {
 		components:{ 
@@ -112,6 +114,9 @@
 		},
 		data() {
 			return {
+				loginWhether:'',//登陆状态
+				userStore:'', //用户信息
+				merchNo:'', //商户号
 				getheight:0,
 				scrollTop:0,
 				agreeChecked:false,
@@ -120,6 +125,9 @@
 			};
 		},  
 		onLoad() { 
+			this.loginWhether = uni.getStorageSync('status') 
+			this.userStore = uni.getStorageSync('user')
+			this.merchNo = uni.getStorageSync('user').merchNo 
 			this.joinNo = uni.getStorageSync('user').joinNo  
 			this.mearchName = uni.getStorageSync('user').identityName  
 			uni.getSystemInfo({
@@ -131,16 +139,20 @@
 			
 		},
 		methods:{
-			listScroll(w){
-				console.log(w)
+			
+			back() { 
+				uni.reLaunch({
+					url:'../../../pages/utility/index/index'
+				})
+			},
+			listScroll(w){ 
 				this.agreeChecked = true
 			},
 			checkBargain(param){
-				if(param === true){
-					console.log('没勾选')
+				if(param === true){ 
 					if(this.agreeChecked){
-						uni.setStorageSync('agreeChecked',true)
-						console.log('勾选了可以')
+						this.isRegular() //是否新用户
+						// uni.setStorageSync('agreeChecked',false) 
 						uni.showLoading({
 							mask:true,
 							title:'恭喜你成为正式商家！'
@@ -154,13 +166,27 @@
 						},2000)
 					}
 				}else if(param === false){ 
-					uni.redirectTo({
-						url:'../../../pages/utility/index/index',
-						animationDuration:200,
-						animationType:'pop-out',
+					// uni.setStorageSync('agreeChecked',true)
+					uni.navigateBack({
+						delta:1
 					})
 				}
-			},
+			},			
+			isRegular(){		
+				let vVlue = {
+					"merchNo": this.merchNo, 
+				}
+				let sSort = getSortAscii(vVlue)    
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() 
+				this.$request.post('isRegular', {	
+					...vVlue,
+					"sign": sSign
+				},{
+					token:true
+				}).then(res=>{ 
+						uni.setStorageSync('agreeChecked',false) 
+				}).catch()  
+			}, 
 		},
 	}
 </script>
@@ -177,7 +203,7 @@ page{
 .unpaid-list{
 	padding: 0 20rpx;
 	.h1{
-		font-size: 48rpx;
+		font-size: 40rpx;
 		font-weight: normal;
 		text-align: center;
 	}
@@ -212,7 +238,7 @@ page{
 	}
 }
 .checked-wrap{
-	height: 180rpx;
+	height: 220rpx;
 	position: fixed;
 	bottom: 0;
 	left: 0;
@@ -221,7 +247,7 @@ page{
 	background-color: #FFFFFF;
 	border-top: 1px solid #EEEEEE;
 	.btn-cont{
-		padding: 20rpx 40rpx;
+		padding: 30rpx 40rpx;
 	}
 	.checkOnCredit{ 
 		display: flex;

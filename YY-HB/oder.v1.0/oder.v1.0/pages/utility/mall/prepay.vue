@@ -6,7 +6,8 @@
 				<pre-pay-list :pre-pay-list="PrePayListData"></pre-pay-list>
 				<!-- 预支付商品列表 end--> 
 			</scroll-view>
-			<btn-foot title="确认订单" @tap="btnClick" :fixd="true"></btn-foot> 
+			<btn-foot title="确认订单" @tap="btnClick" :fixd="true" :disable="disableBtn"></btn-foot> 
+			 <!-- :class="disableBtn ? 'bg-gary' : ''" -->
 		</view>
 		
 		<!-- 立即支付 -->
@@ -48,7 +49,8 @@
 					<btn-foot title="确认下单" class="topayBtn" @tap="toOnCredit()"></btn-foot> 
 				</template>
 				<template v-if="!disablepay"> 
-					<btn-foot title="立即结清" class="topayBtn" @tap="getUnpaidOrder('nowPay')"></btn-foot> 
+					<btn-foot title="立即结清" class="topayBtn" :disable="disableBtn"  @tap="getUnpaidOrder('nowPay')"></btn-foot> 
+					<!-- :class="disableBtn ? 'bg-gary' : ''" -->
 				</template>
 			</view>
 		</uni-popup>
@@ -145,6 +147,7 @@
 				clock:false,
 				PreStatus:false,
 				prePOrder:'',
+				disableBtn:false,
 			}
 		},
 		components:{
@@ -187,14 +190,9 @@
 		onLoad(option) {   
 			this.loginWhether = uni.getStorageSync('status') 
 			this.merchNo = uni.getStorageSync('user').merchNo				
-			this.perpay() 
-			
+			this.perpay()  
 			this.prePOrder = option.orderno 
-			if(option.status == 'true' && option.from != 'mallcar'){ 	
-				// 滞后弹出 begin
-				// this.PreStatus = true
-				// this.getPrevOrder()		
-				// 滞后弹出 end
+			if(option.status == 'true' && option.from != 'mallcar'){ 	 
 				// 预先弹出 begin
 				this.getPrevOrder()
 				this.$nextTick(()=>{
@@ -231,6 +229,7 @@
 		methods:{ 
 			closePrev(){ 
 				this.$refs.hasUnpaid.close()
+				this.disableBtn = false
 			},
 			closePopup(){
 				this.$refs.popup.close()
@@ -247,15 +246,8 @@
 					}
 					this.newOrderGoods.push(res) 
 				} 
-			},			
-			// bindTextAreaBlur(e){ 
-			// 	this.markText = e.detail.value ? e.detail.value : '无' 
-			// },
-			btnClick(){   
-				// if(this.PreStatus){
-				// 	this.getPrevOrder()
-				// 	this.$refs.hasUnpaid.open()					
-				// }else 
+			},			 
+			btnClick(){    
 				if(this.canCredit == 1){ 
 					this.$refs.popup.open()	
 				}else{
@@ -349,6 +341,7 @@
 						this.$store.dispatch('receive_previous_order',res.data)  
 						if(res.data.orderNo){
 							this.hasFinalPay = true  
+							this.disableBtn = true
 							this.getBreakfastOrderDetail()
 							this.getOrderCoupon(res.data.orderNo) 							
 						}
@@ -433,6 +426,7 @@
 					token:true
 				}).then(res => {  						
 					if(res.code == 200){
+						this.$store.commit('clear_cart',[])
 						 uni.showLoading({
 							mask:true,
 							title:'恭喜您，下单成功！'
@@ -440,8 +434,8 @@
 						 setTimeout(()=>{
 							 uni.hideLoading()
 						 },1500)
-						 uni.redirectTo({ 
-							url:'../../finance/outlay/list'
+						 uni.reLaunch({ 
+							url:'../index/index'
 						 })
 					}else{				
 						uni.showToast({
@@ -471,9 +465,12 @@
 				let vVlue = ''
 				let thisOrderNo = ''
 				let instantPay = ''
+				// this.disableBtn = true
 				if(type == 'prevPay'){
 					thisOrderNo = this.previousOrder.orderNo
 					instantPay = 0
+					// this.disableBtn = false
+					
 				}else if(type == 'nowPay'){ 
 					thisOrderNo = this.prePOrder
 					instantPay = 1
@@ -515,13 +512,16 @@
 							success: (res) => { 
 								this.$refs.hasUnpaid.close() 
 								this.PreStatus = false  
+								this.disableBtn = false
 								if(type == 'nowPay'){
 									setTimeout(()=>{
-										uni.redirectTo({
+										uni.reLaunch({ 
 											url:'../index/index'
 										})
-									},2000)								 					
+										this.$store.commit('clear_cart',[])	
+									},1000)						 					
 								}
+								
 							},
 							fail: (err)=>{ 
 								uni.showToast({
@@ -535,9 +535,16 @@
 								this.$store.dispatch('get_cart_amt','')								
 							},
 						});
-					}else if(res.code == 400){
+					}else if(res.code == 412){
 						this.getPrevOrder()
-						this.$refs.hasUnpaid.open()			
+						this.$refs.hasUnpaid.open()	 						
+						// this.disableBtn = true
+					}else{
+						uni.showToast({
+							icon:'none',
+							title:res.message,
+							duration: 2000
+						})
 					}
 				}).catch()
 			},
@@ -546,6 +553,7 @@
 				let vVlue = ''
 				let thisOrderNo = ''
 				let instantPay = ''
+				// this.disableBtn = true
 				if(type == 'prevPay'){
 					thisOrderNo = this.previousOrder.orderNo
 					instantPay = 0
@@ -600,13 +608,15 @@
 							success: (res) => { 
 								this.$refs.hasUnpaid.close() 
 								this.PreStatus = false 
+								this.disableBtn = false
 								this.$store.dispatch('get_coupon_id','')
 								if(type == 'nowPay'){
-									setTimeout(()=>{
+									setTimeout(()=>{	
 										uni.redirectTo({
 											url:'../index/index'
-										})
-									},2000)		 					 					
+										})	
+										this.$store.commit('clear_cart',[])
+									},1000)									
 								} 
 							},
 							fail: (err)=>{ 
@@ -621,7 +631,17 @@
 								this.$store.dispatch('get_cart_amt','')								
 							},
 						})
-					} 
+					}else if(res.code == 412){
+						this.getPrevOrder()
+						this.$refs.hasUnpaid.open()		
+						// this.disableBtn = true	
+					}else{						
+						uni.showToast({
+							icon:'none',
+							title:res.message,
+							duration: 2000
+						})   
+					}
 					 
 				}).catch() 
 			},
@@ -632,6 +652,10 @@
 </script>
 
 <style lang="scss"> 
+
+	// .bg-gary{
+	// 	// opacity: .5 !important; 
+	// }
 	.prePayOrder{ 
 		width: 100vw;  
 		padding: 20rpx;
@@ -763,6 +787,7 @@
 				}
 			}
 			
+			
 			.unpaid-list{
 				padding: 20rpx 0;  
 				.conten_list{
@@ -773,7 +798,7 @@
 						width: 100%;
 						display: flex;
 						justify-content: space-between;
-						padding: 16rpx 8rpx; 
+						padding: 16rpx 20rpx 16rpx 0;
 						align-items: center; 
 						
 						.tit{
@@ -786,8 +811,9 @@
 								font-size: 32rpx; 
 							}
 							.unit{
-								font-size: 20rpx;
-								color: #777777;
+								padding-top: 10rpx;
+								font-size: 25rpx;
+								color: #999;
 							}
 						}
 					} 
@@ -799,7 +825,7 @@
 						width: 100%;
 						display: flex;
 						justify-content: space-between;
-						padding: 16rpx 8rpx;
+						padding: 16rpx 20rpx 16rpx 0;
 						
 						.txt{
 							width: 80%;

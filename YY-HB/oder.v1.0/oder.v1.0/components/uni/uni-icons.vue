@@ -1,5 +1,5 @@
 <template>
-	<view :class="'uni-icon-' + type" :style="{ color: color, 'font-size': size + 'px' }" class="uni-icon" @click="_onClick" />
+	<view :class="'uni-icon-' + type" :style="{ color: color, 'font-size': checkRight ? `${size + 12}px` : `${size}px`}" class="uni-icon" @click="_onClick" />
 </template>
 
 <script>
@@ -17,6 +17,10 @@
 			size: {
 				type: [Number, String],
 				default: 16
+			},
+			checkRight:{
+				type:Boolean,
+				default:false,
 			}
 		},
 		methods: {

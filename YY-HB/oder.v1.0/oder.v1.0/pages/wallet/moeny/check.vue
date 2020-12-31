@@ -288,7 +288,7 @@
 									duration: 2000
 								})
 								uni.redirectTo({
-									url:'./result?type=fail&msg=${res.message}'
+									url:`./result?type=fail&msg=${res.message}`
 								}) 								
 							}else if(res.data.cashCode == 3){									
 								uni.showToast({
@@ -297,7 +297,7 @@
 									duration: 2000
 								})
 								uni.redirectTo({
-									url:'./result?type=fail&msg=${res.message}'
+									url:`./result?type=fail&msg=${res.message}`
 								}) 								
 							}		
 						}else{

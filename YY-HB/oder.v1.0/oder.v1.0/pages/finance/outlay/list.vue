@@ -19,7 +19,7 @@
  
 	<view id="oderList">  
 		<view class="orderlist_main">
-			<swiper :style="'height:'+ scrollH +'px;'" :current="this.tabIndex" @change="linktabindex">
+			<swiper :style="'height:'+ scrollH +'px;'" :current="this.tabIndex" @change="linktabindex" previous-margin="50" next-margin="50">
 				<swiper-item>
 					<scroll-view scroll-y :style="'height:'+ scrollH +'px;'" @scrolltolower="allOrderList">
 						
@@ -28,17 +28,18 @@
 								<view class="group">
 									<view class="head">
 										<view class="tit">  
-											<text class="titIcon iconfont iconstauts-ing"></text> 
-										
+											<text class="titIcon iconfont iconstauts-ing"></text>  
 											<template v-if="orderItem.payState==1">
 												<template v-if="orderItem.orderState == 0">
-													<view class="titTxt">等待配送</view> 							
+													<view class="titTxt">等待配送</view> 	
 												</template>
 												<template v-if="orderItem.orderState == 1"><text class="titTxt">工厂接单（配送中）</text></template>
 												<template v-if="orderItem.orderState == 2"><text class="titTxt">已确认收货</text></template> 
 											</template>
 											<template v-else>
-												<template v-if="orderItem.payState == 0"><view class="titTxt isright">待付款</view></template>
+												<template v-if="orderItem.payState == 0"><view class="titTxt isright">待付款 
+												<text class="titTxt" v-if="orderItem.orderState == 1">(配送中)</text>
+												</view></template>
 												<template v-if="orderItem.payState == 2"><view class="titTxt">支付失败</view></template>
 											</template> 
 													
@@ -165,11 +166,11 @@
 											<view class="titTxt isright">待结算</view> 	 													
 										</view><view class="time">{{orderItem.orderTime}}</view>
 									</view> 
-									<view class="main_cont" @tap="creditNavto({page:orderItem.orderNo,from:'parents',tStates:orderItem.orderType,navto:'credit'})">
+									<view class="main_cont" @tap="creditNavto({page:orderItem.orderNo,from:'unpaid',pStates:orderItem.instantPay,navto:'credit'})">
 										<view class="itemBlock">
 											<block v-for="(itemList,index) in orderItem.content.slice(0,3)">
 												<view class="sigleItem">
-													<view class="name">{{itemList.goodsName}} <view v-if="itemList.hotSale == 1" class="hots">&nbsp;&nbsp; 热门</view></view>
+													<view class="name">{{itemList.goodsName}}</view>
 													<view class="unit">{{itemList.goodsNum}} {{itemList.goodsUnit}}</view>
 												</view> 
 											</block>
@@ -184,22 +185,23 @@
 									
 									<view class="footbtn">
 										<view class="left-footbtn">  
-										<template v-if="orderItem.instantPay == 0">
-											<view v-if="index == 0">
-												<view class="checkOk isno" @tap="checkOkBtn(index,'unPay','nopop')">立即付</view>  												
-											</view>
-											<view v-else>
-												<view class="checkOk isno" @tap="checkOkBtn(index,'unPay','yespop')">立即付</view>  												
-												<view class="checkOk isfeed" @tap="cancelOrder(index)">删除</view>  												
-											</view>
-										</template>
-										<template v-if="orderItem.instantPay == 1">     
-											<template v-if="otherBtn && otherCanCredit">
-												<view class="checkOk isright" @tap="creditOrder(index,'unPay')">先铺货</view>  			
-											</template>  
-											<view class="checkOk isno" @tap="checkOkBtn(index,'unPay','yespop')">立即付</view> 
-											<view class="checkOk isfeed" @tap="cancelOrder(index)">删除</view> 	
-										</template>		 	 
+											<template v-if="orderItem.instantPay == 0">
+												<template v-if="index == 0">
+													<view class="checkOk isno" @tap="checkOkBtn(index,'unPay','nopop')">去支付</view>  		
+													<view class="checkOk isfeed">已铺货</view> 											 
+												</template>
+												<template v-else>
+													<view class="checkOk isno" @tap="checkOkBtn(index,'unPay','yespop')">立即付</view>  												
+													<view class="checkOk isfeed" @tap="cancelOrder(index)">删除</view>  												
+												</template>
+											</template>
+											<template v-if="orderItem.instantPay == 1">     
+												<template v-if="otherBtn && otherCanCredit">
+													<view class="checkOk isright" @tap="creditOrder(index,'unPay')">先铺货</view>  			
+												</template>  
+												<view class="checkOk isno" @tap="checkOkBtn(index,'unPay','yespop')">立即付</view> 
+												<view class="checkOk isfeed" @tap="cancelOrder(index)">删除</view> 	
+											</template>		 	 
 										</view>  
 										
 										<view class="right-moeny">{{parseFloat(orderItem.realAmt/100).toFixed(2)}} <text class="txt">元</text></view> 
@@ -348,7 +350,7 @@
 				actualPay:'', 
 				got:false, 
 				clock:false,
-				navTag:['全部订单','待结算'],
+				navTag:['已配送订单','未支付订单'],
 				tabIndex:0,
 				scrollH:0,
 				scrollTop:0, 
@@ -382,11 +384,12 @@
 			...mapState(['userOrderList','userUnPayList','getCouponId','getCartAmt','getUnusualAmt','getUnusualNo','canCredit']),  
 			...mapGetters(['totalCount','totalPrice','prevOrderPrice']),  
 			Payable:function(){
-				this.totalPriceN = this.totalPrice
-				return this.numFloat(this.totalPriceN).toFixed(2)
+				// this.totalPriceN = this.totalPrice
+				return this.numFloat(this.totalPrice).toFixed(2)
 			},
 			PayActual:function(){
-				this.totalPriceN = this.totalPrice
+				// console.log(this.totalPriceN,this.getUnusualAmt)
+				// this.totalPrice = this.totalPrice
 				let actualNums = ''
 				if(this.clock){					
 					let org = this.totalPriceN,
@@ -402,7 +405,7 @@
 				return actualNums
 			},			
 			prePayActual:function(){
-				this.totalPriceN = this.totalPrice
+				// this.totalPriceN = this.totalPrice
 				let actualNums = ''
 				if(this.clock || this.prevOrderPrice){	 
 					let org = this.prevOrderPrice,
@@ -423,7 +426,7 @@
 					
 				this.got = true
 				this.couponid = `满${c_one}减${c_two}`
-				this.totalPriceN = this.totalPrice
+				// this.totalPriceN = this.totalPrice
 				
 				this.actualPay = this.numFloat(this.totalPriceN - this.getCouponId.couponAmt) 		
 			
@@ -497,7 +500,7 @@
 				return parseFloat(param / 100)
 			},
 			navtoGetCoupon(){ 
-				this.totalPriceN = this.totalPrice
+				// this.totalPrice = this.totalPrice
 				if(!this.clock){
 					uni.navigateTo({
 						url:'../../account/coupon/usable?type='+ this.totalPriceN,
@@ -681,7 +684,9 @@
 				}).catch() 
 			},
 			checkOkBtn(index,type,other){  
-				this.totalPriceN = this.totalPrice
+				let orderInfo = this.unOrderList   
+				console.log(this.totalPrice,this.totalPriceN,orderInfo[index].realAmt)
+				// this.totalPrice = this.totalPrice
 				//当前页继续支付   
 				if(type == 'keepon'){
 					let orderInfo = this.userOrderList  
@@ -1009,9 +1014,9 @@
 					}					
 				}
 			},
-			creditNavto(option){
+			creditNavto(option){ 
 				uni.navigateTo({
-					url:`./list_detail?orderNo=${option.page}&navto=${option.navto}`
+					url:`./list_detail?orderNo=${option.page}&navto=${option.navto}&pStates=${option.pStates}&from=${option.from}`
 				})
 			},
 		},

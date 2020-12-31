@@ -19,8 +19,9 @@
 		<uni-nav-bar :status-bar="true" :fixed="true" left-icon="arrowleft" @clickLeft="back" color="#ffffff" background-color="RGBA(70, 184, 91, 1)"/>
 	</template>
 	<view class="goods-detail"> 
+	<!-- this.credit && this.pStates == 0 -->
 		<view class="header">
-			<template v-if="this.credit">
+			<template v-if="this.credit && this.unpaid">
 			<view class="status">未支付订单</view> 
 			</template>
 			<template v-else>
@@ -73,7 +74,7 @@
 								<view class="">已优惠</view> <view class="price">{{parseFloat(currentItem.couponAmt/100).toFixed(2)/1}}</view>元
 							</view>
 							<view class="sub_right">
-								<view class="tit">实付</view>  
+								<view class="tit">应付</view>  
 								<view class="price">{{parseFloat(currentItem.realAmt/100).toFixed(2)/1}}</view>
 								<view class="unit">元</view>
 							</view>
@@ -115,25 +116,25 @@
 					<view class="tit">下单时间</view>
 					<view class="cont"><text>{{currentItem.orderTime}}</text></view> 
 				</view>
-				<view class="order-group">
+				<view class="order-group" v-if="!this.suborder || !this.unpaid">
 					<view class="tit">支付方式</view> 
 					<view class="cont">{{orderPayType}} </view>
 				</view>
-				<view class="order-group">
+			<!-- 	<view class="order-group">
 					<view class="tit">备注</view>
 					<view class="cont">{{currentItem.remark ? currentItem.remark : '无'}}</view>
-				</view>
-				<view class="order-group">
+				</view> -->
+				<view class="order-group" v-if="!this.suborder || !this.unpaid">
 					<view class="tit">支付状态</view>
 					<view class="cont">{{payStatus}}</view>
 				</view>
-				<template v-if="payStatus==2">
-					<view class="order-group">
+				<template>
+					<view class="order-group" v-if="this.currentItem.payState == 2">
 						<view class="tit">失败原因</view>
 						<view class="cont">{{currentItem.reason}}</view>
 					</view>
 				</template> 
-				<view class="order-group">
+				<view class="order-group serve_phone">
 					<view class="tit">联系客服</view>
 					<view class="cont callNo" @tap="callNoBtn()">
 						<view class="callText"><text class="iconfont icondianhua-copy"></text>联系客服</view>
@@ -180,6 +181,9 @@
 				preicePart:false,
 				credit:false,
 				maphide:false,
+				pStates:0,
+				suborder:true,
+				unpaid:true,
 			};
 		},
 		components:{
@@ -193,7 +197,7 @@
 				this.pushMsg = option.pushNo
 			}else{
 				this.orderArg = option  
-			}  
+			}   
 			
 			this.loginWhether = uni.getStorageSync('status')  
 			this.merchNo = uni.getStorageSync('user').merchNo		 
@@ -201,15 +205,23 @@
 				this.getDetail('getBreakfastOrderDetail')	
 			}else{		
 				this.credit = true
+				this.pStates = option.pStates
 				this.getDetail('getUnpaidOrderDetail')	 
 			}
 			
 			
 			if(this.orderArg.from == 'parents'){
 				this.preicePart = true 
+			}else if(this.orderArg.from == 'suborder'){
+				this.suborder = true
 			}
 			if(this.orderArg.from == 'allsub'){
 				this.maphide = true   
+				this.preicePart = true
+			}
+			if(this.orderArg.from == 'unpaid'){ 
+				this.unpaid = true		
+				this.preicePart = true
 			}
 		},
 		computed:{  
@@ -264,7 +276,7 @@
 					delta: 1
 				})
 			},
-			callNoBtn(){	 
+			callNoBtn(){	  
 				let no = this.currentItem.serviceContactMobile 
 				let arr = JSON.parse(no)
 				let newNo = [].concat.apply([], arr) 
@@ -503,7 +515,7 @@
 				&:last-child{
 					border: 0;
 				}
-								
+				
 				.callNo{
 					display: flex;  
 					justify-items: flex-end;   
@@ -521,7 +533,8 @@
 							font-size: 40rpx;
 						}
 					}
-				}
+				} 				
+				
 			}
 		}
 		

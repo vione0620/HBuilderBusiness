@@ -34,11 +34,11 @@
 						
 						<scroll-view scroll-y :scroll-into-view="scrollInto" show-scrollbar="true" scroll-with-animation @scroll="myscroll"
 						class="right-main" :style="'height:'+ scrollH +'px;'">
-							<view class="swiper-item" v-for="(item,index) in stockFoods" :key="index">   
+							<view class="swiper-item" v-for="(item,index) in stockFoods" :key="index">    
 								<goods-group :goods="item" :category="stockStock[index]" :id="'gdsItem' + index" 
 								@set-hot-sell="StockSetHotSell" 
 								@i-show="isTrueSet" 
-								@is-down="isDownSet"></goods-group>  
+								@is-down="isDownSet"></goods-group> 
 							</view>  
 						</scroll-view>  
 						
@@ -203,7 +203,7 @@
 								this.isload = false
 								this.isnostore = false  
 								this.isready = true
-								
+								console.log(resDataStore)
 								let result = resDataStore  		
 								let nKeys = []
 								let nValue = []

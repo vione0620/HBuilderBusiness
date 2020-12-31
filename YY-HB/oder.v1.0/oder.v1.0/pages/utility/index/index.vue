@@ -45,7 +45,7 @@
 
 		<view id="entry-list">
 			<block v-for="(item,index) in gotolist" :key="'4'+ index">
-				<view class="item" @tap="navTo(item.urls)">
+				<view class="item" @tap="navTo(item.urls,item.navto)">
 					<view class="icon" :class="item.icon"></view>
 					<view class="txt">{{item.text}}</view>
 				</view>
@@ -140,42 +140,50 @@
 	const gotolist = [{
 			"icon": 'iconfont iconorder-report',
 			"text": "经营报表",
-			"urls": "../../wallet/report/report"
+			"urls": "../../wallet/report/report",
+			"navto":"report",
 		},
 		{
 			"icon": 'iconfont iconorder-home',
 			"text": "商家下单",
-			"urls": "../mall/mall"
+			"urls": "../mall/mall",
+			"navto":"mall",
 		},
 		{
 			"icon": 'iconfont iconoder-stock',
 			"text": "商家库存",
-			"urls": "../../utility/stock/stock"
+			"urls": "../../utility/stock/stock",
+			"navto":"stock",
 		},
 		{
 			"icon": 'iconfont iconmanage',
 			"text": "服务商家",
-			"urls": "../../utility/manage/manage"
+			"urls": "../../utility/manage/manage",
+			"navto":"manage",
 		},
 		{
 			"icon": 'iconfont iconoder-entry',
 			"text": "我的订单",
-			"urls": "../../finance/outlay/list"
+			"urls": "../../finance/outlay/list",
+			"navto":"list",
 		},
 		{
 			"icon": 'iconfont iconoder-entry-history',
 			"text": "收款记录",
-			"urls": "../../wallet/entry/entry"
+			"urls": "../../wallet/entry/entry",
+			"navto":"entry",
 		},
 		{
 			"icon": 'iconfont icon-agency',
 			"text": "订制管理",
-			"urls": "../../finance/agent/agent"
+			"urls": "../../finance/agent/agent",
+			"navto":"agent",
 		},
 		{
 			"icon": 'iconfont icon-money',
 			"text": "订制红包",
-			"urls": "../../wallet/rebate/rebate"
+			"urls": "../../wallet/rebate/rebate",
+			"navto":"rebate",
 		},  
 	]
 	const serVer = [{
@@ -223,6 +231,8 @@
 				UnPaidData:Object,//有订单未结清
 				FirstOrder:false,
 				isAds:0,//优惠开关
+				eContract:false,//是否签合同
+				// webview:false,//电子合同
 			}
 		}, 
 		computed:{ 
@@ -245,8 +255,8 @@
 		onLoad(option) {    
 			this.loginWhether = uni.getStorageSync('status') 
 			this.userStore = uni.getStorageSync('user')
-			this.merchNo = uni.getStorageSync('user').merchNo		
-			
+			this.merchNo = uni.getStorageSync('user').merchNo
+			 
 			let login_type = option.loginType  
 			if(login_type === 'login'){ 
 				this.fromLogin() 
@@ -264,19 +274,29 @@
 			}
 		}, 
 		methods: {
-			getUnpaidOrderDetail(refreshKey){ 
+			openEcontract(){
+				// this.webview = true
+				uni.navigateTo({
+					url:'../../../hybrid/html/e_contract/e_contract'
+				})
+			},
+			getPlatParam(refreshKey){ 
 				let vVlue = {"merchNo":this.merchNo}
 				let sSort = getSortAscii(vVlue)
 				let sSign = hexMD5(sSort + "&key=" + refreshKey).toUpperCase()   
 				
-				this.$request.post('getUnpaidOrderDetail',{
+				this.$request.post('getPlatParam',{
 				  ...vVlue, 
 				  "sign": sSign
 				},{
 					token:true
 				}).then((res)=>{   
+					// console.log(res.data)
 					if(res.code == 200){ 
 						this.isAds = res.data.actionSwitch						
+						if(res.data.actionSwitch == 0){
+							this.openAds()
+						}
 					}
 				})
 			},
@@ -569,19 +589,11 @@
 				this.$api.getUserDev()
 				this.getUploadDev()
 				this.ownPaypwd('ownPaypwd',this.loginWhether.md5key)
-				this.fromlogin = true
-				this.isRegular() //是否新用户
+				this.fromlogin = true 
 				this.aboutPrevOrder(this.loginWhether.md5key)
 				
 				//获取优惠开关 begin
-				this.getUnpaidOrderDetail(this.loginWhether.md5key)				
-				if(this.isAds == 0){
-					this.openAds()
-				}
-				//获取优惠开关 end
-				// console.log('this.loginWhether.md5kethis.loginWhether.md5ke',this.loginWhether.md5key)
-				// this.getPrevOrder(this.loginWhether.md5key)
-				// this.refreshKey = this.loginWhether.md5key
+				this.getPlatParam(this.loginWhether.md5key)		 
 			}, 
 			initUser() {  
 				let vVlue = {"merchNo": this.merchNo} 
@@ -613,10 +625,10 @@
 							this.getServiceMobile('getServiceMobile',this.refreshed) 
 							
 							//获取优惠开关 begin
-							this.getUnpaidOrderDetail(this.refreshed)
-							if(this.isAds == 0){
-								this.openAds()
-							}
+							this.getPlatParam(this.refreshed)
+							// console.log(this.isAds)
+							
+							
 							//获取优惠开关 end
 							
 							//走一遍未接订单流程 
@@ -723,28 +735,27 @@
 					}).catch()  
 				}
 			}, 
-			isRegular(){		
-				let vVlue = {
-					"merchNo": this.merchNo, 
+			  
+			navTo(path,navto) {
+				// console.log(uni.getStorageSync('agreeChecked')) 
+				if(navto == 'mall'){
+					if(uni.getStorageSync('agreeChecked') == true){
+						console.log('sssss')/
+						this.openEcontract()
+					}else{				
+						uni.navigateTo({ 
+							url:path,
+							animationType: 'pop-in',
+							animationDuration: 200
+						});						
+					}
+				}else{					
+					uni.navigateTo({ 
+						url:path,
+						animationType: 'pop-in',
+						animationDuration: 200
+					});
 				}
-				let sSort = getSortAscii(vVlue)    
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() 
-				this.$request.post('isRegular', {	
-					...vVlue,
-					"sign": sSign
-				},{
-					token:true
-				}).then(res=>{
-					this.FirstOrder = true
-					uni.setStorageSync('isRegular',res.data)
-				}).catch()  
-			}, 
-			navTo(path) { 
-				uni.navigateTo({ 
-					url:path,
-					animationType: 'pop-in',
-					animationDuration: 200
-				});
 			},			
 			openSever(index) { 
 				let newNo = this.serVer[index].phone 
@@ -870,7 +881,7 @@
 					width: 100%;
 					display: flex;
 					justify-content: space-between;
-					padding: 16rpx 8rpx; 
+					padding: 16rpx 20rpx 16rpx 0;
 					align-items: center; 
 					
 					.tit{
@@ -883,8 +894,9 @@
 							font-size: 32rpx; 
 						}
 						.unit{
-							font-size: 20rpx;
-							color: #777777;
+							padding-top: 10rpx;
+							font-size: 25rpx;
+							color: #999;
 						}
 					}
 				} 
@@ -896,10 +908,10 @@
 					width: 100%;
 					display: flex;
 					justify-content: space-between;
-					padding: 16rpx 8rpx;
+					padding: 16rpx 20rpx 16rpx 0;
 					
 					.txt{
-						width: 80%;
+						width: 78%;
 						text-align: right;
 					}
 				}

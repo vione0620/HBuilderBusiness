@@ -105,7 +105,7 @@
 		,{
 			"path" : "pages/utility/manage/manage",
 			"style" : { 
-				"navigationBarTitleText":"运营管理",
+				"navigationBarTitleText":"服务商家",
 				"app-plus":{  
 					"titleNView":{
 						"titleColor":"#FFFFFF",  
@@ -177,7 +177,7 @@
 		,{
 			"path" : "pages/finance/sell/unity/unity",
 			"style" : { 
-				"navigationBarTitleText":"用户订单",
+				"navigationBarTitleText":"买家订单",
 				"app-plus":{  
 					"titleNView":{
 						"titleColor":"#FFFFFF",  
@@ -397,7 +397,13 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "加盟协议",
-                "enablePullDownRefresh": false
+				"app-plus":{  
+					"titleNView":{
+						"titleColor":"#FFFFFF",  
+						"autoBackButton":	false,
+						"backgroundColor":"#46B85B"
+					} 
+				}
             }
             
         }  

@@ -346,7 +346,7 @@
 		 }
 	}
 	.logout{
-		padding: 32rpx 0;
+		padding: 40rpx 0;
 		text-align: center;
 		position: fixed;
 		bottom: 0;
