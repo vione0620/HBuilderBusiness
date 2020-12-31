@@ -109,22 +109,22 @@ export default {
 				align-items: center;
 			}
 			.name {
-				font-size: 30rpx;
+				font-size: 32rpx;
 			}
-			.hotbtn{
-				font-size: 24rpx;
-				border: 1px solid #666;
-				color:#666;
-				width: 100rpx;
-				height: 44rpx;
-				border-radius: 22rpx; 
-				text-align: center;
-				line-height:44rpx;
-			}
-			.hotbtn-active{
-				color: #FF0000;
-				border: 1px solid #FF0000;
-			} 
+			// .hotbtn{
+			// 	font-size: 24rpx;
+			// 	border: 1px solid #666;
+			// 	color:#666;
+			// 	width: 100rpx;
+			// 	height: 44rpx;
+			// 	border-radius: 22rpx; 
+			// 	text-align: center;
+			// 	line-height:44rpx;
+			// }
+			// .hotbtn-active{
+			// 	color: #FF0000;
+			// 	border: 1px solid #FF0000;
+			// } 
 			.etalon {
 				font-size: 20rpx;
 				color: #999;

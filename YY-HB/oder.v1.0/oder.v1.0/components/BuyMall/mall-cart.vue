@@ -75,10 +75,7 @@
 			return{
 				showPop:false,
 			}
-		},
-		created() {
-			console.log(this.orderNo)
-		},
+		}, 
 		methods:{
 			goToPay(){
 				if(this.totalPrice <= 0){					

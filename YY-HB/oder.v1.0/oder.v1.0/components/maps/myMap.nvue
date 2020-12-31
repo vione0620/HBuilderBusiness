@@ -23,7 +23,7 @@
                     id: 1,
                     position: {
                         left: 15,
-                        top: 25,
+                        top: 30,
                         width: 35,
                         height: 35
                     },

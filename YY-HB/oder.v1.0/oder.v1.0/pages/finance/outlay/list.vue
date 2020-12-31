@@ -145,7 +145,7 @@
 						</template>
 						<template v-else>
 							<view class="nothing">
-								<image src="@/static/default_null@1x.png" class="img" mode="scaleToFill"></image>
+								<image src="@/static/default_null@1x.png" class="gifimg" mode="scaleToFill"></image>
 								<view class="txt">暂无记录</view>
 							</view>
 						</template>
@@ -216,7 +216,7 @@
 						</template>
 						<template v-else>
 							<view class="nothing">
-								<image src="@/static/default_null@1x.png" class="img" mode="scaleToFill"></image>
+								<image src="@/static/default_null@1x.png" class="gifimg" mode="scaleToFill"></image>
 								<view class="txt">暂无记录</view>
 							</view>
 						</template>
@@ -428,8 +428,7 @@
 				this.couponid = `满${c_one}减${c_two}`
 				// this.totalPriceN = this.totalPrice
 				
-				this.actualPay = this.numFloat(this.totalPriceN - this.getCouponId.couponAmt) 		
-			
+				this.actualPay = this.numFloat(this.totalPriceN - this.getCouponId.couponAmt) 		 
 			}else{ 
 				this.couponid = '不使用优惠券'
 			} 
@@ -1177,28 +1176,7 @@
 	}
 	#oderList{
 		padding: 32rpx;
-		width: 100%;
-		
-		
-		// .navTagBar{
-		// 	padding-bottom: 20rpx; 
-		// 	display: flex;
-		// 	justify-content: center;
-			
-		// 	.title{
-		// 		padding: 0 0 10rpx 0;
-		// 		margin: 0 40rpx;
-		// 		color: #333333; 
-		// 		border-bottom: 2px solid #F2F2F2; 
-		// 		color: #999999;				
-		// 	}
-		// 	.active{
-		// 		color: #46B85B;
-		// 		font-weight: 500;
-		// 		border-bottom: 2px solid #46B85B;
-		// 	}
-		// }
-		
+		width: 100%; 
 		
 		
 		.Nothing{
@@ -1215,6 +1193,15 @@
 			.txt{
 				padding-top: 20rpx;
 				text-align: center;
+			}
+			
+			uni-image{
+				width: 400rpx;
+				height: 300rpx;
+			}
+			.gifimg{
+				max-width: 100%;
+				max-height: 100%;
 			}
 		}
 		
