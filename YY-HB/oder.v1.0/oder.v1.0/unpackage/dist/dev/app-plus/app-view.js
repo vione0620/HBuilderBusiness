@@ -9880,6 +9880,9 @@ var render = function() {
               on: {
                 "open-sum-rebate": function($event) {
                   return _vm.$handleViewEvent($event)
+                },
+                "nums-fulfill": function($event) {
+                  return _vm.$handleViewEvent($event)
                 }
               }
             })

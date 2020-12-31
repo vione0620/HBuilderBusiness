@@ -191,6 +191,7 @@
 			this.loginWhether = uni.getStorageSync('status') 
 			this.merchNo = uni.getStorageSync('user').merchNo				
 			this.perpay()  
+			// console.log(option)
 			this.prePOrder = option.orderno 
 			if(option.status == 'true' && option.from != 'mallcar'){ 	 
 				// 预先弹出 begin
@@ -474,7 +475,11 @@
 				}else if(type == 'nowPay'){ 
 					thisOrderNo = this.prePOrder
 					instantPay = 1
-				} 
+				}else{
+					thisOrderNo = this.prePOrder
+					instantPay = 1					
+				}
+				 
 				if(this.getCouponId.couponNo){
 					vVlue = {
 					"merchNo":this.merchNo,
@@ -560,6 +565,9 @@
 				}else if(type == 'nowPay'){
 					thisOrderNo = this.prePOrder
 					instantPay = 1
+				}else{
+					thisOrderNo = this.prePOrder
+					instantPay = 1					
 				}
 				
 				if(this.getCouponId.couponNo && !this.clock){

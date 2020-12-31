@@ -65,6 +65,7 @@
 		props:{
 			bottomCars:Object,
 			hasFinalPay:Boolean,
+			// orderNo:String,
 		},
 		computed:{
 			...mapState(['cartGoods','previousOrder']),
@@ -74,6 +75,9 @@
 			return{
 				showPop:false,
 			}
+		},
+		created() {
+			console.log(this.orderNo)
 		},
 		methods:{
 			goToPay(){
@@ -87,9 +91,7 @@
 				}else if(this.totalPrice < 30000 && this.totalPrice > 0){
 					this.$emit('open-sum-rebate',true)
 				}else{ 
-					uni.navigateTo({
-						url:`/pages/utility/mall/prepay?status=${this.hasFinalPay}&from=mallcar`
-					}) 				 
+					this.$emit('nums-fulfill',true)  	 
 				} 
 			},
 			showCarsList(){

@@ -38,7 +38,7 @@
 			:bottomCart="this.bottomCars" 
 			:first-order="this.FirstOrder" 
 			:has-final-pay="this.hasFinalPay"
-			@open-sum-rebate="openSumRebate"></mall-cart>
+			@open-sum-rebate="openSumRebate" @nums-fulfill="shopNumsFulfill"></mall-cart>
 					
 		</template>
 		
@@ -113,6 +113,7 @@
 				prevOrderDetail:[],//上一笔订单详情 
 				isAds:0,//优惠开关
 				eContract:false,//是否签合同
+				// orderNums:'',
 			}
 		}, 
 		onLoad() {  
@@ -164,6 +165,9 @@
 					this.prePayOrder()
 				}
 			},
+			shopNumsFulfill(e){				
+				this.prePayOrder()
+			},
 			checkOnShop(option){
 				if(option == true){
 					this.$refs.openSumRebate.close()
@@ -199,7 +203,7 @@
 					this.newOrderGoods.push(res)  
 				}  
 			},	
-			prePayOrder(){
+			prePayOrder(type){
 				this.perpay()
 				setTimeout(()=>{
 					let vVlue = {
@@ -222,7 +226,13 @@
 						if(res.code === 200){	 
 							this.$refs.openSumRebate.close() 
 							let orderNo = res.data.orderNo 
-							uni.navigateTo({ 
+							console.log(orderNo,res)
+							// uni.setStorageSync('orderNums',res.data.orderNo)
+							// this.orderNums = res.data.orderNo
+							// if(type =='fulfill'){
+								
+							// }
+							uni.navigateTo({
 								url:`/pages/utility/mall/prepay?status=${this.hasFinalPay}&orderno=${orderNo}`,
 								animationType: 'pop-in',
 								animationDuration: 200,
