@@ -64,7 +64,7 @@
 <script>  
 	import {mapState,mapGetters} from 'vuex'
 	import {b64Md5,hexMD5} from '@/network/md5.js'	
-	import {getSortAscii} from '@/common/util/utils.js'	 
+	import {getSortAscii} from '@/common/util/utils.js'	  
 	
 	import UniBadge from '@/components/uni/uni-badge.vue'  
 	import GoodsGroup from '@/components/basic/cartbox/goods-group.vue' 
@@ -113,7 +113,7 @@
 				prevOrderDetail:[],//上一笔订单详情 
 				isAds:0,//优惠开关
 				eContract:false,//是否签合同
-				// orderNums:'',
+				// orderNums:'', 
 			}
 		}, 
 		onLoad() {  
@@ -226,7 +226,7 @@
 						if(res.code === 200){	 
 							this.$refs.openSumRebate.close() 
 							let orderNo = res.data.orderNo 
-							console.log(orderNo,res)
+							// console.log(orderNo,res)
 							// uni.setStorageSync('orderNums',res.data.orderNo)
 							// this.orderNums = res.data.orderNo
 							// if(type =='fulfill'){
@@ -296,6 +296,7 @@
 				let vVlue = {"merchNo":this.merchNo}  
 				let sSort = getSortAscii(vVlue) 
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()    
+				 
 				
 				this.$request.post('getBreakfastGoods',{
 				  ...vVlue, 
@@ -306,7 +307,7 @@
 					this.$api.initPage(res.code,res.message)
 					if(res.code == 200){
 						let resData = res.data							
-						//交给vuex
+				 		//交给vuex
 						this.$store.commit('receive_mall_goods',resData) 
 						this.$store.commit('clear_cart',[])						
 						setTimeout(()=>{

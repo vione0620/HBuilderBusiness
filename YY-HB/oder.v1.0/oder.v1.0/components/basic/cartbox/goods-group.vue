@@ -16,9 +16,16 @@
 						<template v-if="goodsItem.onSale == 0">
 							<view class="etalon">重量：{{goodsItem.goodsWeight}} 克</view> 
 							<view class="etalon">规格：{{goodsItem.goodsQuantity}} {{goodsItem.goodsUnit}}</view> 
+							<view class="etalon">库存：{{goodsItem.storeNum}}</view> 
 							<view class="boot">
 								<view class="price">{{parseFloat((goodsItem.merchPrice * goodsItem.goodsQuantity)/100).toFixed(2)/1}}<text style="font-size: 20rpx;">元</text></view>  
-								<get-btn-item :foods="goodsItem"></get-btn-item> 
+								
+								<template v-if="goodsItem.storeNum > 0">
+									<get-btn-item :foods="goodsItem"></get-btn-item> 
+								</template>
+								<template v-else>
+									<view class="etalon">已售罄</view>
+								</template>
 							</view> 
 						</template>
 						<template v-if="goodsItem.onSale != 0">

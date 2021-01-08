@@ -63,7 +63,7 @@ export default {
 	// //购物车加
 	[ADD_FOOD_COUNT](state,isfood){
 		let _this = isfood.food 
-		
+		// console.log(_this.storeNum,isfood)
 		// let must_buy_item = state.mustBuyItem
 		// let additem = state.addDrink[0]   	
 		
@@ -72,15 +72,20 @@ export default {
 			state.cartGoods.push(_this) 
 		}else{
 			if(state.limitNum === 0){ 
-				_this.boxNums++ 		
+				_this.boxNums++
 			}else{ 
 				// if(_this.goodsNo === must_buy_item[0].goodsNo){	
 				// 		_this.boxNums++					
 				// }else{					
-					if(_this.boxNums === state.limitNum){					
+					if(_this.boxNums === state.limitNum){
 						return uni.showToast({
 							icon:'none',
 							title:`当前单品限制${state.limitNum}份`
+						})
+					}else if(_this.boxNums+1 > _this.storeNum){ //当前库存量storeNum
+						return uni.showToast({
+							icon:'none',
+							title:`当前单品今日仅剩${_this.storeNum}份`
 						})
 					}else{					
 						_this.boxNums++
@@ -167,6 +172,7 @@ export default {
 		let _this = isfood.food
 		let _value = isfood.valueNums		 
 		
+		
 		// let must_buy_item = state.mustBuyItem 
 		// let additem = state.addDrink[0] 
 		
@@ -186,7 +192,13 @@ export default {
 							
 					if(_value === 0){ //输入0 自行移除
 						state.cartGoods.splice(state.cartGoods.indexOf(_this),1) 
-					}  
+					}else if(_value+1 >= _this.storeNum){ //当前库存量storeNum
+						_this.boxNums = +_this.storeNum //赋予最大库存值storeNum
+						return uni.showToast({
+							icon:'none',
+							title:`当前单品今日仅剩${_this.storeNum}份`
+						})
+					} 
 					//需加项...  
 					// if(_this.categoryNo === additem[0] || _this.categoryNo === additem[1]){   //购物车中，必加总数
 					
@@ -219,6 +231,12 @@ export default {
 							title:`当前单品限制${state.limitNum}份`
 						})
 						
+					}else if(_value+1 > _this.storeNum){ //当前库存量 storeNum
+						_this.boxNums = +_this.storeNum  //赋予最大库存值storeNum
+						return uni.showToast({
+							icon:'none',
+							title:`当前单品今日仅剩${_this.storeNum}份`
+						})
 					}else{ //>限制量=当前输入量
 					
 						_this.boxNums = _value					

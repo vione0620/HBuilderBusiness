@@ -133,7 +133,7 @@
 											<view class="checkOk isfeed" @tap="navTo({page:orderItem.orderNo,from:'allsub',tStates:orderItem.orderType})">下单详情</view>	
 										</view>  
 										
-										<view class="right-moeny">{{parseFloat(orderItem.realAmt/100).toFixed(2)}} <text class="txt">元</text></view> 
+										<view class="right-moeny">{{parseFloat(orderItem.realAmt/100).toFixed(2) / 1}} <text class="txt">元</text></view> 
 										
 									</view>
 									
@@ -204,7 +204,7 @@
 											</template>		 	 
 										</view>  
 										
-										<view class="right-moeny">{{parseFloat(orderItem.realAmt/100).toFixed(2)}} <text class="txt">元</text></view> 
+										<view class="right-moeny">{{parseFloat(orderItem.realAmt/100).toFixed(2) / 1}} <text class="txt">元</text></view> 
 										
 									</view>
 									
@@ -385,7 +385,7 @@
 			...mapGetters(['totalCount','totalPrice','prevOrderPrice']),  
 			Payable:function(){
 				// this.totalPriceN = this.totalPrice
-				return this.numFloat(this.totalPriceN).toFixed(2)
+				return this.numFloat(this.totalPriceN).toFixed(2) / 1
 			},
 			PayActual:function(){
 				// console.log(this.totalPriceN,this.getUnusualAmt)
@@ -394,12 +394,12 @@
 				if(this.clock){					
 					let org = this.totalPriceN,
 						now = this.getUnusualAmt ? this.getUnusualAmt : 0; 
-					actualNums = this.numFloat(org - now).toFixed(2) 
+					actualNums = this.numFloat(org - now).toFixed(2) / 1 
 				}else{
 					let org = this.totalPriceN,
 						now = this.getCartAmt ? this.getCartAmt : 0 ;
 					
-					actualNums = this.numFloat(org -now).toFixed(2) 					
+					actualNums = this.numFloat(org -now).toFixed(2) / 1 					
 				}
 				
 				return actualNums

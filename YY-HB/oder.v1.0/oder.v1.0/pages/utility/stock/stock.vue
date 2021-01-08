@@ -43,9 +43,8 @@
 						</scroll-view>  
 						
 					</view>
-						
+					
 				</view> 
-				
 			</template>
 		
 		</view> 
@@ -60,6 +59,7 @@
 		</uni-popup> -->
 		<!-- 弹出修改选项 end -->
 		
+		<!-- {{pushmessage}} -->
 	</view>
 </template>
 
@@ -87,6 +87,7 @@
 				isTrueSet:false,
 				isDownSet:false,
 				// indexNo:true, 
+				// pushmessage:'',
 			}
 		},
 		computed:{
@@ -108,6 +109,7 @@
 			}) 
 			this.getMerchDayStore('getMerchDayStore',1)
 			 
+			// this.pushmessage = uni.getStorageSync('receive_pushMsg')
 		}, 
 		// onNavigationBarButtonTap(tap){
 		// 	if(tap.index === 0){

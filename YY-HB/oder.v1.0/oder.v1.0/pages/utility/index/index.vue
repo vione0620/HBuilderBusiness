@@ -63,12 +63,12 @@
 			<!-- <view class="text">违约申述</view> --> 
 			<view class="text" @tap="navTo('../helper/helper')">帮助中心</view>
 		</view>
-  
+		<!-- {{pushmessage}} -->
 
 
 	</template>
 	
-	<uni-popup ref="openAds" type="center" :backbg="false" :maskClick="false" :adsb="true" style="top: -100px;">
+	<uni-popup ref="openAds" type="center" :backbg="false" :adsb="true" style="top: -100px;">
 		<view class="pop_content">
 			<image src="../../../static/popbg.png" mode="aspectFit" class="adimg"></image>
 			<view class="title iconfont iconclose" @tap="closeAd()"></view>  
@@ -233,6 +233,7 @@
 				isAds:0,//优惠开关
 				eContract:false,//是否签合同
 				// webview:false,//电子合同
+				// pushmessage:'',
 			}
 		}, 
 		computed:{ 
@@ -263,7 +264,7 @@
 			}else{ 
 				this.initUser() 
 			} 
-		}, 
+		},  
 		onNavigationBarButtonTap(tap){
 			if(tap.index === 0){
 				uni.navigateTo({
