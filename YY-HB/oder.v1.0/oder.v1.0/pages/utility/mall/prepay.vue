@@ -261,16 +261,20 @@
 					this.disablepay = true   
 					if(this.limitAmt > 0 && this.totalPrice > this.limitAmt){
 						setTimeout(()=>{
-							uni.showModal({
-								title:'下单提醒',
-								content:`当前购买限额${this.limitAmt / 100}`,
-								showCancel:false,
-								success:(res)=> {
-									uni.navigateTo({ 
-										delta:1
-									})
-								},
-							}) 
+							uni.showToast({
+								icon:'none',
+								title:`赊账最高额度：${this.limitAmt / 100}元`
+							})
+							// uni.showModal({
+							// 	title:'下单提醒',
+							// 	content:`当前购买限额${this.limitAmt / 100}`,
+							// 	showCancel:false,
+							// 	success:(res)=> {
+							// 		uni.navigateTo({ 
+							// 			delta:1
+							// 		})
+							// 	},
+							// }) 
 						},500)
 					}else{
 						this.$refs.popup.open()						

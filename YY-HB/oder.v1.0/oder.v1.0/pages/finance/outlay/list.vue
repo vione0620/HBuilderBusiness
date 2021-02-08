@@ -222,6 +222,26 @@
 						</template>
 					</scroll-view>
 				</swiper-item>
+				
+			<!-- 	<swiper-item>
+					<scroll-view scroll-y :style="'height:'+ scrollH +'px;'" @scrolltolower="unPaidOrderList">
+						<template>
+							<view class="serve-order">
+								<view class="group">
+									<view class="head">待配送</view>
+									<view class="content">
+										<view class=""></view>
+									</view>
+									<view class="foot">
+										<view class="servebtn" @tap="servebtn()">售后服务</view>
+									</view>
+								</view>
+							</view>
+						</template>						
+					</scroll-view>
+				</swiper-item> -->
+				
+				
 			</swiper>
 		</view>
 		 
@@ -357,7 +377,7 @@
 				toPayOrderNo:'',
 				hasFinalPay:false,
 				UnPaidData:[],
-				instantPay:'',
+				instantPay:10,
 				popShow:false, //上一笔是否弹出
 				hasGoodness:false,//是否可享优惠
 				otherBtn:false, //其它待支付状态
@@ -442,6 +462,13 @@
 		},
 		
 		methods: {
+			servebtn(){
+				console.log('点击售后服务')
+				uni.navigateTo({
+					url:'../../aftersale/check'
+				})
+				
+			},
 			allOrderList(e){
 				this.scrolltolower('allOrderList','getBreakfastOrder')
 			},			
@@ -688,6 +715,7 @@
 				let orderInfo = this.unOrderList   
 				// console.log(this.totalPrice,this.totalPriceN,orderInfo[index].realAmt)
 				// this.totalPrice = this.totalPrice
+			 
 				//当前页继续支付   
 				if(type == 'keepon'){
 					let orderInfo = this.userOrderList  
@@ -710,6 +738,7 @@
 					this.popShow = true 	
 					this.hasGoodness = true
 				} 
+				 
 				//获取不寻常订单信息getUnusual  			 
 				this.getOrderCoupon(this.toPayOrderNo) 				 
 			},
@@ -937,10 +966,12 @@
 							if(type == 'unPaidOrderList'){ 
 								let resDataUn = resData.unpaidOrder 
 								this.unOrderList = resDataUn 
-								if(resDataUn[0].instantPay == 0){ 
-									this.otherBtn = false
-								}else if(resDataUn[0].instantPay == 1){
-									this.otherBtn = true 
+								if(resDataUn.length > 0){
+									if(resDataUn[0].instantPay == 0){ 
+										this.otherBtn = false
+									}else if(resDataUn[0].instantPay == 1){
+										this.otherBtn = true 
+									}										
 								}
 								this.$store.dispatch('receive_unpay_order_list',resDataUn)	 
 								//铺货总开关
@@ -1028,6 +1059,27 @@
 	page{
 		width: 100vw;
 	}
+	.serve-order{
+		
+		.group{
+		
+		
+			.foot{
+				padding: 20rpx 0;
+				display: flex;
+				.servebtn{
+					padding:0 20rpx;
+					background-color: #1AAD19;
+					color: #FFFFFF;
+				}
+			}
+			
+			
+		}
+		
+	}
+	
+	
 	
 	.unpaid_checked{
 			padding: 40rpx;

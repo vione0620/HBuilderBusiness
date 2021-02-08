@@ -10,11 +10,11 @@
       <li><div class="title">店铺名称：</div><div class="cont">{{sharesData.merchName}}</div></li>
       <!-- <li><div class="title">商家编号：</div><div class="cont">{{sharesData.joinNo}}</div></li> -->
       <li><div class="title">上线时间：</div><div class="cont">{{sharesData.onlineDate}}</div></li>
-      <li><div class="title">活动时间：</div><div class="cont">{{(`${sharesData.startDate} 至 ${sharesData.endDate}`)}}</div></li>
+      <!-- <li><div class="title">活动时间：</div><div class="cont">{{(`${sharesData.startDate} 至 ${sharesData.endDate}`)}}</div></li> -->
       <li><div class="title">联系电话：</div><div class="cont">{{sharesData.merchPhone}}</div></li>
       <li><div class="title">店铺地址：</div><div class="cont">{{sharesData.merchAddr}}</div></li>
     </ul>   
-    <div class="ticket" :class="isGot ? 'ticket-got' : ''" @click="getTicket()"> 
+    <!-- <div class="ticket" :class="isGot ? 'ticket-got' : ''" @click="getTicket()"> 
         <div class="left">
           <div class="title">{{sharesData.couponName}}</div>
           <div class="subtitle">{{nameType}}</div>
@@ -30,7 +30,7 @@
           </div>
           <div style="text-align:center">点击领券</div>
         </div> 
-    </div>
+    </div> -->
     <div class="location"> 
       <el-amap vid="amapDemo" :zoom="zoom" :center="center" class="amap-demo" dragEnable>
           <el-amap-marker vid="component-marker" :position="center"></el-amap-marker>
@@ -58,21 +58,21 @@ export default {
             offset:[-10,-60], 
         }  
     },  
-    methods:{
-        getTicket(){
-            this.$emit('click')
-        }, 
-    },
-    computed: {
-        nameType: function () {
-            let use = this.shares.issuerType 
-            if(use === 2){
-                return `${this.sharesData.merchName}（店可用）`
-            }else{
-                return `全网可用`
-            }
-        }
-    }, 
+    // methods:{
+    //     getTicket(){
+    //         this.$emit('click')
+    //     }, 
+    // },
+    // computed: {
+    //     nameType: function () {
+    //         let use = this.shares.issuerType 
+    //         if(use === 2){
+    //             return `${this.sharesData.merchName}（店可用）`
+    //         }else{
+    //             return `全网可用`
+    //         }
+    //     }
+    // }, 
 }
 </script>
 

@@ -24,19 +24,18 @@
 									:class="(this.account.length < 6 || this.password.length < 6 ) ? 'prov-disabled' :'' ">
 									{{codeTime > 0 ? codeTime + 's' : firstcode}}</view>
 								</view>
-							</view>
-
-							<view class="link-to"> 
-								<view><navigator url="../passwd/passwd?type=forget" class="links">忘记密码</navigator></view>
-								
+							</view> 
+							<view class="footer">								
+								<evan-checkbox  :iconSize="12" primaryColor="#46B85B" v-model="agreeChecked"><text style="font-size: 12px;">我同意</text></evan-checkbox> 	
+								<view class="links" @click="navto('../../utility/about/privacy')">《用户服务协议》</view>
+								<view class="links" @click="navto('../../utility/about/treaty')">《隐私政策》</view>
 							</view>
 							<view class="input-group">
 								<view class="login-btn" @tap="bindLogin" hover-class="animate__animated animate__pulse" 
 								:class="(this.account.length < 6 || this.password.length < 6 || this.verifcode.length < 6) ? 'btn-disabled' : '' ">登录</view>
 							</view> 
-							<view class="footer">查阅 
-								<view class="links" @click="navto('../../utility/about/privacy')">《用户服务协议》</view>、
-								<view class="links" @click="navto('../../utility/about/treaty')">《隐私政策》</view>
+							<view class="link-to"> 
+								<view><navigator url="../passwd/passwd?type=forget" class="links">忘记密码</navigator></view> 
 							</view>
 						</view>
 					</view>
@@ -53,11 +52,13 @@
 	import {mapState} from 'vuex'
 	import {b64Md5,hexMD5} from '@/network/md5.js'	
 	import {getSortAscii,excludeBlankNewline} from '@/common/util/utils.js'
+	import EvanCheckbox from '@/components/plugin-ui/evan-checkbox.vue'
 	
 	import LoginInput from '@/components/basic/c-input.vue'
 	export default {
 		components: {
 			LoginInput,
+			EvanCheckbox,
 		},
 		data() {
 			return { 
@@ -67,6 +68,7 @@
 				initSign: 'key=YIYI@Customer!@#$803', 
 				codeTime: '', 
 				firstcode:'获取验证码',
+				agreeChecked:false,
 			}
 		},
 		onLoad() {  
@@ -76,7 +78,7 @@
 			}
 			this.$api.getUserDev() 
 		},  
-		methods: {   
+		methods: {  
 			navto(url){
 				uni.navigateTo({
 					url:url,
@@ -130,9 +132,9 @@
 				let vVlue = {"loginNo": this.account,"passwd": this.password,"verCode": this.verifcode} //必传 
 				let sSort = getSortAscii(vVlue) ///排序
 				let sSign = hexMD5(sSort + "&" + this.initSign).toUpperCase() //转码    
-				if(this.account.length < 7 || this.password.length < 6 || this.verifcode.length < 6){ 
+				if(this.account.length < 7 || this.password.length < 6 || this.verifcode.length < 6 || !this.agreeChecked){ 
 					return
-				}
+				} 
 				
 				//发送请求 
 				this.$request.post('login', {
@@ -197,10 +199,11 @@
 	.footer{
 		padding: 20rpx;
 		display: flex; 
-		justify-content: center; 
-		font-size: 24rpx;
+		justify-content: left; 
+		font-size: 24rpx; 
 		.links{
 			color: #46B85B;
+			margin-top: 12rpx;
 		}
 	}
 
@@ -279,7 +282,7 @@
 				.link-to {
 					display: flex;
 					width: 100%;
-					padding: 0 20rpx 24rpx 20rpx;
+					padding: 24rpx 20rpx 24rpx 20rpx;
 
 
 					.links {

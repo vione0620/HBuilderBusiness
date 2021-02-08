@@ -1,9 +1,9 @@
 {
-    "name" : "oder.v1.0",
+    "name" : "移移商户",
     "appid" : "__UNI__80DC7F1",
     "description" : "",
-    "versionName" : "1.0.0",
-    "versionCode" : "100",
+    "versionName" : "1.0.1",
+    "versionCode" : 101,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -55,7 +55,10 @@
                     "<uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\"/>",
                     "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
                 ],
-                "abiFilters" : [ "armeabi-v7a" ]
+                "abiFilters" : [ "armeabi-v7a" ],
+                "permissionExternalStorage" : {
+                    "request" : "none"
+                }
             },
             /* ios打包配置 */
             "ios" : {

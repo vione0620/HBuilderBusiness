@@ -70,7 +70,7 @@
 	
 	<uni-popup ref="openAds" type="center" :backbg="false" :adsb="true" style="top: -100px;">
 		<view class="pop_content">
-			<image src="../../../static/popbg.png" mode="aspectFit" class="adimg"></image>
+			<image src="../../../static/popbg.png" @tap="openPlaceOrder()" mode="aspectFit" class="adimg"></image>
 			<view class="title iconfont iconclose" @tap="closeAd()"></view>  
 		</view>
 	</uni-popup>
@@ -826,6 +826,14 @@
 					animationDuration: 200
 				}); 
 			},		  
+			openPlaceOrder() {
+				this.$refs.openAds.close() 
+				uni.navigateTo({
+					url: '../mall/mall',
+					animationType: 'pop-in',
+					animationDuration: 200
+				}); 
+			},	
 			onPullDownRefresh(){
 				let platform = uni.getSystemInfoSync().platform
 				if(platform == "android"){ 
@@ -1000,7 +1008,7 @@
 			padding: 8rpx 10rpx;
 		}
 		.adimg{
-			height: 500rpx;
+			height: 664rpx;
 		}
 	}
 	#oderIndex {

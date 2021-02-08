@@ -47,6 +47,16 @@
 				const ready = plus.navigator.hasSplashscreen()
 				const platform = uni.getSystemInfoSync().platform 
 				if(ready && !this.iswelcome){ 
+					if(platform == "android"){
+						if(this.androidPage && !this.iswelcome){
+							uni.redirectTo({
+								url:'../index/index', 
+							}) 
+						}else{
+							this.androidPage = false
+							this.iswelcome = true
+						} 
+					}
 				}else{
 					this.loadExecution()  
 				} 
@@ -94,7 +104,7 @@ page{
 .splash{ 
 	width: 100vw;
 	height: 100vh;
-	background-image: url(../../../static/splash.gif);
+	background-image: url(../../../static/splash.png);
 	background-size: 100% 100%;
 	position: relative;
 	
