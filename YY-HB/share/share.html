@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link rel="stylesheet" href="style.css" />
+		<script src="dsbridge.js"></script>
+		<title></title>
+
+	</head>
+	<body>
+		<div class="text-center"><img src="imgs/title.png" class="title" /></div>
+		<div class="content">
+			<div class="text-center red font1 bold">邀请好友</div>
+			<div class="text-center red font2 bold">领福利</div>
+			<div class="text-center">
+				<div class="tips">天天抢福利 优惠送不停</div>
+				<div><img src="imgs/redp.png" class="redp" /></div>
+			</div>
+			<div class="box">
+				<div>恭喜您抢到红包<img src="imgs/arrow-y.png" class="arrow-y" /></div>
+				<div class="price text-center">20.00<span>元</span></div>
+				<div style="font-size:12px;text-align: center;">
+					活动时间：2020.01.22 -- 2020.02.22
+				</div>
+				<div class="text-center" onclick="getcoupon()">
+					<div class="get">领取</a>
+				</div>
+				<div class="text-center" style="font-size: 11px;color: #fff;padding-top: 3px;">今日份红包已到账<img src="imgs/arrow-w.png"
+					 class="arrow-w" /></div>
+			</div>
+		</div>
+
+		<script>
+			function getcoupon() {
+				
+				if (is_weixn_qq()) {
+					window.location.href = "https://a.app.qq.com/o/simple.jsp?pkgname=com.yiyi.YY";
+					return false;
+				} else {
+					dsBridge.call("getNewCoupon", "", function(response) {
+						if (response == 0) {
+					
+						}
+					})
+					
+				}
+			}
+
+			// 是微信浏览器
+			function is_weixn_qq() {
+				var UserBrowser = navigator.userAgent.toLowerCase();
+				
+				if (UserBrowser.indexOf("yyapp") === -1) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		</script>
+	</body>
+</html>
