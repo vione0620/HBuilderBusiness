@@ -101,8 +101,17 @@
 					} 
 				}
 			}
-		}
-		,{
+		},
+		{
+			"path" : "pages/utility/newstock/newstock",
+			"style" : { 
+				"navigationBarTitleText":"商家库存",		 
+				"app-plus":{  
+					"titleNView":false
+				}
+			}
+		},
+		{
 			"path" : "pages/utility/manage/manage",
 			"style" : { 
 				"navigationBarTitleText":"服务商家",
@@ -421,6 +430,15 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "可用券",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/utility/release/release",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "发布宝贝",
                 "enablePullDownRefresh": false
             }
             

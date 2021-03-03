@@ -152,8 +152,8 @@
 		{
 			"icon": 'iconfont iconoder-stock',
 			"text": "商家库存",
-			"urls": "../../utility/stock/stock",
-			"navto":"stock",
+			"urls": "../../utility/newstock/newstock",
+			"navto":"newstock",
 		},
 		{
 			"icon": 'iconfont iconmanage',
