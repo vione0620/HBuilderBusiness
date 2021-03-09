@@ -98,6 +98,7 @@
 				this.tabCurrentIndex = index;
 				this.classNo = classNo;
 				this.categoryNo = this.categorys[index].category[0].categoryNo;
+				this.smallTabCurrentIndex = 0;
 				this.getCategoryGoods(this.categoryNo, this.onSale);
 
 			},
@@ -110,6 +111,13 @@
 			},
 			//获取分类列表
 			getClassCategory() {
+				if(this.merchNo=='35110000000000'){
+					let testDate = [{"classNo":"ZC000604","className":"早餐","category":[{"categoryNo":"YYZC000625","categoryName":"营养早餐"}]},{"classNo":"JSYP0608","className":"酒水饮品","category":[{"categoryNo":"JS00000642","categoryName":"酒水"},{"categoryNo":"YL00000641","categoryName":"饮料"}]},{"classNo":"NNHB0609","className":"牛奶烘焙","category":[{"categoryNo":"BGGD000644","categoryName":"饼干糕点"}]}]
+					this.categorys = testDate;
+					this.categoryNo = this.categorys[0].category[0].categoryNo;
+					this.getCategoryGoods(this.categoryNo, this.onSale);
+					return
+				}
 				let vVlue = {
 					"merchNo": this.merchNo
 				} //必传   
@@ -137,6 +145,19 @@
 			},
 			//获取小类商品(添加商户之前)
 			getCategoryGoods(categoryNo) {
+				if(this.merchNo=='35110000000000'){
+					let testDate
+					if(categoryNo == 'YYZC000625'){
+						testDate = [{"goodsNo":"BZ0XRDB0000075","goodsPic":"http://res.yiyichina.cn/breakfast/6f55c7a2-41e5-4f45-a5dc-13a3f3252783.png","goodsName":"鲜肉大包"},{"goodsNo":"BZ0ZRBCB000076","goodsPic":"http://res.yiyichina.cn/breakfast/e5b4941a-6f7b-4676-a0d2-17b21e86cd5d.png","goodsName":"猪肉包菜包"},{"goodsNo":"BZ0JRJGB000077","goodsPic":"http://res.yiyichina.cn/breakfast/f1e5e5f3-d54a-439f-a06d-1b5e4c6f92c2.png","goodsName":"鸡肉菌菇包"},{"goodsNo":"BZ0JGQCB000078","goodsPic":"http://res.yiyichina.cn/breakfast/1ccf6efe-77a2-4efd-8863-051d193dbea6.png","goodsName":"菌菇青菜包"},{"goodsNo":"MD0HTMT0000079","goodsPic":"http://res.yiyichina.cn/breakfast/e87fddc7-8508-4d3e-9e09-13b615addcf1.png","goodsName":"红糖馒头"}]
+					} else if (categoryNo == 'JS00000642') {
+						testDate = [{"goodsNo":"BWPJBP00001491","goodsPic":"http://res.yiyichina.cn/JSYP0608/JS00000642/x1fAFYAB.jpg","goodsName":"百威啤酒冰啤500ml"},{"goodsNo":"KLNPJ000001492","goodsPic":"http://res.yiyichina.cn/JSYP0608/JS00000642/ZdTHX7iK.jpg","goodsName":"科罗娜啤酒330ml"},{"goodsNo":"XJTZPJ00001493","goodsPic":"http://res.yiyichina.cn/JSYP0608/JS00000642/twboUMHy.jpg","goodsName":"雪津特制啤酒330ml"},{"goodsNo":"XJLBPJ00001494","goodsPic":"http://res.yiyichina.cn/JSYP0608/JS00000642/yX6VHTID.png","goodsName":"雪津蓝冰啤酒330ml"},{"goodsNo":"LMPJ0000001495","goodsPic":"http://res.yiyichina.cn/JSYP0608/JS00000642/CwWuUTrB.jpg","goodsName":"蓝妹啤酒醇香浓郁330ml"}]
+					} else {
+						testDate = [{"goodsNo":"HSXXMBZX001514","goodsPic":"http://res.yiyichina.cn/NNHB0609/BGGD000644/7WnPXxdV.jpg","goodsName":"豪士小小面包整箱380g"},{"goodsNo":"DLYRSJ00001515","goodsPic":"http://res.yiyichina.cn/NNHB0609/BGGD000644/H5f3v55J.jpg","goodsName":"达利园瑞士卷160g"},{"goodsNo":"DLYFSRMB001516","goodsPic":"http://res.yiyichina.cn/NNHB0609/BGGD000644/lEiHQX1E.jpg","goodsName":"达利园法式软面包200g"}]
+					}
+					this.items = testDate;
+					return
+					
+				}
 				let vVlue = {
 					"merchNo": this.merchNo,
 					"categoryNo": categoryNo,
@@ -193,38 +214,46 @@
 			},
 			//发布(添加)商品
 			addMerchGoods(){
-			
-				 let vVlue1 = {
-				 	"goodsList":JSON.stringify(this.checkedArr),
-				 	"merchNo": this.merchNo,
-				 	
-				 } //必传 
-				let sSort = getSortAscii(vVlue1) ///排序 
-				//console.log(sSort);
-				let sSigns = (sSort + "&key=" + this.loginWhether.md5key);
-				console.log(sSigns);
-				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
-				this.$request.post('addMerchGoods', {
-					...vVlue1,
-					"sign": sSign
-				}, {
-					token: true
-				}).then(res => {
-					this.$api.initPage(res.code, res.message)
-					if (res.code === 200) {
+				if(this.checkedArr.length>0){
+					let vVlue1 = {
+						"goodsList":JSON.stringify(this.checkedArr),
+						"merchNo": this.merchNo,
+						
+					} //必传 
+					let sSort = getSortAscii(vVlue1) ///排序 
+					//console.log(sSort);
+					let sSigns = (sSort + "&key=" + this.loginWhether.md5key);
+					console.log(sSigns);
+					let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
+					this.$request.post('addMerchGoods', {
+						...vVlue1,
+						"sign": sSign
+					}, {
+						token: true
+					}).then(res => {
+						this.$api.initPage(res.code, res.message)
+						if (res.code === 200) {
+							uni.showToast({
+								mask: true,
+								title: res.message
+							});
+							this.checkedArr = [];
+						}
+					}).catch((err) => {
 						uni.showToast({
-							mask: true,
-							title: res.message
-						});
-						this.checkedArr = [];
-					}
-				}).catch((err) => {
+							icon: 'none',
+							title: err,
+							duration: 2000
+						})
+					})
+				} else {
 					uni.showToast({
 						icon: 'none',
-						title: err,
+						title: '请选择商品',
 						duration: 2000
 					})
-				})
+				}
+		
 			}
 		}
 	}
@@ -234,7 +263,14 @@
 	.white-bg {
 		background: #fff;
 	}
-
+    ::-webkit-scrollbar {
+    	display: none;
+    	width: 0 !important;
+    	height: 0 !important;
+    	-webkit-appearance: none;
+    	background: transparent;
+    	color: transparent;
+     }
 	.footer {
 		position: fixed;
 		width: 100%;
@@ -327,8 +363,5 @@
 		height: 148rpx;
 		border-radius: 16rpx;
 		margin-right: 20rpx;
-	}
-   uni-checkbox-input .uni-checkbox-input{
-	    border-radius: 100rpx !important;
 	}
 </style>

@@ -170,64 +170,79 @@
 				let openStatus = this.merchData.busiState
 				return new Promise((resolve, reject) => {
 					if (openStatus === 0) {
-						uni.showModal({
-							title: '开启营业',
-							content: '祝您生意兴隆',
-							success: (res) => {
-								if (res.confirm) {
-									if (this.siteReady) {
+						// uni.showModal({
+						// 	title: '开启营业',
+						// 	content: '祝您生意兴隆',
+						// 	success: (res) => {
+						// 		if (res.confirm) {
+									// if (this.siteReady) {
 										resolve()
-										this.isOnSale('openBusi')
-									} else {
-										this.getOpenPlace()
-										uni.showModal({
-											title: '获取定位提醒',
-											content: '为确保买家找到您，我们将获取您开店的位置信息。',
-											success: (res) => {
-												if (res.confirm) {
-													this.getOpenPlace()
-													uni.showLoading({
-														title: '获取位置信息'
-													})
-													setTimeout(() => {
-														uni.hideLoading()
-													}, 2000)
-												}
-											},
-										})
-										reject()
-									}
-								} else if (res.cancel) {
-									return
-								}
-							}
-						})
+										this.isOnSale('openBusi');
+									// } else {
+								// 		this.getOpenPlace()
+								// 		uni.showModal({
+								// 			title: '获取定位提醒',
+								// 			content: '为确保买家找到您，我们将获取您开店的位置信息。',
+								// 			success: (res) => {
+								// 				if (res.confirm) {
+								// 					this.getOpenPlace()
+								// 					uni.showLoading({
+								// 						title: '获取位置信息'
+								// 					})
+								// 					setTimeout(() => {
+								// 						uni.hideLoading()
+								// 					}, 2000)
+								// 				}
+								// 			},
+								// 		})
+										// reject()
+									// }
+								// } else if (res.cancel) {
+								// 	return
+								// }
+						// 	}
+						// })
 					} else if (openStatus === 1) {
-						uni.showModal({
-							title: '关闭营业提醒',
-							content: '您辛苦啦！关店将阻止用户下单！',
-							success: (res) => {
-								if (res.confirm) {
+						// uni.showModal({
+						// 	title: '关闭营业提醒',
+						// 	content: '您辛苦啦！关店将阻止用户下单！',
+						// 	success: (res) => {
+						// 		if (res.confirm) {
 									resolve()
-									this.isOnSale('closeBusi')
-									this.notAgain = true
-								} else if (res.cancel) {
-									return
-								}
-							}
-						})
+									this.isOnSale('closeBusi');
+									// this.notAgain = true;
+						// 		} else if (res.cancel) {
+						// 			return
+						// 		}
+						// 	}
+						// })
 					}
 				})
 
 			},
 
 			isOnSale(post) {
+				if(this.merchNo=='35110000000000'){
+					uni.showToast({
+						icon: 'none',
+						title: '开启成功',
+						duration: 2000
+					})
+					if (post === 'openBusi') {
+						this.open = true
+						this.merchData.busiState = 1
+					} else {
+						this.open = false
+						this.merchData.busiState = 0
+					}
+					return
+				}
 				let vVlue = ''
 				if (post === 'openBusi') {
 					vVlue = {
 						"merchNo": this.merchNo,
-						"longitude": this.longSite,
-						"latitude": this.latSite,
+						// "longitude": this.longitude,
+						// "latitude": this.latitude,
 					} //必传 					
 				} else if (post === 'closeBusi') {
 					vVlue = {
@@ -250,11 +265,14 @@
 					if (res.code === 200) {
 						if (post === 'openBusi') {
 							this.open = true
+							this.merchData.busiState = 1
 						} else {
 							this.open = false
+							this.merchData.busiState = 0
 						}
 					} else {
 						this.open = false
+						this.merchData.busiState = 0
 					}
 				}).catch((err) => {
 					uni.showToast({
@@ -323,6 +341,11 @@
 				})
 			},
 			getMerchDetail() {
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"merchName":"移移-好友便利店 XM1002","deliverState":0,"busiState":1,"busiAutoOpen":1,"busiHoursStart":"05:15","busiHoursEnd":"23:30","merchPic":"http://res.yiyichina.cn/merch/3a2b8166-ef06-4ab2-985c-e215ddf7c524.jpg","serviceContactMobile":["0592-2096880","0592-2096882"]}
+					this.merchData = testDate
+					return
+				}
 				let vVlue = {
 					"merchNo": this.merchNo
 				} //必传   
@@ -355,6 +378,14 @@
 				}
 				else if(this.merchData.busiAutoOpen===1){
 					busiSwitch=0
+				}
+				if(this.merchNo=='35110000000000'){
+					if(this.isOpenAutoBusi){
+						this.isOpenAutoBusi=false
+					}else {
+						this.isOpenAutoBusi=true
+					}
+					return
 				}
 				let vVlue = {
 					"merchNo": this.merchNo,

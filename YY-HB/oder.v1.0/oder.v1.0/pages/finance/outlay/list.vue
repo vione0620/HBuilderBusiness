@@ -815,6 +815,10 @@
 			},
 			//获取不寻常订单信息
 			getOrderCoupon(option){
+				if(this.merchNo=='35110000000000'){						
+					this.$refs.popup.open()
+					return
+				}
 				let vVlue = {"merchNo":this.merchNo,"orderNo":option}
 				let sSort = getSortAscii(vVlue)
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()
@@ -941,6 +945,31 @@
 			},
 			
 			getListData(type,url){
+				if(this.merchNo=='35110000000000'){
+					let testDate = [{"orderNo":"FZ000002-20210308152511-2","orderType":0,"instantPay":0,"sourceNo":"","realAmt":7040,"orderState":0,"orderTime":"2021-03-08 15:25:11","payState":0,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0MG000000082","merchPrice":"160","goodsPrice":"250","categoryNo":"ZGL0016","goodsQuantity":"4","goodsUnit":"个","goodsNum":"44","goodsName":"米糕","goodsSpec":"袋","hotSale":"0"}]},{"orderNo":"FZ000002-20210303235422-2","orderType":0,"instantPay":1,"sourceNo":"","realAmt":360,"orderState":2,"orderTime":"2021-03-03 23:54:22","payState":1,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0HTMT0000079","merchPrice":"120","goodsPrice":"200","categoryNo":"MT00014","goodsQuantity":"3","goodsUnit":"个","goodsNum":"3","goodsName":"红糖馒头","goodsSpec":"袋","hotSale":"0"}]}]
+					setTimeout(()=>{
+						this.isload = false
+						this.isready = true
+						if(type == 'allOrderList'){
+							this.orderList = testDate
+							this.$store.dispatch('receive_order_list',testDate)
+						}
+						if(type == 'unPaidOrderList'){
+							let resDataUn = testDate.unpaidOrder
+							this.unOrderList = resDataUn 
+							// this.otherBtn = false
+							this.otherBtn = true 									
+							this.$store.dispatch('receive_unpay_order_list',resDataUn)	 
+							//铺货总开关
+							if(testDate.canCredit == 0){
+								this.otherCanCredit = true 
+							}else if(testDate.canCredit == 1){
+								this.otherCanCredit == false
+							}
+						} 
+					},1000)
+					return
+				}
 				let vVlue = {"merchNo":this.merchNo,"pageNum":'1',"pageLimt":'20',}
 				let sSort = getSortAscii(vVlue)
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()		  
@@ -989,6 +1018,16 @@
 			
 			//获取上一笔订单
 			getPrevOrder(){
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"orderNo":"FZ000002-20210308152511-2","orderAmt":"7040"}
+					this.prevOrder = testDate
+					this.$store.dispatch('receive_previous_order',testDate)
+					if(testDate.orderNo){
+						this.hasFinalPay = true 
+						this.getBreakfastOrderDetail(testDate.orderNo)
+					}
+					return
+				}
 				let vVlue = {"merchNo":this.merchNo,"orderType":1}
 				let sSort = getSortAscii(vVlue)
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()  
@@ -1012,7 +1051,13 @@
 				})
 			},
 				
-			getBreakfastOrderDetail(option){   
+			getBreakfastOrderDetail(option){
+				if(this.merchNo=='35110000000000'){
+					let testDate = [{"orderNo":"FZ000002-20210308152511-2","orderType":0,"instantPay":0,"sourceNo":"","realAmt":7040,"orderState":0,"orderTime":"2021-03-08 15:25:11","payState":0,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0MG000000082","merchPrice":"160","goodsPrice":"250","categoryNo":"ZGL0016","goodsQuantity":"4","goodsUnit":"个","goodsNum":"44","goodsName":"米糕","goodsSpec":"袋","hotSale":"0"}]},{"orderNo":"FZ000002-20210303235422-2","orderType":0,"instantPay":1,"sourceNo":"","realAmt":360,"orderState":2,"orderTime":"2021-03-03 23:54:22","payState":1,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0HTMT0000079","merchPrice":"120","goodsPrice":"200","categoryNo":"MT00014","goodsQuantity":"3","goodsUnit":"个","goodsNum":"3","goodsName":"红糖馒头","goodsSpec":"袋","hotSale":"0"}]}]
+					this.UnPaidData = testDate
+					return
+				}
+				
 				let vVlue = {"merchNo":this.merchNo,"orderNo":option}
 				let sSort = getSortAscii(vVlue)
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()  

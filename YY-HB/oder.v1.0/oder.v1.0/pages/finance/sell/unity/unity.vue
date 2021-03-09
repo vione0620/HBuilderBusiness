@@ -115,8 +115,73 @@
 			...mapState(['userUnityList'],)
 		},
 		methods: {
-			getUserOrder(){ 
-				let vVlue = {"merchNo":this.merchNo,"orderType":1,"pageNum":'1',"pageLimt":"20",} //必传 
+			getUserOrder(){
+				if(this.merchNo=='35110000000000'){
+					let testData = [{
+						"data":[{
+								"couponAmt": 0,
+								"deliverType": 2,
+								"discountAmt": "Object",
+								"issuerType": 0,
+								"orderNo": 3.5020320500000006e+17,
+								"orderSn": "350203205000000071",
+								"orderState": 1,
+								"orderTime": "02:20",
+								"reachAddr": "",
+								"reachTime": "0000-00-00 00:00:00",
+								"realAmt": 300,
+								"recPhone": "",
+								"receiver": "",
+								"sex": "1"
+							}
+						],
+						"time": "2021-03-05"
+					},{
+						"data": [{
+								"couponAmt": 0,
+								"deliverType": 2,
+								"discountAmt": "Object",
+								"issuerType": 0,
+								"orderNo": 3.5020320400000006e+17,
+								"orderSn": "350203204000000068",
+								"orderState": 1,
+								"orderTime": "02:42",
+								"reachAddr": "",
+								"reachTime": "0000-00-00 00:00:00",
+								"realAmt": 300,
+								"recPhone": "",
+								"receiver": "",
+								"sex": "1"
+							},
+							{
+								"couponAmt": 0,
+								"deliverType": 2,
+								"discountAmt": "Object",
+								"issuerType": 0,
+								"orderNo": 3.5020320400000006e+17,
+								"orderSn": "350203204000000065",
+								"orderState": 1,
+								"orderTime": "02:39",
+								"reachAddr": "",
+								"reachTime": "0000-00-00 00:00:00",
+								"realAmt": 300,
+								"recPhone": "",
+								"receiver": "",
+								"sex": "1"
+							}
+						],
+						"time": "2021-03-04",
+					}]
+					
+					this.isload = false
+					this.isready = true 
+					this.$store.dispatch('receive_user_unity_list',testData) 
+					this.mainUserList = testData
+					this.loadmore = '没有更多了'
+					this.Nothing = false
+					return
+				}
+				let vVlue = {"merchNo":this.merchNo,"orderType":1,"pageNum":'1',"pageLimt":"20",} //必传
 				let sSort = getSortAscii(vVlue) ///排序
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 
 						 

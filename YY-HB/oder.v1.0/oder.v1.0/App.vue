@@ -130,4 +130,34 @@
 	button.primary {
 		background-color: #46B85B;
 	}
+	::-webkit-scrollbar {
+		display: none;  
+		width: 0 !important;  
+		height: 0 !important;  
+		-webkit-appearance: none;  
+		background: transparent;  
+	}
+	uni-checkbox .uni-checkbox-input {
+		border-radius: 50% !important;
+		border-color: #DDDDDD !important;
+		color: #ffffff !important;
+	}
+	
+	uni-checkbox .uni-checkbox-input.uni-checkbox-input-checked {
+		border: none !important;
+		background: #5DB55F;
+		border-color: #5DB55F;
+	}
+	
+	uni-checkbox .uni-checkbox-input.uni-checkbox-input-checked::before {
+		width: 20rpx;
+		height: 20rpx;
+		line-height: 20rpx;
+		text-align: center;
+		font-size: 18rpx;
+		color: #fff;
+		background: transparent;
+		transform: translate(-70%, -50%) scale(1);
+		-webkit-transform: translate(-70%, -50%) scale(1);
+	}
 </style>

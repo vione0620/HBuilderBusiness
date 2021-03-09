@@ -271,7 +271,13 @@
 				}); 
 			},
 			getDetail(){  		  
-				 			
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"orderNo":"350203205000000071","orderState":1,"deliverType":2,"payType":1,"issuerType":0,"orderTime":"2021-03-05 02:20:43","orderAmt":300,"discountAmt":0,"couponAmt":0,"realAmt":300,"orderFee":0,"helpFee":0,"helpState":0,"receiver":"","recPhone":"","sex":"1","reachAddr":"","merchContactPhone":"15821580396","remark":"","orderContent":null,"content":[{"goodsNo":"BSKLSLP0001456","goodsPrice":"300","goodsUnit":"瓶","suit":"0","goodsNum":"1","goodsName":"百事可乐（塑料瓶）500ml"}],"serviceContactMobile":"0592-2096882,0592-2096880","orderSn":"350203205000000071"}
+					this.isload = false
+					this.isready = true
+					this.currentItem = testDate
+					return
+				}
 				let vVlue = ''
 				if(this.pushMsg){ 
 					vVlue = {"merchNo":this.merchNo,"orderNo":this.pushMsg,} //必传 

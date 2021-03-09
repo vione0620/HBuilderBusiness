@@ -760,6 +760,7 @@
 			},			
 			openSever(index) { 
 				let newNo = this.serVer[index].phone 
+				console.log(newNo)
 				uni.showActionSheet({
 					itemList: newNo,
 					success: (res)=>{  

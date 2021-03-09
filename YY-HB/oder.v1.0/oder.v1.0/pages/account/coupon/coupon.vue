@@ -123,7 +123,31 @@
 				console.log(e)
 			},
 			getMerchCoupon(){ 
-				
+				if(this.merchNo=='35110000000000'){
+					setTimeout(()=>{
+						this.isload = false
+						this.isready = true
+						let handleCoupon = [] 
+						
+						let c_one = handleCoupon.filter(coupon => {
+							let today = new Date().getTime()
+							let end =  new Date(coupon.expireTime)
+							return coupon.useState == 0 && end > today 
+						})  
+						
+						let c_two = handleCoupon.filter(coupon => coupon.useState == 1) 
+						let c_three = handleCoupon.filter(coupon => { 
+							let today = new Date().getTime()
+							let end =  new Date(coupon.expireTime) 
+							return end < today
+						})  
+						 
+						this.validity = c_one
+						this.normalUsed = c_two
+						this.exprires = c_three 
+					},300)	
+					return
+				}
 				let vVlue = {"merchNo":this.merchNo} //必传 
 				let sSort = getSortAscii(vVlue) ///排序
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   

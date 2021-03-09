@@ -64,7 +64,13 @@
 			this.getMerchBankCard()
 		}, 
 		methods:{
-			getMerchBankCard(){				
+			getMerchBankCard(){	
+				if(this.merchNo=='35110000000000'){
+					this.brandcard = []
+					this.isload = false
+					this.isready = true
+					return
+				}
 				let vVlue = {"merchNo": this.merchNo} //必传 
 				let sSort = getSortAscii(vVlue) ///排序 
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码     }

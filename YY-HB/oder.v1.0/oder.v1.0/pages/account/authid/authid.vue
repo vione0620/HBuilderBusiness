@@ -115,6 +115,12 @@
 				}).catch()
 			},
 			getAccountBind(){
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"aliBindState":1,"wxBindState":1}
+					this.listdata[0].status = testDate.aliBindState
+					this.listdata[1].status = testDate.wxBindState
+					return
+				}
 				let vVlue = {"merchNo": this.merchNo} //必传   
 				let sSort = getSortAscii(vVlue) ///排序 
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   

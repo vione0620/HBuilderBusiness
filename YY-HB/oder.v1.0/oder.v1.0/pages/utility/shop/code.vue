@@ -92,7 +92,14 @@
 			},
 		},
 		methods: { 
-			getScanCode(){				 
+			getScanCode(){
+				if(this.merchNo=='35110000000000'){
+					let testDate = "https://gworder.yiyichina.cn/scan?m=35020353110003"
+					this.codeText = testDate
+					this.isload = false
+					this.isready = true	
+					return
+				}
 				let vVlue = {"merchNo": this.merchNo} //必传 
 				let sSort = getSortAscii(vVlue) ///排序    
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()   
@@ -115,6 +122,11 @@
 				}).catch() 
 			},
 			getShopImg(){
+				if(this.merchNo=='35110000000000'){
+					let testDate = "http://res.yiyichina.cn/merch/3a2b8166-ef06-4ab2-985c-e215ddf7c524.jpg"
+					this.merchPic = testDate
+					return
+				}
 				let vVlue = {"merchNo": this.merchNo} //必传 
 				let sSort = getSortAscii(vVlue) ///排序    
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()   

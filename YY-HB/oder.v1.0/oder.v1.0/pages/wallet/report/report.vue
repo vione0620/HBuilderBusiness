@@ -167,8 +167,10 @@
 		methods:{
 			openMore(){
 				this.showCharts = !this.showCharts 				
-				
 				let totheTop = 0
+				if(this.merchNo=='35110000000000'){
+					return
+				}
 				const query = uni.createSelectorQuery().in(this);				
 				query.select('#open-more').boundingClientRect(data => { 
 				  totheTop = data.top
@@ -212,7 +214,12 @@
 				this.$refs.isDaysOfMonth.close()
 			},
 			//apiapiapiapi--------apiapiapiapi
-			getBusiDay(time,post,parms){ 
+			getBusiDay(time,post,parms){
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"merchNo":'35110000000000',"busiDate":null,"totalRecAmt":15900,"totalDiscountAmt":553,"payOrderNum":30,"payCustomerNum":30,"memberPayAmt":150,"annoPayAmt":6100,"memberOrderNum":51,"annoOrderNum":15}	
+					this.staticIncome(testDate)
+					return
+				}
 				let vVlue = {}
 				if(parms === 'busiDay'){
 					vVlue = {"merchNo":this.merchNo,"busiDay":time,} //必传					

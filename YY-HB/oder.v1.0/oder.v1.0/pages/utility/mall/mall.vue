@@ -176,6 +176,11 @@
 				}
 			},  
 			getPlatParam(){				
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"actionSwitch":"0"}
+					this.isAds = testDate.actionSwitch
+					return
+				}
 				let vVlue = {"merchNo":this.merchNo}
 				let sSort = getSortAscii(vVlue)
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()  
@@ -250,6 +255,13 @@
 			// 	this.$refs.openAds.close() 
 			// },
 			getPrevOrder(){
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"orderNo":"","orderAmt":""}
+					this.prevOrder = testDate
+					this.$store.dispatch('receive_previous_order',testDate)
+					this.hasFinalPay = true 
+					return
+				}
 				let vVlue = {"merchNo":this.merchNo,"orderType":1}  
 				let sSort = getSortAscii(vVlue) 
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()    
@@ -293,6 +305,36 @@
 			},
 			 // 获取数据
 			getBreakfastGoods(){
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"closeDownOrder":{"closeStartTime":"12:00","closeEndTime":"14:00","content":"系统升级，暂停下单","state":"0"},"downOrderTime":"06:30-18:00","limitAmt":20000,"canCredit":" 0","breakfastGoods":{"肉包类":[{"goodsNo":"BZ0XRDB0000075","merchPrice":"200","categoryNo":"RBL0017","goodsQuantity":"6","goodsPic":"http://res.yiyichina.cn/breakfast/6f55c7a2-41e5-4f45-a5dc-13a3f3252783.png","onSale":"0","goodsUnit":"个","storeNum":"20","categoryName":"肉包类","goodsName":"鲜肉大包","goodsSpec":"袋","goodsWeight":"90"}],"素包类":[{"goodsNo":"BZ0JGQCB000078","merchPrice":"160","categoryNo":"SBL0018","goodsQuantity":"6","goodsPic":"http://res.yiyichina.cn/breakfast/1ccf6efe-77a2-4efd-8863-051d193dbea6.png","onSale":"0","goodsUnit":"个","storeNum":"0","categoryName":"素包类","goodsName":"菌菇青菜包","goodsSpec":"袋","goodsWeight":"85"}]}}
+					this.$store.commit('receive_mall_goods',testDate)
+					this.$store.commit('clear_cart',[])
+					setTimeout(()=>{
+						this.isload = false
+						this.isready = true 
+					},300) 
+					const downState = testDate.closeDownOrder
+					this.closeDownOrder = downState
+					if(downState.state == 1){
+						uni.showModal({
+							title:'下单提醒',
+							content:`${downState.content} ${downState.closeStartTime} - ${downState.closeEndTime}`,
+							showCancel:false,
+							success: (res) => {
+								if(res.confirm){
+									uni.navigateBack({
+										animationDuration:2000,
+										delta:1,
+									})
+								}
+							}
+						})
+					}else if(downState.state == 0){ 
+						this.downOrderTime = testDate.downOrderTime
+						uni.setStorageSync('downtime',testDate.downOrderTime)
+					}
+					return
+				}
 				let vVlue = {"merchNo":this.merchNo}  
 				let sSort = getSortAscii(vVlue) 
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()    

@@ -24,7 +24,7 @@
 		<template v-if="isready">
 			<view>
 				<view class="white-bg class-box">
-					<scroll-view class="scroll-view-box" scroll-x="true" @scroll="scroll" style="width: 98vw;">
+					<scroll-view class="scroll-view-box" scroll-x="true" @scroll="scroll" style="width: 98vw;" show-scrollbar="false">
 						<block v-for="(categoryItem,index) in this.categorys" :key="index">
 							<view class="item" :class="{ active: tabCurrentIndex === index }" @tap="tabClick(index,categoryItem.classNo)">{{categoryItem.className}}</view>
 						</block>
@@ -56,13 +56,13 @@
 											<view><input class="uni-input nameinput" type="text" placeholder="请输入" :value="item.goodsName" @input="editName($event,index)"/></view>
 											<view class="input-box">
 												<label>价格（元）：</label>
-												<input class="uni-input" placeholder="请输入价格" :value="item.goodsPrice" @input="clearInput($event,index)" />
+												<input type="number" class="uni-input" placeholder="请输入价格" :value="item.goodsPrice" @input="clearInput($event,index)" />
 												<icon type="clear" size="16" v-if="item.showClearIcon" @click="clearIcon(index)" />
 											</view>
 											<view class="input-box">
 												<label>库存：</label>
 												<span class="minu" @click="reduce(item)">-</span>
-												<input type="number" :value="item.storeNum" class="kc" />
+												<input type="number" v-model="item.storeNum" class="kc" />
 												<span class="add" @click="add(item)">+</span>
 											</view>
 										</view>
@@ -208,16 +208,14 @@
 				}
 				if(index===1){
 					this.getStoreClassCategory();
-					
 				}
-				
-				
 			},
 			//大分类tab点击
 			tabClick(index, classNo) {
 				this.tabCurrentIndex = index;
 				this.classNo = classNo;
 				this.categoryNo = this.categorys[index].category[0].categoryNo;
+				this.smallTabCurrentIndex = 0;
 				this.getMerchCategoryGoods(this.categoryNo, this.onSale);
 
 			},
@@ -256,6 +254,15 @@
 			},
 			//获取仓库商品大小类 getStoreClassCategory
 			getStoreClassCategory() {
+				if(this.merchNo=='35110000000000'){
+					let testDate = [{"goodsName":"阿尔卑斯多口味牛奶硬糖31g","goodsNo":"AEBSDKWN001563","goodsPrice":300,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/TnjYPbiS.jpg","storeNum":30},{"goodsName":"彩虹糖迷你桶罐-（装30g","goodsNo":"CHTMNTGZ001560","goodsPrice":550,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/qGWhioSf.jpg","storeNum":55},{"goodsName":"大白兔奶糖114g","goodsNo":"DBTNT000001562","goodsPrice":850,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/Xkrqlunn.jpg","storeNum":0}]
+					this.isSalePage = true
+					this.isnohave = true
+					this.categorys = testDate.classStore;
+					this.categoryNo = this.categorys[0].category[0].categoryNo;
+					this.getMerchCategoryGoods(this.categoryNo, this.onSale);
+					return
+				}
 				let vVlue = {
 					"merchNo": this.merchNo,
 				} //必传   
@@ -270,7 +277,7 @@
 					this.$api.initPage(res.code, res.message)
 					if (res.code === 200) {
 						this.isSalePage = true
-						console.log(res.data.classStore);
+						// console.log(res.data.classStore);
 						if(res.data.classStore.length==0){
 							this.isnohave = true
 						}
@@ -291,6 +298,16 @@
 			},
 			//获取出售商品大小类
 			getOnSaleClassCategory() {
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"classOnSale":[{"classNo":"XXLS0610","className":"休闲零食","category":[{"categoryNo":"XXLS000645","categoryName":"休闲零食"}]},{"classNo":"JSYP0608","className":"酒水饮品","category":[{"categoryNo":"YL00000641","categoryName":"饮料"}]},{"classNo":"ZC000604","className":"早餐","category":[{"categoryNo":"YYZC000625","categoryName":"营养早餐"}]}],"categoryGoods":[{"goodsName":"阿尔卑斯多口味牛奶硬糖31g","goodsNo":"AEBSDKWN001563","goodsPrice":300,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/TnjYPbiS.jpg","storeNum":0},{"goodsName":"彩虹糖迷你桶罐-（装30g","goodsNo":"CHTMNTGZ001560","goodsPrice":550,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/qGWhioSf.jpg","storeNum":0},{"goodsName":"大白兔奶糖114g","goodsNo":"DBTNT000001562","goodsPrice":850,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/Xkrqlunn.jpg","storeNum":0}]}
+					this.isSalePage = false
+					this.isnohave = false;
+					this.categorys = testDate.classOnSale;
+					this.categoryNo = this.categorys[0].category[0].categoryNo
+					this.getMerchCategoryGoods(this.categoryNo, this.onSale)
+					return
+				}
+				
 				let vVlue = {
 					"merchNo": this.merchNo,
 				} //必传   
@@ -305,7 +322,7 @@
 					this.$api.initPage(res.code, res.message)
 					if (res.code === 200) {
 						this.isSalePage = false
-						console.log(res.data.classOnSale);
+						// console.log(res.data.classOnSale);
 						if(res.data.classOnSale.length==0){
 							this.isnohave = true
 						}
@@ -326,6 +343,24 @@
 			},
 			//获取商户小类商品（仓库或出售)
 			getMerchCategoryGoods(categoryNo, onSale) {
+				if(this.merchNo=='35110000000000'){
+					let testDate
+					if(categoryNo == 'XXLS000645'){
+						testDate = [{"goodsName":"阿尔卑斯多口味牛奶硬糖31g","goodsNo":"AEBSDKWN001563","goodsPrice":300,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/TnjYPbiS.jpg","storeNum":0},{"goodsName":"彩虹糖迷你桶罐-（装30g","goodsNo":"CHTMNTGZ001560","goodsPrice":550,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/qGWhioSf.jpg","storeNum":0},{"goodsName":"大白兔奶糖114g","goodsNo":"DBTNT000001562","goodsPrice":850,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/Xkrqlunn.jpg","storeNum":0}]
+					} else if (categoryNo == 'YL00000641') {
+						testDate = [{"goodsName":"百事可乐（塑料瓶）500ml","goodsNo":"BSKLSLP0001456","goodsPrice":350,"onSale":0,"goodsPic":"http://res.yiyichina.cn/JSYP0608/YL00000641/T3vxfsKS.png","storeNum":2}]
+					} else {
+						testDate = [{"goodsName":"豆沙包","goodsNo":"BZ0DSB00000085","goodsPrice":250,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/2a12ee69-7142-49f3-a30c-41ba9af2b3cc.png","storeNum":0},{"goodsName":"南瓜花生糖包","goodsNo":"BZ0HSTB0000086","goodsPrice":200,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/44a0bbde-1411-4d9a-9acf-0dc601ab63c3.png","storeNum":0},{"goodsName":"菌菇青菜包3","goodsNo":"BZ0JGQCB000078","goodsPrice":300,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/1ccf6efe-77a2-4efd-8863-051d193dbea6.png","storeNum":1},{"goodsName":"玉米窝窝头家庭装","goodsNo":"YMWWTJTZ001963","goodsPrice":1000,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/50eca2ba-dfdd-4fa8-804c-bda81876be8f.png","storeNum":0},{"goodsName":"紫薯双色花卷家庭装","goodsNo":"ZSSSHJJT001971","goodsPrice":800,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/45598544-f020-4699-9d35-f8f576878304.png","storeNum":0}]
+					}
+					testDate.forEach((item, index) => {
+						item.right = '0';
+						item.showClearIcon = false;
+						item.goodsPrice=(item.goodsPrice/100).toFixed(2);
+					})
+					this.dataList = testDate;
+					return
+				}
+				
 				let vVlue = {
 					"merchNo": this.merchNo,
 					"categoryNo": categoryNo,
@@ -348,9 +383,9 @@
 								item.showClearIcon = false;
 								item.goodsPrice=(item.goodsPrice/100).toFixed(2);
 							})
-							console.log("res", resData);
+							// console.log("res", resData);
 							this.dataList = resData;
-							console.log("res", this.dataList);
+							// console.log("res", this.dataList);
 						} else {
 							this.isnohave = true
 						}
@@ -364,7 +399,7 @@
 				})
 			},
 			servebtn() {
-				console.log('点击售后服务')
+				// console.log('点击售后服务')
 				uni.navigateTo({
 					url: '../../aftersale/check'
 				})
@@ -379,20 +414,20 @@
 				this.$refs.hasUnpaid.close()
 			},
 			drawStart: function(e) {
-				console.log("drawStart");
+				// console.log("drawStart");
 				var touch = e.touches[0];
 				var index = e.currentTarget.dataset.index;
 				var item = this.dataList[e.currentTarget.dataset.index];
-				console.log(touch);
-				console.log('item1', item);
+				// console.log(touch);
+				// console.log('item1', item);
 				this.startX = touch.clientX;
 				if (item.right > 0 && this.startX < 285) {
 					this.dataList[index].right = 0;
 				}
 				for (let i = 0; i < this.dataList.length; i++) {
-					console.log("i", i);
+					// console.log("i", i);
 					if (i != index) {
-						console.log("index2", index);
+						// console.log("index2", index);
 						this.dataList[i].right = 0;
 					}
 				}
@@ -415,28 +450,28 @@
 				}
 			},
 			drawEnd: function(e) {
-				console.log("滑动结束");
+				// console.log("滑动结束");
 				var item = this.dataList[e.currentTarget.dataset.index];
-				console.log(item);
+				// console.log(item);
 				if (item.right >= this.delBtnWidth / 2) {
 					this.isScroll = false;
-					console.log('1');
+					// console.log('1');
 					this.dataList[e.currentTarget.dataset.index].right = this.delBtnWidth;
 				} else {
 					this.isScroll = true;
-					console.log('2');
-					console.log(item.right);
+					// console.log('2');
+					// console.log(item.right);
 					this.dataList[e.currentTarget.dataset.index].right = 0;
 				}
 			},
 			delItem: function(goodsNo) {
 				var goodsNo = goodsNo;
-				console.log(goodsNo)
+				// console.log(goodsNo)
 				this.clearGoods(goodsNo);
 			},
 			clearInput: function(event, index) {
 				this.dataList[index].goodsPrice = event.target.value;
-				console.log(event.target.value);
+				// console.log(event.target.value);
 				if (event.target.value.length > 0) {
 					this.dataList[index].showClearIcon = true;
 					var itemVal=this.dataList[index].goodsNo;
@@ -459,7 +494,7 @@
 			},
 			checkboxChange: function(e) {
 				this.checkedArr = e.detail.value;
-				console.log(this.checkedArr)
+				// console.log(this.checkedArr)
 				this.count = this.checkedArr.length;
 				// 如果选择的数组中有值，并且长度等于列表的长度，就是全选
 				if (this.checkedArr.length > 0 && this.checkedArr.length == this.dataList.length) {
@@ -490,6 +525,14 @@
 			},
 			//商户商品上架（可批量
 			onSaleGoods() {
+				if(this.checkedArr.length === 0){
+					uni.showToast({
+						icon: 'none',
+						title: '请选择要上架的商品',
+						duration: 2000
+					})
+					return
+				}
 				let vVlue = {
 					"goodsList": JSON.stringify(this.checkedArr),
 					"merchNo": this.merchNo,
@@ -499,7 +542,7 @@
 				let sSort = getSortAscii(vVlue) ///排序 
 				//console.log(sSort);
 				let sSigns = (sSort + "&key=" + this.loginWhether.md5key);
-				console.log(sSigns);
+				// console.log(sSigns);
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
 				this.$request.post('onSaleGoods', {
 					...vVlue,
@@ -526,6 +569,14 @@
 			},
 			//下架
 			downSaleGoods() {
+				if(this.checkedArr.length === 0){
+					uni.showToast({
+						icon: 'none',
+						title: '请选择要下架的商品',
+						duration: 2000
+					})
+					return
+				}
 				let vVlue = {
 					"goodsList": JSON.stringify(this.checkedArr),
 					"merchNo": this.merchNo,
@@ -535,7 +586,7 @@
 				let sSort = getSortAscii(vVlue) ///排序 
 				//console.log(sSort);
 				let sSigns = (sSort + "&key=" + this.loginWhether.md5key);
-				console.log(sSigns);
+				// console.log(sSigns);
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
 				this.$request.post('downSaleGoods', {
 					...vVlue,
@@ -574,7 +625,7 @@
 				let sSort = getSortAscii(vVlue) ///排序 
 				//console.log(sSort);
 				let sSigns = (sSort + "&key=" + this.loginWhether.md5key);
-				console.log(sSigns);
+				// console.log(sSigns);
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
 				this.$request.post('clearGoods', {
 					...vVlue,
@@ -618,7 +669,7 @@
 			},
 			//加号
 			add(item) {
-				console.log("storeNum", item.storeNum)
+				// console.log("storeNum", item.storeNum)
 				let num = item.storeNum;
 				item.storeNum = num + 1;
 				var itemVal=item.goodsNo;
@@ -626,7 +677,20 @@
 			},
 			//修改商户商品信息（可批量） changeMerchGoods
 			changeMerchGoods() {
-				var newArr = [];
+				if(this.checkedArr.length === 0){
+					uni.showToast({
+						icon: 'none',
+						title: '请选择要修改的商品',
+						duration: 2000
+					})
+					return
+				}
+				let newArr = [];
+				let vVlue = [];
+				let sSort = [];
+				let sSigns = [];
+				let sSign = [];
+				let isnull = 1;
 				this.dataList.forEach((item, index) => {
 					if (this.checkedArr.indexOf(item.goodsNo) > -1) {
 						let newObject = {
@@ -640,57 +704,62 @@
 					}
 				});
 				newArr.forEach((item,index)=>{
-					console.log("chang",item);
 					if(item.goodsPrice==0||item.goodsName==0){
-						console.log("chang",item);
+						isnull = 0;
+						// console.log("chang",item);
 						uni.showToast({
 							icon: 'none',
-							title: "请输入！",
+							title: "请输入"+item.goodsName+"的价格",
 							duration: 2000
 						})
-					}
-					else{
-						let vVlue = {
+					} else {
+						vVlue = {
 							"goodsList": JSON.stringify(newArr),
 							"merchNo": this.merchNo,
 							"categoryNo": this.categoryNo,
 						
-						} //必传 
-						let sSort = getSortAscii(vVlue) ///排序 
+						} 
+						// let vVlues = {
+						// 	"merchNo": this.merchNo,
+						// 	"categoryNo": this.categoryNo,
+						
+						// } //必传 
+						sSort = getSortAscii(vVlue) ///排序 
 						//console.log(sSort);
-						let sSigns = (sSort + "&key=" + this.loginWhether.md5key);
+						sSigns = (sSort + "&key=" + this.loginWhether.md5key);
 						// console.log(sSigns);
-						let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
-						this.$request.post('changeMerchGoods', {
-							...vVlue,
-							"sign": sSign
-						}, {
-							token: true
-						}).then(res => {
-							this.$api.initPage(res.code, res.message)
-							if (res.code === 200) {
-								uni.showToast({
-									mask: true,
-									title: res.message
-								})
-								this.checkedArr = [];
-								uni.showLoading()
-								setTimeout(()=>{ 
-									uni.hideLoading()							
-									this.getMerchCategoryGoods(this.categoryNo,this.onSale);
-								},2000)
-								
-							}
-						}).catch((err) => {
-							uni.showToast({
-								icon: 'none',
-								title: err,
-								duration: 2000
-							})
-						})
+						sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码
 					}
 				});
-				
+				if(isnull){
+					this.$request.post('changeMerchGoods', {
+						...vVlue,
+						"sign": sSign
+					}, {
+						token: true
+					}).then(res => {
+						this.$api.initPage(res.code, res.message)
+						if (res.code === 200) {
+							uni.showToast({
+								mask: true,
+								title: res.message
+							})
+							this.checkedArr = [];
+							uni.showLoading()
+							setTimeout(()=>{ 
+								uni.hideLoading()							
+								this.getMerchCategoryGoods(this.categoryNo,this.onSale);
+							},2000)
+							
+						}
+					}).catch((err) => {
+						uni.showToast({
+							icon: 'none',
+							title: err,
+							duration: 2000
+						})
+					})
+				}
 			},
 			//发布宝贝
 			navToRelease(){
@@ -706,6 +775,14 @@
 	page {
 		width: 100vw;
 	}
+	::-webkit-scrollbar {
+		display: none;
+		width: 0 !important;
+		height: 0 !important;
+		-webkit-appearance: none;
+		background: transparent;
+		color: transparent;
+	  }
     .plank-box{
 		position: fixed;
 		width: 100%;
