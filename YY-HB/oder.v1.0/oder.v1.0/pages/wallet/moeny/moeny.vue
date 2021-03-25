@@ -14,12 +14,12 @@
 				</view>
 				<view class="group-flex2">
 					<view class="item border-right">
-						<view class="title">可用余额</view>
-						<view class="contMain">{{walletData.remainAmt / 100}}<text class="lab">元</text></view>
+						<view class="title">今日收入</view>
+						<view class="contMain">{{walletData.frozenAmt / 100}}<text class="lab">元</text></view>
 					</view>
 					<view class="item">
-						<view class="title">不可用余额</view>
-						<view class="contMain">{{walletData.frozenAmt / 100}}<text class="lab">元</text></view>
+						<view class="title">待结算余额</view>
+						<view class="contMain">{{walletData.settingAmt / 100}}<text class="lab">元</text></view>
 					</view>				
 				</view>	
 			</view>
@@ -67,6 +67,16 @@
 		},
 		methods: {
 			getMerchWallet(){ 
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"remainAmt":4550,"frozenAmt":2550,"settingAmt": 2000}
+					setTimeout(()=>{
+						this.walletData = testDate
+						this.$store.dispatch('get_moeny_quota',testDate.remainAmt)
+						this.isload = false
+						this.isready = true
+					},500)
+					return
+				}
 				let vVlue = {"merchNo": this.merchNo} //必传
 				let sSort = getSortAscii(vVlue) ///排序 
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码    
@@ -81,7 +91,6 @@
 						setTimeout(()=>{
 							this.walletData = res.data 
 							this.$store.dispatch('get_moeny_quota',res.data.remainAmt)
-							
 							this.isload = false
 							this.isready = true
 						},500)						

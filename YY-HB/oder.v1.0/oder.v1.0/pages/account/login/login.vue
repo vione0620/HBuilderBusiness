@@ -204,7 +204,7 @@
 				if (this.codeTime > 0 || this.password === '' || this.account.length < 7) { 
 					return
 				} 
-				this.codeTime = 180
+				this.codeTime = 60
 				let timer = setInterval(() => {
 					if (this.codeTime >= 1) {
 						this.codeTime--
@@ -241,7 +241,7 @@
 				if(this.contactPhone.length != 11){
 					return
 				}
-				this.codeTimeTo = 180;
+				this.codeTimeTo = 60;
 				let timer = setInterval(() => {
 					if (this.codeTimeTo >= 1) {
 						this.codeTimeTo--;

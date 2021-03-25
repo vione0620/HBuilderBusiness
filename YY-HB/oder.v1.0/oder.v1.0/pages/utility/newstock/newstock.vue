@@ -42,7 +42,7 @@
 								<block :key="index" v-for="(item, index) in dataList">
 									<view :data-index="index" class="proitem" @touchstart="drawStart" @touchmove="drawMove" @touchend="drawEnd"
 									 :style="{ right: item.right + 'rpx' }">
-										<view>
+										<view style="display: flex;align-items: center;">
 											<label class="uni-list-cell uni-list-cell-pd ">
 												<view>
 													<checkbox :value="item.goodsNo" :checked="checkedArr.includes(item.goodsNo)" />
@@ -53,16 +53,25 @@
 											<image :src="item.goodsPic"></image>
 										</view>
 										<view style="padding-right: 30rpx;">
-											<view><input class="uni-input nameinput" type="text" placeholder="请输入" :value="item.goodsName" @input="editName($event,index)"/></view>
-											<view class="input-box">
-												<label>价格（元）：</label>
-												<input type="number" class="uni-input" placeholder="请输入价格" :value="item.goodsPrice" @input="clearInput($event,index)" />
-												<icon type="clear" size="16" v-if="item.showClearIcon" @click="clearIcon(index)" />
+											<view class="input-box" style="padding-left: 0;;">
+												<input style="padding-left: 8rpx;width: 100%;" class="uni-input nameinput" type="text" placeholder="请输入" :value="item.goodsName" @input="editName($event,index)"/>
 											</view>
 											<view class="input-box">
-												<label>库存：</label>
+												<text>原&emsp;价</text>
+												<text style="left: 100rpx;color: #020101; font-weight: 400;">￥</text>
+												<input id="oldInput" type="number" class="uni-input" placeholder="请输入原价" v-model="item.goodsPrice" @input="clearInput($event,index)" />
+												<icon id="oldIcon" type="clear" size="16" v-if="item.showClearIcon" @click="clearIcon($event,index)" />
+											</view>
+											<view class="input-box">
+												<text>促销价</text>
+												<text style="left: 100rpx;color: #020101; font-weight: 400;">￥</text>
+												<input id="newInput" type="number" class="uni-input" placeholder="可填写促销价" v-model="item.promotePrice" @input="clearInput($event,index)" />
+												<icon id="newIcon" type="clear" size="16" v-if="item.showClearIconTo" @click="clearIcon($event,index)" />
+											</view>
+											<view class="input-box">
+												<text>库存</text>
 												<span class="minu" @click="reduce(item)">-</span>
-												<input type="number" v-model="item.storeNum" class="kc" />
+												<input style="padding-left: 0" type="number" v-model="item.storeNum" class="kc" />
 												<span class="add" @click="add(item)">+</span>
 											</view>
 										</view>
@@ -142,6 +151,7 @@
 				isScroll: true,
 				windowHeight: 0,
 				dataList: [],
+				dataListCopy: [], //商品对比数组
 				inputClearValue: '',
 				showClearIcon: false,
 				classNo: "", //大类编号
@@ -203,6 +213,14 @@
 				this.tabIndex = index;
 				this.onSale = index;
 				this.dataList="";
+				// 清除全选
+				this.allChecked = false;
+				this.checkedArr = [];
+				this.count = 0;
+				//大分类重置
+				this.tabCurrentIndex = 0
+				// 小标签重置
+				this.smallTabCurrentIndex = 0;
 				if(index===0){
 					this.getOnSaleClassCategory();
 				}
@@ -215,7 +233,12 @@
 				this.tabCurrentIndex = index;
 				this.classNo = classNo;
 				this.categoryNo = this.categorys[index].category[0].categoryNo;
+				// 小标签重置
 				this.smallTabCurrentIndex = 0;
+				// 清除全选
+				this.allChecked = false;
+				this.checkedArr = [];
+				this.count = 0;
 				this.getMerchCategoryGoods(this.categoryNo, this.onSale);
 
 			},
@@ -223,6 +246,10 @@
 			tabClickSmall(index, categoryNo) {
 				this.smallTabCurrentIndex = index;
 				this.categoryNo = categoryNo;
+				// 清除全选
+				this.allChecked = false;
+				this.checkedArr = [];
+				this.count = 0;
 				this.getMerchCategoryGoods(this.categoryNo, this.onSale);
 			},
 			//获取分类列表
@@ -255,9 +282,42 @@
 			//获取仓库商品大小类 getStoreClassCategory
 			getStoreClassCategory() {
 				if(this.merchNo=='35110000000000'){
-					let testDate = [{"goodsName":"阿尔卑斯多口味牛奶硬糖31g","goodsNo":"AEBSDKWN001563","goodsPrice":300,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/TnjYPbiS.jpg","storeNum":30},{"goodsName":"彩虹糖迷你桶罐-（装30g","goodsNo":"CHTMNTGZ001560","goodsPrice":550,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/qGWhioSf.jpg","storeNum":55},{"goodsName":"大白兔奶糖114g","goodsNo":"DBTNT000001562","goodsPrice":850,"onSale":0,"goodsPic":"http://res.yiyichina.cn/XXLS0610/XXLS000645/Xkrqlunn.jpg","storeNum":0}]
+					let testDate = {
+						"classStore":[
+							{
+								"classNo":"ZD000613",
+								"className":"早点",
+								"category":[
+									{
+										"categoryNo":"ZCSP000652",
+										"categoryName":"早餐食品",
+									},
+								],
+							},
+							{
+								"classNo":"XXLS0610",
+								"className":"休闲零食",
+								"category":[
+									{
+										"categoryNo":"XXLS000645",
+										"categoryName":"休闲零食",
+									},
+								],
+							},
+							{
+								"classNo":"JSYP0608",
+								"className":"酒水饮品",
+								"category":[
+									{
+										"categoryNo":"YL00000641",
+										"categoryName":"饮料",
+									},
+								],
+							},
+						]}
+
 					this.isSalePage = true
-					this.isnohave = true
+					this.isnohave = false
 					this.categorys = testDate.classStore;
 					this.categoryNo = this.categorys[0].category[0].categoryNo;
 					this.getMerchCategoryGoods(this.categoryNo, this.onSale);
@@ -350,7 +410,7 @@
 					} else if (categoryNo == 'YL00000641') {
 						testDate = [{"goodsName":"百事可乐（塑料瓶）500ml","goodsNo":"BSKLSLP0001456","goodsPrice":350,"onSale":0,"goodsPic":"http://res.yiyichina.cn/JSYP0608/YL00000641/T3vxfsKS.png","storeNum":2}]
 					} else {
-						testDate = [{"goodsName":"豆沙包","goodsNo":"BZ0DSB00000085","goodsPrice":250,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/2a12ee69-7142-49f3-a30c-41ba9af2b3cc.png","storeNum":0},{"goodsName":"南瓜花生糖包","goodsNo":"BZ0HSTB0000086","goodsPrice":200,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/44a0bbde-1411-4d9a-9acf-0dc601ab63c3.png","storeNum":0},{"goodsName":"菌菇青菜包3","goodsNo":"BZ0JGQCB000078","goodsPrice":300,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/1ccf6efe-77a2-4efd-8863-051d193dbea6.png","storeNum":1},{"goodsName":"玉米窝窝头家庭装","goodsNo":"YMWWTJTZ001963","goodsPrice":1000,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/50eca2ba-dfdd-4fa8-804c-bda81876be8f.png","storeNum":0},{"goodsName":"紫薯双色花卷家庭装","goodsNo":"ZSSSHJJT001971","goodsPrice":800,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/45598544-f020-4699-9d35-f8f576878304.png","storeNum":0}]
+						testDate = [{"goodsName":"豆沙包","goodsNo":"BZ0DSB00000085","goodsPrice":250,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/2a12ee69-7142-49f3-a30c-41ba9af2b3cc.png","storeNum":0},{"goodsName":"南瓜花生糖包","goodsNo":"BZ0HSTB0000086","goodsPrice":200,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/44a0bbde-1411-4d9a-9acf-0dc601ab63c3.png","storeNum":0},{"goodsName":"菌菇青菜包3","goodsNo":"BZ0JGQCB000078","goodsPrice":300,"onSale":0,"goodsPic":"http://res.yiyichina.cn/breakfast/1ccf6efe-77a2-4efd-8863-051d193dbea6.png","storeNum":1}]
 					}
 					testDate.forEach((item, index) => {
 						item.right = '0';
@@ -378,14 +438,29 @@
 					if (res.code === 200) {
 						let resData = res.data;
 						if (resData) {
+							if(resData.length === this.dataListCopy.length){
+								this.dataListCopy = []
+							}
 							resData.forEach((item, index) => {
 								item.right = '0';
 								item.showClearIcon = false;
 								item.goodsPrice=(item.goodsPrice/100).toFixed(2);
+								item.promotePrice=(item.promotePrice/100).toFixed(2);
+								let newObject = {
+									"goodsName": item.goodsName,
+									"goodsNo": item.goodsNo,
+									"goodsPrice": (item.goodsPrice*100).toString(),
+									"promotePrice": (item.promotePrice*100).toString(),
+									"storeNum": item.storeNum.toString()
+								}
+								this.dataListCopy.push(newObject)
 							})
-							// console.log("res", resData);
 							this.dataList = resData;
-							// console.log("res", this.dataList);
+							this.dataList.forEach((item,index) => {
+								if(item.promotePrice==0){
+									item.promotePrice = null
+								}
+							})
 						} else {
 							this.isnohave = true
 						}
@@ -414,7 +489,6 @@
 				this.$refs.hasUnpaid.close()
 			},
 			drawStart: function(e) {
-				// console.log("drawStart");
 				var touch = e.touches[0];
 				var index = e.currentTarget.dataset.index;
 				var item = this.dataList[e.currentTarget.dataset.index];
@@ -470,15 +544,25 @@
 				this.clearGoods(goodsNo);
 			},
 			clearInput: function(event, index) {
-				this.dataList[index].goodsPrice = event.target.value;
-				// console.log(event.target.value);
-				if (event.target.value.length > 0) {
-					this.dataList[index].showClearIcon = true;
-					var itemVal=this.dataList[index].goodsNo;
-					this.checkedArr.push(itemVal);
+				// this.dataList[index].goodsPrice = event.target.value;
+				if(event.currentTarget.id == "oldInput"){
+					if (event.target.value.length > 0) {
+						this.dataList[index].showClearIcon = true;
+						var itemVal=this.dataList[index].goodsNo;
+						this.checkedArr.push(itemVal);
+					} else {
+						this.dataList[index].showClearIcon = false;
+					}
 				} else {
-					this.dataList[index].showClearIcon = false;
+					if (event.target.value.length > 0) {
+						this.dataList[index].showClearIconTo = true;
+						var itemVal=this.dataList[index].goodsNo;
+						this.checkedArr.push(itemVal);
+					} else {
+						this.dataList[index].showClearIconTo = false;
+					}
 				}
+
 			},
 			//编辑名称
 			editName: function(event, index) {
@@ -488,9 +572,15 @@
 					this.checkedArr.push(itemVal);
 				}
 			},
-			clearIcon: function(index) {
-				this.dataList[index].goodsPrice = '';
-				this.dataList[index].showClearIcon = false;
+			clearIcon: function(event,index) {
+				if(event.currentTarget.id == "oldIcon"){
+					this.dataList[index].goodsPrice = '';
+					this.dataList[index].showClearIcon = false;
+				} else {
+					this.dataList[index].promotePrice = '';
+					this.dataList[index].showClearIconTo = false;
+				}
+
 			},
 			checkboxChange: function(e) {
 				this.checkedArr = e.detail.value;
@@ -686,52 +776,41 @@
 					return
 				}
 				let newArr = [];
-				let vVlue = [];
-				let sSort = [];
-				let sSigns = [];
-				let sSign = [];
-				let isnull = 1;
-				this.dataList.forEach((item, index) => {
-					if (this.checkedArr.indexOf(item.goodsNo) > -1) {
-						let newObject = {
-							"goodsName": item.goodsName,
-							"goodsNo": item.goodsNo,
-							"goodsPrice": (item.goodsPrice*100).toString(),
-							"storeNum": item.storeNum.toString()
-						}
-						newArr.push(newObject);
-						
-					}
-				});
-				newArr.forEach((item,index)=>{
-					if(item.goodsPrice==0||item.goodsName==0){
-						isnull = 0;
-						// console.log("chang",item);
-						uni.showToast({
-							icon: 'none',
-							title: "请输入"+item.goodsName+"的价格",
-							duration: 2000
+				let vVlue, vVlues, sSort, sSigns, sSign;
+				this.postCheck().then((res) => {
+					newArr = res
+					this.dataListCopy.forEach((item1,index1)=>{
+						newArr.forEach((item2,index2)=>{
+							if(item1.goodsNo === item2.goodsNo){
+								if(item1.goodsName === item2.goodsName)
+									item2.goodsName = ""
+								
+								if(item1.goodsPrice === item2.goodsPrice)
+									item2.goodsPrice = ""
+		
+								if(item1.storeNum === item2.storeNum)
+									item2.storeNum = ""
+									
+								if(item1.promotePrice == item2.promotePrice)
+									item2.promotePrice = ""
+							}
 						})
-					} else {
-						vVlue = {
-							"goodsList": JSON.stringify(newArr),
-							"merchNo": this.merchNo,
-							"categoryNo": this.categoryNo,
-						
-						} 
-						// let vVlues = {
-						// 	"merchNo": this.merchNo,
-						// 	"categoryNo": this.categoryNo,
-						
-						// } //必传 
-						sSort = getSortAscii(vVlue) ///排序 
-						//console.log(sSort);
-						sSigns = (sSort + "&key=" + this.loginWhether.md5key);
-						// console.log(sSigns);
-						sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码
+					})
+					vVlue = {
+						"goodsList": JSON.stringify(newArr),
+						"merchNo": this.merchNo,
+						"categoryNo": this.categoryNo,
 					}
-				});
-				if(isnull){
+					vVlues = {
+						"merchNo": this.merchNo,
+						"categoryNo": this.categoryNo,
+					}
+					// } //必传 
+					sSort = getSortAscii(vVlues) ///排序 
+					sSigns = (sSort + "&key=" + this.loginWhether.md5key);
+					sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码
+					
+					uni.showLoading()
 					this.$request.post('changeMerchGoods', {
 						...vVlue,
 						"sign": sSign
@@ -740,26 +819,27 @@
 					}).then(res => {
 						this.$api.initPage(res.code, res.message)
 						if (res.code === 200) {
+					
 							uni.showToast({
 								mask: true,
 								title: res.message
 							})
 							this.checkedArr = [];
-							uni.showLoading()
-							setTimeout(()=>{ 
-								uni.hideLoading()							
+							setTimeout(()=>{
+								uni.hideLoading()
 								this.getMerchCategoryGoods(this.categoryNo,this.onSale);
 							},2000)
 							
 						}
 					}).catch((err) => {
+						uni.hideLoading()
 						uni.showToast({
 							icon: 'none',
 							title: err,
 							duration: 2000
 						})
 					})
-				}
+				}).catch(() => {})
 			},
 			//发布宝贝
 			navToRelease(){
@@ -767,6 +847,44 @@
 				    url: '../release/release'
 				});
 			},
+			postCheck(){
+				return new Promise((resolve,reject)=>{
+					let newArr = [];
+					this.dataList.forEach((item, index) => {
+						if (this.checkedArr.indexOf(item.goodsNo) > -1) {
+							let newObject = {
+								"goodsName": item.goodsName,
+								"goodsNo": item.goodsNo,
+								"goodsPrice": (item.goodsPrice*100).toString(),
+								"promotePrice": (item.promotePrice*100).toString(),
+								"storeNum": item.storeNum.toString()
+							}
+							newArr.push(newObject);
+						}
+					});
+					newArr.forEach((item,index)=>{
+						if(item.goodsPrice==0||item.goodsName==0){
+							uni.showToast({
+								icon: 'none',
+								title: "请输入"+item.goodsName+"的价格",
+								duration: 2000
+							})
+							reject()
+						}
+						let goodsPrice = parseInt(item.goodsPrice)
+						let promotePrice = parseInt(item.promotePrice)
+						if(goodsPrice<=promotePrice){
+							uni.showToast({
+								icon: 'none',
+								title: item.goodsName+"的促销价不能大于原价",
+								duration: 2000
+							})
+							reject()
+						}
+					});
+					resolve(newArr)
+				})
+			}
 		},
 	}
 </script>
@@ -904,16 +1022,14 @@
 		width: 100%;
 		display: flex;
 		position: relative;
-		align-items: center;
-		padding: 20rpx 0;
+		// align-items: center;
+		padding: 20rpx 0 40rpx;
 	}
-
 	.proitem image {
-		width: 148rpx;
-		height: 148rpx;
+		width: 192rpx;
+		height: 192rpx;
 		border-radius: 16rpx;
 		margin-right: 20rpx;
-
 	}
 
 	.remove {
@@ -937,10 +1053,10 @@
 
 	.input-box {
 		position: relative;
-		padding: 16rpx 20rpx 20rpx 180rpx;
+		padding: 10rpx 20rpx 10rpx 110rpx;
 	}
 
-	.input-box label {
+	.input-box text {
 		position: absolute;
 		left: 0;
 		top: 14rpx;
@@ -948,8 +1064,10 @@
 	}
 
 	.input-box uni-input {
+		width: 86%;
 		border-bottom: 2rpx solid #E4E4E4;
-		padding-bottom: 10rpx;
+		padding-left: 20rpx;
+		// padding-bottom: 10rpx;
 	}
 
 	.input-box uni-icon {

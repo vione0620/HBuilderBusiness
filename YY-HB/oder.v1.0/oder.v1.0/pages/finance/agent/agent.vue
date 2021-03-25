@@ -196,6 +196,22 @@
 				
 			}, 
 			getDirectOrder(){   
+				if(this.merchNo=='35110000000000'){
+					let testDate = []
+					setTimeout(()=>{
+						if(testDate.length){ 
+							this.isload = false
+							this.isready = true 
+							this.orderList = testDate
+							this.$store.dispatch('receive_agent_list',testDate)   
+						}else{
+							this.isload = false
+							this.isready = false 
+							this.isnohave = true 
+						}
+					},300)	
+					return
+				}
 				let vVlue = {"merchNo":this.merchNo,"pageNum":'1',"pageLimt":'20',} //必传 
 				let sSort = getSortAscii(vVlue) ///排序
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 		  

@@ -108,6 +108,24 @@
 			},
 			getRecRecord(post,time,pages){
 				// let timeday = handleDate()
+				if(this.merchNo=='35110000000000'){
+					let testDate = []
+					setTimeout(()=>{
+						this.isload = false
+						this.isready = true
+						
+						if(testDate.length){
+							this.Nothing = false
+							this.entryList = testDate							
+							this.userlist = testDate[0].txn
+							this.loadmore  = testDate[0].txn.length < 20 ? '没有更多了' : '上拉加载更多'
+						}else{
+							this.Nothing = true 
+							this.loadmore  = '没有更多了'
+						}  	 		 
+					},300)
+					return
+				}
 				let vVlue = {"merchNo":this.merchNo,"pageNum":pages,"txnDate":time,"pageLimt":'20',} //必传 
 				let sSort = getSortAscii(vVlue) ///排序
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 		  

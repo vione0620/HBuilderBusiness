@@ -295,6 +295,24 @@
 				})
 			},
 			getDetail(urls){ 			 
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"orderNo":"FZ000002-20210308152511-2","orderType":0,"instantPay":0,"orderAmt":7040,"couponAmt":0,"realAmt":7040,"orderState":0,"orderTime":"2021-03-08 15:25:11","deliverName":"司机测试","deliverPhone":"18516600318","payType":0,"payState":0,"merchName":"移移-好友便利店 XM1002","longitude":118.115329,"latitude":24.431151,"busiAddr":"福建省厦门市思明区曾厝垵西路珍珠湾软件园创新大厦A区","reason":"","remark":"无","orderContent":null,"content":[{"goodsNo":"MD0MG000000082","merchPrice":"160","goodsPrice":"250","categoryNo":"ZGL0016","goodsQuantity":"4","goodsUnit":"个","goodsNum":"44","goodsName":"米糕","goodsSpec":"袋","hotSale":"0"}],"serviceContactMobile":"[[\"0592-2096880\",\"0592-2096882\"]]","vanLongitude":"","vanLatitude":""}
+					setTimeout(()=>{
+						this.isload = false
+						this.isready = true						
+						this.currentItem = testDate
+						
+						let orderMapData = {
+							longitude:testDate.vanLongitude,
+							latitude:testDate.vanLatitude,
+							shopName:testDate.merchName,
+							shoplongitude:testDate.longitude,
+							shoplatitude:testDate.latitude 
+						}
+						this.orderMapData = orderMapData
+					},300)	 
+					return
+				}
 				let vVlue = ''
 				if(this.pushMsg){ 
 					vVlue = {"merchNo":this.merchNo,"orderNo":this.pushMsg,}  

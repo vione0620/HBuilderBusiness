@@ -946,7 +946,57 @@
 			
 			getListData(type,url){
 				if(this.merchNo=='35110000000000'){
-					let testDate = [{"orderNo":"FZ000002-20210308152511-2","orderType":0,"instantPay":0,"sourceNo":"","realAmt":7040,"orderState":0,"orderTime":"2021-03-08 15:25:11","payState":0,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0MG000000082","merchPrice":"160","goodsPrice":"250","categoryNo":"ZGL0016","goodsQuantity":"4","goodsUnit":"个","goodsNum":"44","goodsName":"米糕","goodsSpec":"袋","hotSale":"0"}]},{"orderNo":"FZ000002-20210303235422-2","orderType":0,"instantPay":1,"sourceNo":"","realAmt":360,"orderState":2,"orderTime":"2021-03-03 23:54:22","payState":1,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0HTMT0000079","merchPrice":"120","goodsPrice":"200","categoryNo":"MT00014","goodsQuantity":"3","goodsUnit":"个","goodsNum":"3","goodsName":"红糖馒头","goodsSpec":"袋","hotSale":"0"}]}]
+					let testDate
+					if(url == 'getBreakfastOrder'){
+						testDate = [{"orderNo":"FZ000002-20210308152511-2","orderType":0,"instantPay":0,"sourceNo":"","realAmt":7040,"orderState":0,"orderTime":"2021-03-08 15:25:11","payState":0,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0MG000000082","merchPrice":"160","goodsPrice":"250","categoryNo":"ZGL0016","goodsQuantity":"4","goodsUnit":"个","goodsNum":"44","goodsName":"米糕","goodsSpec":"袋","hotSale":"0"}]},{"orderNo":"FZ000002-20210303235422-2","orderType":0,"instantPay":1,"sourceNo":"","realAmt":360,"orderState":2,"orderTime":"2021-03-03 23:54:22","payState":1,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0HTMT0000079","merchPrice":"120","goodsPrice":"200","categoryNo":"MT00014","goodsQuantity":"3","goodsUnit":"个","goodsNum":"3","goodsName":"红糖馒头","goodsSpec":"袋","hotSale":"0"}]}]
+					} else if(url == 'getUnpaidMerchOrder') {
+						testDate = {
+							"unpaidOrder":[
+								{
+									"orderNo":"FZ000002-20210308152511-2",
+									"realAmt":7040,
+									"orderTime":"2021-03-08 15:25:11",
+									"reason":"",
+									"orderContent":null,
+									"content":[
+										{
+											"goodsNo":"MD0MG000000082",
+											"merchPrice":"160",
+											"goodsPrice":"250",
+											"categoryNo":"ZGL0016",
+											"goodsQuantity":"4",
+											"goodsUnit":"个",
+											"goodsNum":"44",
+											"goodsName":"米糕",
+											"goodsSpec":"袋",
+											"hotSale":"0",
+										},
+									],
+									"instantPay":0,
+								},
+								{
+									"orderNo":"FZ000002-20210304172619-2",
+									"realAmt":31280,
+									"orderTime":"2021-03-04 17:26:19",
+									"reason":"","orderContent":null,
+									"content":[
+										{
+											"goodsNo":"MD0HTMT0000079",
+											"merchPrice":"120",
+											"goodsPrice":"200",
+											"categoryNo":"MT00014",
+											"goodsQuantity":"3",
+											"goodsUnit":"个",
+											"goodsNum":"90",
+											"goodsName":"红糖馒头",
+											"goodsSpec":"袋",
+											"hotSale":"0",
+										},
+									]
+								},
+							]
+						}
+					}
 					setTimeout(()=>{
 						this.isload = false
 						this.isready = true
@@ -1053,7 +1103,7 @@
 				
 			getBreakfastOrderDetail(option){
 				if(this.merchNo=='35110000000000'){
-					let testDate = [{"orderNo":"FZ000002-20210308152511-2","orderType":0,"instantPay":0,"sourceNo":"","realAmt":7040,"orderState":0,"orderTime":"2021-03-08 15:25:11","payState":0,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0MG000000082","merchPrice":"160","goodsPrice":"250","categoryNo":"ZGL0016","goodsQuantity":"4","goodsUnit":"个","goodsNum":"44","goodsName":"米糕","goodsSpec":"袋","hotSale":"0"}]},{"orderNo":"FZ000002-20210303235422-2","orderType":0,"instantPay":1,"sourceNo":"","realAmt":360,"orderState":2,"orderTime":"2021-03-03 23:54:22","payState":1,"reason":"","subOrderNo":"","orderContent":"","subOrder":[],"content":[{"goodsNo":"MD0HTMT0000079","merchPrice":"120","goodsPrice":"200","categoryNo":"MT00014","goodsQuantity":"3","goodsUnit":"个","goodsNum":"3","goodsName":"红糖馒头","goodsSpec":"袋","hotSale":"0"}]}]
+					let testDate = {"orderNo":"FZ000002-20210308152511-2","orderType":0,"instantPay":0,"orderAmt":7040,"couponAmt":0,"realAmt":7040,"orderState":0,"orderTime":"2021-03-08 15:25:11","deliverName":"司机测试","deliverPhone":"18516600318","payType":0,"payState":0,"merchName":"移移-好友便利店 XM1002","longitude":118.115329,"latitude":24.431151,"busiAddr":"福建省厦门市思明区曾厝垵西路珍珠湾软件园创新大厦A区","reason":"","remark":"无","orderContent":null,"content":[{"goodsNo":"MD0MG000000082","merchPrice":"160","goodsPrice":"250","categoryNo":"ZGL0016","goodsQuantity":"4","goodsUnit":"个","goodsNum":"44","goodsName":"米糕","goodsSpec":"袋","hotSale":"0"}],"serviceContactMobile":"[[\"0592-2096880\",\"0592-2096882\"]]","vanLongitude":"","vanLatitude":""}
 					this.UnPaidData = testDate
 					return
 				}

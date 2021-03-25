@@ -64,13 +64,17 @@
 			<view class="text" @tap="navTo('../helper/helper')">帮助中心</view>
 		</view>
 		<!-- {{pushmessage}} -->
-
-
 	</template>
 	
+	<!-- 活动弹窗 -->
 	<uni-popup ref="openAds" type="center" :backbg="false" :adsb="true" style="top: -100px;">
 		<view class="pop_content">
-			<image src="../../../static/popbg.png" @tap="openPlaceOrder()" mode="aspectFit" class="adimg"></image>
+			<image src="../../../static/popbg.png" mode="aspectFit" class="adimg"></image>
+			<view class="pop_title">{{platParam.couponName}}</view>
+			<view class="pop_text"><text>￥</text><text class="big">{{platParam.couponAmt}}</text></view>
+			<view class="pop_name">-{{platParam.instructions}}-</view>
+			<view class="pop_time">活动时间：{{platParam.effectTime}} — {{platParam.expireTime}}</view>
+			<image src="../../../static/popbtn.png" @tap="openPlaceOrder()" mode="aspectFit" class="pop_btn"></image>
 			<view class="title iconfont iconclose" @tap="closeAd()"></view>  
 		</view>
 	</uni-popup>
@@ -230,7 +234,7 @@
 				PreStatus:false,
 				UnPaidData:Object,//有订单未结清
 				FirstOrder:false,
-				isAds:0,//优惠开关
+				platParam: {}, //优惠信息
 				eContract:false,//是否签合同
 				// webview:false,//电子合同
 				// pushmessage:'',
@@ -292,10 +296,10 @@
 				},{
 					token:true
 				}).then((res)=>{   
-					// console.log(res.data)
-					if(res.code == 200){ 
-						this.isAds = res.data.actionSwitch						
+					if(res.code == 200){ 					
 						if(res.data.actionSwitch == 0){
+							this.platParam = res.data.coupon
+							this.platParam.couponAmt = (this.platParam.couponAmt/100)
 							this.openAds()
 						}
 					}
@@ -627,7 +631,6 @@
 							
 							//获取优惠开关 begin
 							this.getPlatParam(this.refreshed)
-							// console.log(this.isAds)
 							
 							
 							//获取优惠开关 end
@@ -676,6 +679,13 @@
 				}).catch()  
 			},
 			getDayBusiStat(post,key){
+				if(this.merchNo=='35110000000000'){
+					let testDate = {"payOrderNum":12,"visitorNum":25,"recAmt":4550}
+					this.payOrderNum = testDate.payOrderNum
+					this.visitorNum = testDate.visitorNum
+					this.recAmt = testDate.recAmt
+					return
+				}
 				let vVlue = {"merchNo": this.merchNo} 
 				let sSort = getSortAscii(vVlue)
 				let sSign = hexMD5(sSort + "&key=" + key).toUpperCase() 			
@@ -760,7 +770,6 @@
 			},			
 			openSever(index) { 
 				let newNo = this.serVer[index].phone 
-				console.log(newNo)
 				uni.showActionSheet({
 					itemList: newNo,
 					success: (res)=>{  
@@ -994,11 +1003,47 @@
 	
 	.pop_content{   
 		position: relative;
-		left:0; 
-		text-align: center;
 		display: flex;
 		justify-content: center;
 		padding-bottom: 80px;
+		.pop_title{
+			position: absolute;
+			top: 174rpx;
+			font-size: 40rpx;
+			color: #f53f2a;
+			font-weight: bold;
+			letter-spacing: 2rpx;
+		}
+		.pop_text{
+			position: absolute;
+			top: 232rpx;
+			color: #f53f2a;
+			font-size: 68rpx;
+			font-weight: 600;
+		}
+		.pop_name{
+			position: absolute;
+			font-size: 44rpx;
+			letter-spacing: 2rpx;
+			color: #FFFFFF;
+			top: 424rpx;
+			text-shadow: 0rpx 4rpx 0rpx rgba(242, 80, 9, 0.98);
+		}
+		.big{
+			font-size: 120rpx;
+		}
+		.pop_time{
+			position: absolute;
+			top: 492rpx;
+			color: #FFFFFF;
+			font-size: 24rpx;
+			opacity: 0.8;
+		}
+		.pop_btn{
+			height: 100rpx;
+			position: absolute;
+			top: 532rpx;
+		}
 		.title{ 
 			position: absolute; 
 			bottom: 40rpx;

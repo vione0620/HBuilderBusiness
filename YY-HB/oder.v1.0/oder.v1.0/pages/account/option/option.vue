@@ -11,12 +11,6 @@
 					</view>
 
 				</uni-list-item>
-
-				<!-- <uni-list-item title="营业时间">
-					<view slot="right" class="text-muted">
-						{{merchData.busiHoursStart}} - {{merchData.busiHoursEnd}}
-					</view>
-				</uni-list-item> -->
 				<uni-list-item title="营业时间" showArrow>
 					<view slot="right" class="text-muted picker-box">
 						<picker mode="time" :value="merchData.busiHoursStart"  @change="bindTimeChange">
@@ -28,6 +22,23 @@
 						</picker>
 					</view>
 				</uni-list-item>
+<!-- 				<uni-list-item title="开启早餐营业">
+					<view slot="right" class="text-muted">
+						<evan-switch v-model="isBreakFast" :beforeChange="openFast" activeColor="#46B85B" :size="22"></evan-switch>
+					</view>
+				</uni-list-item>
+				<uni-list-item title="早餐营业时间" showArrow>
+					<view slot="right" class="text-muted picker-box">
+						<picker mode="time" :value="breakFast.fastHoursStart" @change="fastTimeChange">
+							<view class="uni-input">{{breakFast.fastHoursStart}}</view>
+						</picker>
+						<span style="display: inline-block;padding: 0 10rpx;font-size: 24rpx;">至</span>
+						<picker mode="time" :value="breakFast.fastHoursEnd"  @change="fastEndTimeChange">
+							<view class="uni-input">{{breakFast.fastHoursEnd}}</view>
+						</picker>
+					</view>
+				</uni-list-item> -->
+
 				<uni-list-item title="自动营业">
 					<view slot="right" class="text-muted">
 						<evan-switch v-model="isOpenAutoBusi" :beforeChange="openStore" activeColor="#46B85B" :size="22"></evan-switch>
@@ -46,16 +57,13 @@
 
 			<view class="group">
 				<uni-list-item title="关于移移" @click="navTo('../../utility/about/about')"></uni-list-item>
-				<!-- <uni-list-item title="关于移移"></uni-list-item> -->
 				<uni-list-item title="客服热线" @tap="onPhone">
 					<view slot="right" class="callText"><text class="iconfont icondianhua-copy"></text>立即联系</view>
 				</uni-list-item>
 			</view>
-
-		</view>
-
-		<view class="group logout" hover-class="animate__animated animate__pulse">
-			<view @click="logout">退出登录</view>
+			<view class="group logout" hover-class="animate__animated animate__pulse">
+				<uni-list-item title="退出登录" :showArrow="false" @click="logout"></uni-list-item>
+			</view>
 		</view>
 	</view>
 </template>
@@ -92,7 +100,12 @@
 					serviceContactMobile: "",
 					busiAutoOpen:'',//自动营业
 				},
+				breakFast: {
+					fastHoursStart: "08:00",
+					fastHoursEnd: "23:00"
+				},
 				open: false, //营业 
+				isBreakFast: false,
 				longitude: '',
 				latitude: '',
 				siteReady: false,
@@ -176,7 +189,7 @@
 						// 	success: (res) => {
 						// 		if (res.confirm) {
 									// if (this.siteReady) {
-										resolve()
+										// resolve()
 										this.isOnSale('openBusi');
 									// } else {
 								// 		this.getOpenPlace()
@@ -208,7 +221,7 @@
 						// 	content: '您辛苦啦！关店将阻止用户下单！',
 						// 	success: (res) => {
 						// 		if (res.confirm) {
-									resolve()
+									// resolve()
 									this.isOnSale('closeBusi');
 									// this.notAgain = true;
 						// 		} else if (res.cancel) {
@@ -257,22 +270,19 @@
 				}, {
 					token: true
 				}).then(res => {
-					uni.showToast({
-						icon: 'none',
-						title: res.message,
-						duration: 2000
+					uni.showLoading({
+						title: '请稍后'
 					})
 					if (res.code === 200) {
-						if (post === 'openBusi') {
-							this.open = true
-							this.merchData.busiState = 1
-						} else {
-							this.open = false
-							this.merchData.busiState = 0
-						}
-					} else {
-						this.open = false
-						this.merchData.busiState = 0
+						setTimeout(()=>{
+							this.getMerchDetail()
+							uni.hideLoading()
+							uni.showToast({
+								icon: 'none',
+								title: res.message,
+								duration: 2000
+							})
+						},2000)
 					}
 				}).catch((err) => {
 					uni.showToast({
@@ -468,7 +478,21 @@
 					})
 				})
 			},
-			
+			fastTimeChange: function(e) {
+				this.breakFast.fastHoursStart = e.target.value;
+				console.log(this.breakFast.fastHoursStart)
+				
+			},
+			fastEndTimeChange: function(e) {
+				this.breakFast.fastHoursEnd = e.target.value;
+				console.log(this.breakFast.fastHoursEnd)
+			},
+			openFast() {
+				this.isBreakFast = true
+				setTimeout(()=>{
+					this.isBreakFast = false
+				},2000)
+			},
 		}
 	}
 </script>
@@ -522,12 +546,7 @@
 		}
 
 		.logout {
-			padding: 40rpx 0;
 			text-align: center;
-			position: fixed;
-			bottom: 0;
-			left: 20rpx;
-			right: 20rpx;
 		}
 	}
 </style>

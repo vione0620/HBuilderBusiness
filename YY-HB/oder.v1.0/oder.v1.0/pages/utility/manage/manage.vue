@@ -58,9 +58,10 @@
 		methods: {
 			getOperManger(){
 				if(this.merchNo=='35110000000000'){
+					let testDate = [{"cityName":"厦门市","areaName":"思明区","busiManager":"张旭","busiPhone":"13663719471","workPosition":"区域经理","avatar":"http://res.yiyichina.cn/avatar/86b6fc36-ca8d-43bc-b5fb-55a9d57626d3.jpg"}]
 					this.isload = false
 					this.isready = true
-					this.workData = []
+					this.workData = testDate
 					return
 				}
 				let vVlue = {"merchNo": this.merchNo} //必传   
