@@ -1,4 +1,6 @@
 import $config from './config.js'  
+import { b64Md5,hexMD5 } from './md5.js'
+import {getSortAscii} from '../common/util/utils.js'
 
 export default { 
 	common:{
@@ -43,12 +45,68 @@ export default {
 	post(url,data = {},options = {}){
 		options.url = url
 		options.data = data
+		
+		let _loginNo = uni.getStorageSync('user').loginNo
+		if(!options.data.loginNo){
+			options.data.loginNo = _loginNo
+		}
+		delete options.data.sign
+		
+		let list
+		if(url == 'changeMerchGoods'){
+			list = options.data.goodsList
+			delete options.data.goodsList
+		}
+		let refreshKey = uni.getStorageSync('status').md5key
+		let vVlue = options.data
+		let sSort = getSortAscii(vVlue)
+		let sSign
+		
+		if(url == 'login' || url == 'salesLogin' || url == 'getVerCodeL' || url == 'getVerCode' || url == 'joinApply' || url == 'getVerCodeS' || url == 'getVerCodeF' || url == 'forgetPwd'){
+			sSign = hexMD5(sSort + "&key=YIYI@Customer!@#$803").toUpperCase()   
+		} else {
+			sSign = hexMD5(sSort + "&key=" + refreshKey).toUpperCase()  
+		}
+		options.data.sign = sSign
+		
+		if(url == 'changeMerchGoods'){
+			options.data.goodsList = list
+		}
+		
 		options.method = 'POST' 
 		return this.request(options)
 	},
 	postAlone(url,data = {},options = {}){
 		options.url = url
 		options.data = data
+		
+		let _loginNo = uni.getStorageSync('user').loginNo
+		if(!options.data.loginNo){
+			options.data.loginNo = _loginNo
+		}
+		delete options.data.sign
+		
+		let list
+		if(url == 'changeMerchGoods'){
+			list = options.data.goodsList
+			delete options.data.goodsList
+		}
+		let refreshKey = uni.getStorageSync('status').md5key
+		let vVlue = options.data
+		let sSort = getSortAscii(vVlue)
+		let sSign
+		
+		if(url == 'login' || url == 'salesLogin' || url == 'getVerCodeL' || url == 'getVerCode' || url == 'joinApply' || url == 'getVerCodeS' || url == 'getVerCodeF' || url == 'forgetPwd'){
+			sSign = hexMD5(sSort + "&key=YIYI@Customer!@#$803").toUpperCase()   
+		} else {
+			sSign = hexMD5(sSort + "&key=" + refreshKey).toUpperCase()  
+		}
+		options.data.sign = sSign
+		
+		if(url == 'changeMerchGoods'){
+			options.data.goodsList = list
+		}
+		
 		options.method = 'POST' 
 		return this.requestAlone(options)
 	},

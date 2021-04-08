@@ -139,7 +139,7 @@
 				} 
 				
 				if(this.codeTime < 1){
-					this.codeTime = 180
+					this.codeTime = 60
 					let timer = setInterval(() => {
 						if (this.codeTime >= 1) {
 							this.codeTime--

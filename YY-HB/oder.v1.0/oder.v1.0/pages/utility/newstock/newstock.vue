@@ -59,13 +59,13 @@
 											<view class="input-box">
 												<text>原&emsp;价</text>
 												<text style="left: 100rpx;color: #020101; font-weight: 400;">￥</text>
-												<input id="oldInput" type="number" class="uni-input" placeholder="请输入原价" v-model="item.goodsPrice" @input="clearInput($event,index)" />
+												<input id="oldInput" type="number" :disabled = "loginType==2" class="uni-input" placeholder="请输入原价" v-model="item.goodsPrice" @input="clearInput($event,index)" />
 												<icon id="oldIcon" type="clear" size="16" v-if="item.showClearIcon" @click="clearIcon($event,index)" />
 											</view>
 											<view class="input-box">
 												<text>促销价</text>
 												<text style="left: 100rpx;color: #020101; font-weight: 400;">￥</text>
-												<input id="newInput" type="number" class="uni-input" placeholder="可填写促销价" v-model="item.promotePrice" @input="clearInput($event,index)" />
+												<input id="newInput" type="number" :disabled = "loginType==2" class="uni-input" placeholder="可填写促销价" v-model="item.promotePrice" @input="clearInput($event,index)" />
 												<icon id="newIcon" type="clear" size="16" v-if="item.showClearIconTo" @click="clearIcon($event,index)" />
 											</view>
 											<view class="input-box">
@@ -160,12 +160,13 @@
 				checkedArr: [], //
 				allChecked: false, //是否全选
 				count: 0, //选择条数
-
+				loginType: 0,
 			}
 		},
 		onLoad() {
 			this.loginWhether = uni.getStorageSync('status')
 			this.merchNo = uni.getStorageSync('user').merchNo
+			this.loginType = uni.getStorageSync('user').loginType
 			uni.getSystemInfo({
 				success: res => {
 					this.scrollH = res.windowHeight

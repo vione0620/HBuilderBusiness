@@ -10,7 +10,7 @@
 		    }
 			,{
 			"path": "pages/utility/index/index", 
-			"style" : {  
+			"style" : {
 				"navigationBarTitleText":"今日收款",
 				"app-plus":{  
 					"titleNView":{
@@ -442,7 +442,72 @@
                 "enablePullDownRefresh": false
             }
             
-        }
+        },
+		{
+			"path":"pages/account/staff/staff",
+			"style":{
+				"navigationBarTitleText":"店员管理",
+				"app-plus":{
+					"titleNView":{
+						"titleColor":"#FFFFFF",  
+						"autoBackButton":true,
+						"backgroundColor":"#46B85B"
+					} 
+				}
+			}
+		},
+		{
+			"path":"pages/account/staff/emendation",
+			"style":{
+				"navigationBarTitleText":"修改店员",
+				"app-plus":{
+					"titleNView":{
+						"titleColor":"#FFFFFF",  
+						"autoBackButton":true,
+						"backgroundColor":"#46B85B"
+					} 
+				}
+			}
+		},
+		{
+			"path": "pages/account/printer/printer",
+			"style": {
+				"navigationBarTitleText":"打印机管理",
+				"app-plus":{
+					"titleNView":{
+						"titleColor":"#FFFFFF",  
+						"autoBackButton":true,
+						"backgroundColor":"#46B85B"
+					} 
+				}
+			}
+		},
+		{
+			"path":"pages/account/printer/bluetooth",
+			"style":{
+				"navigationBarTitleText":"设置蓝牙打印机",
+				"app-plus":{
+					"titleNView":{
+						"titleColor":"#FFFFFF",  
+						"autoBackButton":true,
+						"backgroundColor":"#46B85B"
+					} 
+				}
+			}
+		},
+		{
+			"path":"pages/account/packfee/packfee",
+			"style":{
+				"navigationBarTitleText":"设置包装费",
+				"app-plus":{
+					"titleNView":{
+						"titleColor":"#FFFFFF",  
+						"autoBackButton":true,
+						"backgroundColor":"#46B85B"
+					} 
+				}
+			}
+		}
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",

@@ -24,7 +24,8 @@ Vue.prototype.$api = $api
 // import $daliy from 'network/daliy.js'
 // Vue.prototype.$daliy = $daliy
  
-
+import $esc from './common/util/esc.js'
+Vue.prototype.$esc = $esc 
 
 const app = new Vue({
 	store,

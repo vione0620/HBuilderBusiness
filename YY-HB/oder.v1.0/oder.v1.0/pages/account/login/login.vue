@@ -27,35 +27,62 @@
 							<view class="login-open" :class="{loginActive: loginTable===1,loginActiveTo: loginTable===0}" @click="changeTable(0)">申请开店</view>
 						</view>
 						<view class="input-wrap" v-if="loginTable===0">
-							<view class="input-group">
-								<text class="input-text">请输入登录账号</text>
-								<login-input type="number" pattern="\d*" clearable v-model="account" :maxSize="7"></login-input>
-							</view>
-							<view class="input-group">
-								<text class="input-text">请输入账号密码</text>
-								<login-input password displayable type="password" v-model="password"></login-input>
-							</view>
-							<view class="input-group">
-								<text class="input-text">请输入验证码</text>
-								<view class="input-rows hasbtn">
-									<input class="prov-code" type="number" pattern="\d*" v-model="verifcode" maxlength="6" />
-									<view class="prov-btn" @tap="getVerifCode" 
-									:class="(this.account.length < 6 || this.password.length < 6 ) ? 'prov-disabled' :'' ">
-									{{codeTime > 0 ? codeTime + 's' : firstcode}}</view>
+							<view v-if="loginUserType">
+								<view class="input-group">
+									<text class="input-text">请输入登录账号</text>
+									<login-input type="number" pattern="\d*" clearable v-model="account" :maxSize="7"></login-input>
 								</view>
-							</view> 
-							<view class="footer">								
-								<evan-checkbox  :iconSize="12" primaryColor="#46B85B" v-model="agreeChecked"><text style="font-size: 12px;">我同意</text></evan-checkbox> 	
-								<view class="links" @click="navto('../../utility/about/privacy')">《用户服务协议》</view>
-								<view class="links" @click="navto('../../utility/about/treaty')">《隐私政策》</view>
+								
+								<view class="input-group">
+									<text class="input-text">请输入账号密码</text>
+									<login-input password displayable type="password" v-model="password"></login-input>
+								</view>
+								<view class="input-group">
+									<text class="input-text">请输入验证码</text>
+									<view class="input-rows hasbtn">
+										<input class="prov-code" type="number" pattern="\d*" v-model="verifcode" maxlength="6" />
+										<view class="prov-btn" @tap="getVerifCode" 
+										:class="(this.account.length < 6 || this.password.length < 6 ) ? 'prov-disabled' :'' ">
+										{{codeTime > 0 ? codeTime + 's' : firstcode}}</view>
+									</view>
+								</view> 
+								<view class="footer">								
+									<evan-checkbox  :iconSize="12" primaryColor="#46B85B" v-model="agreeChecked"><text style="font-size: 12px;">我同意</text></evan-checkbox> 	
+									<view class="links" @click="navto('../../utility/about/privacy')">《用户服务协议》</view>
+									<view class="links" @click="navto('../../utility/about/treaty')">《隐私政策》</view>
+								</view>
+								<view class="input-group">
+									<view class="login-btn" @tap="bindLogin" hover-class="animate__animated animate__pulse" 
+									:class="(this.account.length < 6 || this.password.length < 6 || this.verifcode.length < 6 || !this.agreeChecked) ? 'btn-disabled' : '' ">登录</view>
+								</view>
+								<view class="link-to"> 
+									<view><navigator url="../passwd/passwd?type=forget" class="links">忘记密码</navigator></view> 
+									<view class="links" @click="changeType">其它登录方式</view>
+								</view>
 							</view>
-							<view class="input-group">
-								<view class="login-btn" @tap="bindLogin" hover-class="animate__animated animate__pulse" 
-								:class="(this.account.length < 6 || this.password.length < 6 || this.verifcode.length < 6 || !this.agreeChecked) ? 'btn-disabled' : '' ">登录</view>
+							<view v-else>
+								<view class="input-group">
+									<text class="input-text">请输入登录号</text>
+									<login-input type="number" pattern="\d*" clearable v-model="staff" :maxSize="11" />
+								</view>
+								<view class="input-group">
+									<text class="input-text">请输入验证码</text>
+									<view class="input-rows hasbtn">
+										<input class="prov-code" type="number" pattern="\d*" v-model="staVerifcode" maxlength="6" />
+										<view class="prov-btn" @tap="getVerCodeS" 
+										:class="this.staff.length < 11 ? 'prov-disabled' :'' ">
+										{{staCodeTime > 0 ? staCodeTime + 's' : staFirstcode}}</view>
+									</view>
+								</view>
+								<view class="input-group">
+									<view class="login-btn" @tap="salesLogin" hover-class="animate__animated animate__pulse" 
+									:class="(this.staff.length < 11 || this.staVerifcode.length < 6) ? 'btn-disabled' : '' ">登录</view>
+								</view>
+								<view class="link-to">
+									<view class="links" style="text-align: right;" @click="changeType">切换登录方式</view>
+								</view>
 							</view>
-							<view class="link-to"> 
-								<view><navigator url="../passwd/passwd?type=forget" class="links">忘记密码</navigator></view> 
-							</view>
+							
 						</view>
 						<view class="input-wrap" v-else>
 							<view class="input-group">
@@ -72,7 +99,7 @@
 
 							<view class="input-group">
 								<text class="input-text">请输入联系电话</text>
-								<login-input type="number" :maxSize="11" v-model="contactPhone"/>
+								<login-input type="number" clearable :maxSize="11" v-model="contactPhone"/>
 							</view>
 							<view class="input-group">
 								<text class="input-text">请输入验证码</text>
@@ -85,11 +112,11 @@
 							</view>
 							<view class="input-group">
 								<text class="input-text">请输入店铺名称</text>
-								<login-input type="text" v-model="merchName"/>
+								<login-input type="text" clearable v-model="merchName"/>
 							</view>
 							<view class="input-group">
-								<text class="input-text" v-model="address">请输入现住址</text>
-								<login-input type="text" v-model="address"/>
+								<text class="input-text">请输入现住址</text>
+								<login-input type="text" clearable v-model="address"/>
 							</view>
 							<view class="input-group">
 								<view class="login-btn" @tap="SubmitAooly" hover-class="animate__animated animate__pulse" 
@@ -124,14 +151,21 @@
 			return {
 				legal: '您在使用移移商户之前请认真阅读并充分理解相关用户条款、平台规则以及个人信息保护政策。当您点击相关条款，并开始使用产品或服务，即表示您已经阅读并同意该条款，该条款将构成对您具有法律约束力的文件。',
 				legalFlag: false,
+				//普通帐号
 				account: '',
 				password: '',
 				verifcode: '',
+				//员工帐号
+				staff: '',
+				staVerifcode: '',
+				
 				initSign: 'key=YIYI@Customer!@#$803', 
 				codeTime: '', 
-				codeTimeTo: '', 
+				codeTimeTo: '',
+				staCodeTime: '',
 				firstcode:'获取验证码',
 				firstcodeTo:'获取验证码',
+				staFirstcode:'获取验证码',
 				agreeChecked:false,
 				loginTable: 0,
 				contactName: '',
@@ -153,7 +187,8 @@
 				servicePhone: [
 					'0592-2096880',
 					'0592-2096882'
-				]
+				],
+				loginUserType: true
 			}
 		},
 		onLoad() {  
@@ -197,7 +232,7 @@
 					animationDuration: 200,
 				})
 			},
-			getVerifCode() { 
+			getVerifCode() {  //店家登录获取验证码
 				this.account = excludeBlankNewline(this.account)
 				this.password = excludeBlankNewline(this.password)
 				this.verifcode = excludeBlankNewline(this.verifcode)
@@ -236,7 +271,7 @@
 					})
 				}).catch() 
 			},
-			getVerifCodeTo() {
+			getVerifCodeTo() { //店家申请入驻获取验证码
 				this.contactPhone = excludeBlankNewline(this.contactPhone)
 				if(this.contactPhone.length != 11){
 					return
@@ -348,6 +383,8 @@
 							merchName:res.data.merchName,
 							merchType:res.data.merchType,
 							busiType:res.data.busiType,
+							loginType: res.data.loginType,
+							loginNo: res.data.loginNo
 						}
 						this.$store.commit('logStatus',haslogin)
 						uni.setStorageSync('userAccount',this.account)
@@ -363,9 +400,6 @@
 								url:'../../utility/index/index?loginType=login'
 							})									
 						},300)		 	
-					}else{						
-						this.password = ''
-						this.verifcode = ''
 					}
 				}).catch() 
 
@@ -434,6 +468,98 @@
 						});  
 					}
 				});
+			},
+			changeType(){
+				this.loginUserType = !this.loginUserType
+			},
+			getVerCodeS(){
+				this.staff = excludeBlankNewline(this.staff)
+				if (this.staCodeTime > 0 || this.staff.length < 11) { 
+					return
+				} 
+				this.staCodeTime = 60
+				let timer = setInterval(() => {
+					if (this.staCodeTime >= 1) {
+						this.staCodeTime--
+						this.staFirstcode = '重新获取'
+					} else {
+						this.staCodeTime = 0
+						clearInterval(timer)
+					}
+				}, 1000) 
+				
+				///获取验证码 
+				let vVlue = {"loginNo": this.staff} //必传
+				let sSort = getSortAscii(vVlue) ///排序 
+				let sSign = hexMD5(sSort + "&" + this.initSign).toUpperCase() //转码  
+				this.$request.post('getVerCodeS', {
+					...vVlue,
+					"sign": sSign
+				}).then(res=>{   
+					if(res.code != 200){
+						setTimeout(()=>{
+							this.staFirstcode = '重新获取'
+							this.staCodeTime = 0
+						},5000)
+					} 
+					uni.showToast({
+						icon:'none',
+						title:res.message,
+						duration: 2000
+					})
+				}).catch() 
+			},
+			salesLogin(){
+				this.staff = excludeBlankNewline(this.staff)
+				this.staVerifcode = excludeBlankNewline(this.staVerifcode)
+				let vVlue = {"loginNo": this.staff,"verCode": this.staVerifcode} //必传 
+				let sSort = getSortAscii(vVlue) ///排序
+				let sSign = hexMD5(sSort + "&" + this.initSign).toUpperCase() //转码    
+				if(this.staff.length < 11 || this.staVerifcode.length < 6){
+					return
+				}
+				this.$request.post('salesLogin', {
+					...vVlue,
+					"sign": sSign
+				}).then(res => {
+					uni.showLoading({
+						mask:true
+					})
+					uni.showToast({
+						icon: 'none',
+						title:res.message,
+						duration: 2000
+					})
+					if (res.code === 200) {
+						this.$store.commit('loginN',res.data)  
+						let haslogin = {
+							status:true,
+							token:res.data.token,
+							md5key:res.data.md5key,
+							merchNo:res.data.merchNo,
+							joinCategory:res.data.joinCategory,
+							serverTime:res.data.serverTime,  
+							merchName:res.data.merchName,
+							merchType:res.data.merchType,
+							busiType:res.data.busiType,
+							loginType: res.data.loginType,
+							loginNo: res.data.loginNo
+						}
+						this.$store.commit('logStatus',haslogin)
+						uni.setStorageSync('isRegular',res.data.isRegular)  
+						if(res.data.isRegular == 1){
+							uni.setStorageSync('agreeChecked',false) 
+						}else if(res.data.isRegular == 0){
+							uni.setStorageSync('agreeChecked',true) 	 
+						}
+						setTimeout(()=>{
+							uni.hideLoading()
+							uni.reLaunch({ 
+								url:'../../utility/index/index?loginType=login'
+							})									
+						},300)		 	
+					}
+				}).catch() 
 			},
 		}
 	}

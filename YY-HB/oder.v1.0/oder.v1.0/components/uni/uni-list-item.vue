@@ -16,7 +16,7 @@
 				<view v-if="note" class="uni-list-item__content-note">{{ note }}</view>
 			</view>
 			<view v-if="showBadge || showArrow || showSwitch" class="uni-list-item__extra">
-				<text v-if="rightText" class="uni-list-item__extra-text">{{rightText}}</text>
+				<text v-if="rightText" class="uni-list-item__extra-text" :class="{conText: conFlag}">{{rightText}}</text>
 				<uni-badge v-if="showBadge" :type="badgeType" :text="badgeText" />		
 				<slot name="right">
 					<switch v-if="showSwitch" :disabled="disabled" :checked="switchChecked" @change="onSwitchChange" />
@@ -115,7 +115,9 @@
 			}
 		},
 		data() {
-			return {}
+			return {
+				conFlag: false
+			}
 		},
 		methods: {
 			onClick() {
@@ -124,13 +126,28 @@
 			onSwitchChange(e) {
 				this.$emit('switchChange', e.detail)
 			}
+		},
+		watch:{
+			rightText: {
+				immediate: true,
+				handler(val){
+					this.rightText = val
+					if(val === '已连接'){
+						this.conFlag = true
+					} else {
+						this.conFlag = false
+					}
+				}
+			}
 		}
 	}
 </script>
 
 <style>
 	@charset "UTF-8";
-
+	.conText{
+		color: #46B75B;
+	}
 	.uni-list-item {
 		font-size: 32upx;
 		position: relative;
@@ -211,7 +228,7 @@
 	}
 
 	.uni-list-item__extra {
-		width: 70%;
+		width: 50%;
 		display: flex;
 		flex-direction: row;
 		justify-content: flex-end;

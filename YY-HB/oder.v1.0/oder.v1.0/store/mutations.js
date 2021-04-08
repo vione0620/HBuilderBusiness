@@ -383,5 +383,16 @@ export default {
 		uni.removeStorageSync('user');  
 		uni.removeStorageSync('status')  
 	}, 
-	
+	// 蓝牙状态
+	blueStatus(state,blue){
+		uni.setStorageSync('blueStatus',blue)
+	},
+	// 蓝牙设备信息
+	blueDevices(state,blue){
+		uni.setStorageSync('blueDevices',blue)
+	},
+	blueClose(state){
+		uni.removeStorageSync('blueStatus')
+		uni.removeStorageSync('blueDevices')
+	}
 }

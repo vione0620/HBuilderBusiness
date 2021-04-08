@@ -68,10 +68,17 @@ export default {
 				title:'请求不存在'
 			})
 		}else if(code === 406){ 
+			let type = uni.getStorageSync('user').loginType
+			let tis = ''
+			if(type == 1){
+				tis = '修改密码'
+			} else {
+				tis = '重新登录'
+			}
 			uni.showModal({
 				title:'登录提醒',
 				content:'账号已在另一个设备登录了，如非本人操作，请及时修改密码！',
-				cancelText:'修改密码',
+				cancelText: tis,
 				confirmText:'本人操作',
 				success:(res)=>{
 					if(res.confirm){
@@ -79,9 +86,16 @@ export default {
 							url:'/pages/account/login/login'
 						})
 					}else if(res.cancel){
-						uni.reLaunch({
-							url:'/pages/account/passwd/passwd?type=change'
-						})
+						
+						if(type == 1){
+							uni.reLaunch({
+								url:'/pages/account/passwd/passwd?type=forget'
+							})
+						} else if (type == 2){
+							uni.reLaunch({
+								url:'/pages/account/login/login'
+							})
+						}
 					}
 				},
 			})

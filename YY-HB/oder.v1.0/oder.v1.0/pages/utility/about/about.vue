@@ -2,7 +2,7 @@
 	<view class="about">
 		<view class="main">
 			<image class="icon" src="@/static/myicon.png"></image>
-			<view class="txt">v1.0.0版本</view>
+			<view class="txt">v1.5.5版本</view>
 		</view>
 		<view class="list"> 
 			<view class="group">

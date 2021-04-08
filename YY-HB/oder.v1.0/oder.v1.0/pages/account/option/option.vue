@@ -2,16 +2,16 @@
 	<view id="set-app">
 		<view class="set-main">
 			<view class="group">
-				<uni-list-item title="店铺名称">
+				<uni-list-item showSwitch title="店铺名称">
 					<view slot="right">{{merchData.merchName}}</view>
 				</uni-list-item>
-				<uni-list-item title="开始营业">
+				<uni-list-item showSwitch title="开始营业">
 					<view slot="right" class="text-muted">
 						<evan-switch v-model="open" :disabled="notAgain" :beforeChange="openStauts" activeColor="#46B85B" :size="22"></evan-switch>
 					</view>
 
 				</uni-list-item>
-				<uni-list-item title="营业时间" showArrow>
+				<uni-list-item showSwitch title="营业时间" showArrow>
 					<view slot="right" class="text-muted picker-box">
 						<picker mode="time" :value="merchData.busiHoursStart"  @change="bindTimeChange">
 							<view class="uni-input">{{merchData.busiHoursStart}}</view>
@@ -22,37 +22,45 @@
 						</picker>
 					</view>
 				</uni-list-item>
-<!-- 				<uni-list-item title="开启早餐营业">
-					<view slot="right" class="text-muted">
-						<evan-switch v-model="isBreakFast" :beforeChange="openFast" activeColor="#46B85B" :size="22"></evan-switch>
-					</view>
-				</uni-list-item>
-				<uni-list-item title="早餐营业时间" showArrow>
-					<view slot="right" class="text-muted picker-box">
-						<picker mode="time" :value="breakFast.fastHoursStart" @change="fastTimeChange">
-							<view class="uni-input">{{breakFast.fastHoursStart}}</view>
-						</picker>
-						<span style="display: inline-block;padding: 0 10rpx;font-size: 24rpx;">至</span>
-						<picker mode="time" :value="breakFast.fastHoursEnd"  @change="fastEndTimeChange">
-							<view class="uni-input">{{breakFast.fastHoursEnd}}</view>
-						</picker>
-					</view>
-				</uni-list-item> -->
-
-				<uni-list-item title="自动营业">
+				<view v-if="this.busiType<=2">
+					<uni-list-item showSwitch title="开启早餐营业">
+						<view slot="right" class="text-muted">
+							<evan-switch v-model="isBreakFast" :beforeChange="openFast" activeColor="#46B85B" :size="22"></evan-switch>
+						</view>
+					</uni-list-item>
+					<uni-list-item showSwitch title="早餐营业时间" showArrow>
+						<view slot="right" class="text-muted picker-box">
+							<picker mode="time" :value="merchData.breakfastStart" @change="fastTimeChange">
+								<view class="uni-input">{{merchData.breakfastStart}}</view>
+							</picker>
+							<span style="display: inline-block;padding: 0 10rpx;font-size: 24rpx;">至</span>
+							<picker mode="time" :value="merchData.breakfastEnd"  @change="fastEndTimeChange">
+								<view class="uni-input">{{merchData.breakfastEnd}}</view>
+							</picker>
+						</view>
+					</uni-list-item>
+				</view>
+				<uni-list-item showSwitch title="自动营业">
 					<view slot="right" class="text-muted">
 						<evan-switch v-model="isOpenAutoBusi" :beforeChange="openStore" activeColor="#46B85B" :size="22"></evan-switch>
 					</view>
 				</uni-list-item>
 			</view>
 			<view class="group">
-				<uni-list-item title="优惠券管理" @click="navTo('../coupon/coupon')"></uni-list-item>
+				<uni-list-item title="打印机设置" @click="navTo('../printer/printer')"></uni-list-item>
 			</view>
 			<view class="group">
+				<uni-list-item title="设置包装费" @click="navTo('../packfee/packfee')"></uni-list-item>
+			</view>
+			<view class="group">
+				<uni-list-item title="优惠券管理" @click="navTo('../coupon/coupon')"></uni-list-item>
+			</view>
+			<view v-if="loginType==1" class="group">
 				<uni-list-item title="修改密码" @click="navTo('../passwd/passwd?type=change')"></uni-list-item>
 				<uni-list-item title="关联账号" @click="navTo('../authid/authid')"></uni-list-item>
 				<uni-list-item title="银行卡管理" @click="navTo('../../wallet/type/brand')"></uni-list-item>
 				<uni-list-item title="支付管理" @click="navTo('../../payment/payment')"></uni-list-item>
+				<uni-list-item title="店员管理" @click="navTo('../staff/staff')"></uni-list-item>
 			</view>
 
 			<view class="group">
@@ -99,10 +107,8 @@
 					merchPic: "",
 					serviceContactMobile: "",
 					busiAutoOpen:'',//自动营业
-				},
-				breakFast: {
-					fastHoursStart: "08:00",
-					fastHoursEnd: "23:00"
+					breakfastStart: '',
+					breakfastEnd: ''
 				},
 				open: false, //营业 
 				isBreakFast: false,
@@ -115,15 +121,22 @@
 				isOpenAutoBusi: false,//开启自动营业
 				startTime: '08:00',
 				endTime:'23:59',
+				loginType: 1,
+				busiType: 0,
 			}
 		},
 		onLoad() {
 			this.loginWhether = uni.getStorageSync('status')
 			this.merchNo = uni.getStorageSync('user').merchNo
+			this.loginType = uni.getStorageSync('user').loginType
+			this.busiType = uni.getStorageSync('user').busiType
 
 			this.getMerchDetail()
 			// this.getOpenPlace() 
 			this.initsietPlace() //一次获取坐标 
+		},
+		onShow(){
+			this.getMerchDetail()
 		},
 		methods: {
 			pinckerTime(e) {
@@ -271,7 +284,8 @@
 					token: true
 				}).then(res => {
 					uni.showLoading({
-						title: '请稍后'
+						title: '请稍后',
+						mask: true
 					})
 					if (res.code === 200) {
 						setTimeout(()=>{
@@ -283,6 +297,13 @@
 								duration: 2000
 							})
 						},2000)
+					} else {
+						uni.hideLoading()
+						uni.showToast({
+							icon: 'none',
+							title: res.message,
+							duration: 2000
+						})
 					}
 				}).catch((err) => {
 					uni.showToast({
@@ -309,6 +330,7 @@
 				let openStatus = this.merchData.busiState
 				let busiState = this.merchData.deliverState
                 let busiAutoOpen=this.merchData.busiAutoOpen
+				let breakfastState = this.merchData.breakfastState
 				if (openStatus === 0) {
 					this.open = false
 				} else if (openStatus === 1) {
@@ -318,6 +340,11 @@
 					this.isOpenAutoBusi=true
 				}else if(busiAutoOpen===0){
 					this.isOpenAutoBusi=false
+				} 
+				if(breakfastState===1){
+					this.isBreakFast=true
+				} else if (breakfastState===0){
+					this.isBreakFast=false
 				}
 			},
 			logout() {
@@ -370,6 +397,7 @@
 					this.$api.initPage(res.code, res.message)
 					if (res.code === 200) {
 						this.merchData = res.data
+						uni.setStorageSync('packageFee',res.data.packageFee)
 						this.dealStatus()
 					}
 				}).catch((err) => {
@@ -424,6 +452,13 @@
 			},
 			bindTimeChange: function(e) {
 				this.merchData.busiHoursStart = e.target.value;
+				if(!this.merchData.busiHoursEnd){
+					uni.showToast({
+						icon: 'none',
+						title: '请设置营业结束时间'
+					})
+					return
+				}
 				let vVlue = {
 					"merchNo": this.merchNo,
 					"openTime": this.merchData.busiHoursStart,
@@ -440,7 +475,9 @@
 				}).then(res => {
 					this.$api.initPage(res.code, res.message)
 					if (res.code === 200) {
-						this.getMerchDetail();
+						setTimeout(()=>{
+							this.getMerchDetail();
+						},500)
 					}
 				}).catch((err) => {
 					uni.showToast({
@@ -452,6 +489,13 @@
 			},
 			bindEndTimeChange: function(e) {
 				this.merchData.busiHoursEnd = e.target.value;
+				if(!this.merchData.busiHoursStart){
+					uni.showToast({
+						icon: 'none',
+						title: '请设置营业开始时间'
+					})
+					return
+				}
 				let vVlue = {
 					"merchNo": this.merchNo,
 					"openTime": this.merchData.busiHoursStart,
@@ -468,7 +512,9 @@
 				}).then(res => {
 					this.$api.initPage(res.code, res.message)
 					if (res.code === 200) {
-						this.getMerchDetail();
+						setTimeout(()=>{
+							this.getMerchDetail();
+						},500)
 					}
 				}).catch((err) => {
 					uni.showToast({
@@ -479,19 +525,129 @@
 				})
 			},
 			fastTimeChange: function(e) {
-				this.breakFast.fastHoursStart = e.target.value;
-				console.log(this.breakFast.fastHoursStart)
+				this.merchData.breakfastStart = e.target.value;
+				if(!this.merchData.breakfastEnd){
+					uni.showToast({
+						icon: 'none',
+						title: '请设置早餐结束时间'
+					})
+					return
+				}
+				let vVlue = {
+					"merchNo": this.merchNo,
+					"openTime": this.merchData.breakfastStart,
+					"closeTime":this.merchData.breakfastEnd,
+				} //必传   
+				let sSort = getSortAscii(vVlue) ///排序
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
+				this.$request.post('setBreakfastTime', {
+					...vVlue,
+					"sign": sSign,
+					
+				}, {
+					token: true
+				}).then(res => {
+					this.$api.initPage(res.code, res.message)
+					if (res.code === 200) {
+						setTimeout(()=>{
+							this.getMerchDetail();
+						},500)
+					}
+				}).catch((err) => {
+					uni.showToast({
+						icon: 'none',
+						title: err,
+						duration: 2000
+					})
+				})
 				
 			},
 			fastEndTimeChange: function(e) {
-				this.breakFast.fastHoursEnd = e.target.value;
-				console.log(this.breakFast.fastHoursEnd)
+				this.merchData.breakfastEnd = e.target.value;
+				if(!this.merchData.breakfastStart){
+					uni.showToast({
+						icon: 'none',
+						title: '请设置早餐开始时间'
+					})
+					return
+				}
+				let vVlue = {
+					"merchNo": this.merchNo,
+					"openTime": this.merchData.breakfastStart,
+					"closeTime":this.merchData.breakfastEnd,
+				} //必传   
+				let sSort = getSortAscii(vVlue) ///排序
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
+				this.$request.post('setBreakfastTime', {
+					...vVlue,
+					"sign": sSign,
+					
+				}, {
+					token: true
+				}).then(res => {
+					this.$api.initPage(res.code, res.message)
+					if (res.code === 200) {
+						setTimeout(()=>{
+							this.getMerchDetail();
+						},500)
+					}
+				}).catch((err) => {
+					uni.showToast({
+						icon: 'none',
+						title: err,
+						duration: 2000
+					})
+				})
 			},
 			openFast() {
-				this.isBreakFast = true
-				setTimeout(()=>{
-					this.isBreakFast = false
-				},2000)
+				let url
+				if(this.merchData.breakfastState === 0){
+					url = 'openBreakfast'
+				} else if (this.merchData.breakfastState === 1){
+					url = 'closeBreakfast'
+				}
+				let vVlue = {
+					"merchNo": this.merchNo
+				} //必传 
+				let sSort = getSortAscii(vVlue) ///排序
+				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码   
+				this.$request.post(url, {
+					...vVlue,
+					"sign": sSign,
+					
+				}, {
+					token: true
+				}).then(res => {
+					this.$api.initPage(res.code, res.message)
+					uni.showLoading({
+						title: '请稍后',
+						mask: true
+					})
+					if (res.code === 200) {
+						setTimeout(()=>{
+							this.getMerchDetail()
+							uni.hideLoading()
+							uni.showToast({
+								icon: 'none',
+								title: res.message,
+								duration: 2000
+							})
+						},2000)
+					} else {
+						uni.hideLoading()
+						uni.showToast({
+							icon: 'none',
+							title: res.message,
+							duration: 2000
+						})
+					}
+				}).catch((err) => {
+					uni.showToast({
+						icon: 'none',
+						title: err,
+						duration: 2000
+					})
+				})
 			},
 		}
 	}

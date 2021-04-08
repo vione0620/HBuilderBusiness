@@ -6,9 +6,9 @@
 	
 	<template v-if="isready">    
 		<view id="mian">
-			<view class="total">{{parseFloat(recAmt/100).toFixed(2)/1}}<text class="txt">元</text></view>
-			<view class="getMoney">
-				<navigator class="btn" url="../../wallet/moeny/moeny">提现</navigator> 
+			<view class="total" :class="{son: loginType==2}">{{parseFloat(recAmt/100).toFixed(2)/1}}<text class="txt">元</text></view>
+			<view v-if="loginType==1" class="getMoney">
+				<navigator class="btn" url="../../wallet/moeny/moeny">提现</navigator>
 			</view>
 
 			<view class="count-wrap">
@@ -125,7 +125,11 @@
 		</view>
 	</uni-popup>
 	<!-- 有订单未结清 end-->
-
+	<view v-if="!this.blueStatus.status" class="BottomPrompt"  @click="navTo('../../account/printer/printer')">
+		<image src="../../../static/warning.png" mode="aspectFit"></image>
+		<text class="tis">打印机未连接</text>
+		<image src="../../../static/moretis.png" mode="aspectFit"></image>
+	</view>
 	</view>
 </template>
 
@@ -206,7 +210,7 @@
 			UniNavBar,
 			UniPopup,
 			PopUp,
-			BtnFoot,
+			BtnFoot
 		},
 		data() {
 			return { 
@@ -238,6 +242,12 @@
 				eContract:false,//是否签合同
 				// webview:false,//电子合同
 				// pushmessage:'',
+				loginType: 1, //登录号类型
+				loginNo: '', //登录号
+				blueStatus: {
+					status: false,
+					text: '未连接'
+				},
 			}
 		}, 
 		computed:{ 
@@ -261,14 +271,24 @@
 			this.loginWhether = uni.getStorageSync('status') 
 			this.userStore = uni.getStorageSync('user')
 			this.merchNo = uni.getStorageSync('user').merchNo
-			 
+			this.loginType = uni.getStorageSync('user').loginType
+			this.loginNo = uni.getStorageSync('user').loginNo
+			
 			let login_type = option.loginType  
 			if(login_type === 'login'){ 
 				this.fromLogin() 
 			}else{ 
 				this.initUser() 
-			} 
-		},  
+			}
+			setTimeout(()=>{
+				let bs = uni.getStorageSync('blueStatus')
+				this.blueStatus = bs
+			},3000)
+		},
+		onShow(){
+			let bs = uni.getStorageSync('blueStatus')
+			this.blueStatus = bs
+		},
 		onNavigationBarButtonTap(tap){
 			if(tap.index === 0){
 				uni.navigateTo({
@@ -601,7 +621,7 @@
 				this.getPlatParam(this.loginWhether.md5key)		 
 			}, 
 			initUser() {  
-				let vVlue = {"merchNo": this.merchNo} 
+				let vVlue = {"merchNo": this.merchNo,"loginNo": this.loginNo} 
 				let sSort = getSortAscii(vVlue)   		
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()	
 				
@@ -725,7 +745,6 @@
 			},
 			getUploadDev(){ 
 				let userSystem = uni.getStorageSync('user-system') 
-				
 				if(userSystem.cid === '' || userSystem.platform === ''){
 					return
 				}
@@ -869,8 +888,26 @@
 </script>
 
 <style lang="scss">
-	 
-	
+	.BottomPrompt{
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		position: fixed;
+		bottom: 0;
+		background: #FEF7E5;
+		padding: 30rpx 50rpx;
+		image{
+			width: 42rpx;
+			height: 42rpx;
+		}
+		.tis{
+			width: 82%;
+			text-align: left;
+			color: #FF6600;
+			font-size: 28rpx;
+			line-height: 42rpx;
+		}
+	}
 	.unpaid_checked{
 			padding: 40rpx;
 			position: relative; padding-bottom: 140rpx;
@@ -1065,17 +1102,18 @@
 			position: relative;
 			margin-bottom: 94rpx;
 		}
-
 		.total {
 			font-size: 60rpx;
 			text-align: center;
 			color: #FFFFFF;
-
 			.txt {
 				font-size: 20rpx;
 				padding-left: 8rpx;
 			}
-
+		}
+		.son {
+			font-size: 78rpx;
+			line-height: 150rpx;
 		}
 
 		.getMoney {
@@ -1097,6 +1135,9 @@
 		
 		.count-wrap {
 			display: flex;
+			position: absolute;
+			width: 100%;
+			top: 164rpx;
 			padding: 28rpx 28rpx 20rpx 28rpx;
 			// padding: 28rpx 0 8px 0;
 			font-size: 26rpx;

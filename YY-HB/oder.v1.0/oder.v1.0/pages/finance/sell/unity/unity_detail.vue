@@ -26,9 +26,10 @@
 					<block v-for="(items,index) in currentItem.content" :key="'4'+index">
 						<view class="goods-group">
 							<view class="tit">{{items.goodsName}}</view>
+							<view class="unit">{{items.goodsNum}} {{items.goodsUnit}}</view>
 							<view class="cont">
-								<view class="price">{{parseFloat(items.goodsPrice/100).toFixed(2)}} 元</view>
-								<view class="unit">{{items.goodsNum}} {{items.goodsUnit}}</view>
+								<view v-if="items.promotePrice != 0" class="price">{{parseFloat(items.promotePrice/100).toFixed(2)}} 元</view>
+								<view class="price" :class="[items.promotePrice != 0 ? 'unit' : '']">{{parseFloat(items.goodsPrice/100).toFixed(2)}} 元</view>
 							</view>
 						</view>
 					</block>
@@ -55,8 +56,9 @@
 					</view>
 				
 					<view class="total-list">
-						<view class="tit">合计</view>
-						<view class="cont"><text class="price"> {{parseFloat(currentItem.realAmt/100).toFixed(2)}}</text> <text class="unit">元</text></view>
+						<view class="tit">收入</view>
+						<view v-if="currentItem.issuerType == 1" class="cont"><text class="price"> {{parseFloat(currentItem.realAmt/100-currentItem.orderFee/100).toFixed(2)}}</text> <text class="unit">元</text></view>
+						<view v-else class="cont"><text class="price"> {{parseFloat(currentItem.realAmt/100-currentItem.orderFee/100-currentItem.couponAmt/100).toFixed(2)}}</text> <text class="unit">元</text></view>
 					</view>
 				</view> 
 				 
@@ -69,7 +71,7 @@
 						</view>
 						<view class="order-group">
 							<view class="tit">收货人</view>
-							<view class="cont">{{currentItem.merchName}}</view> 
+							<view class="cont">{{currentItem.receiver}}</view> 
 						</view> 
 					</template>
 					<view class="order-group">
@@ -294,6 +296,7 @@
 				},{
 					token:true
 				}).then(res => {
+					console.log(res)
 					this.$api.initPage(res.code,res.message)  
 					if(res.code == 200){						
 						setTimeout(()=>{								
@@ -361,12 +364,13 @@
 												
 						.hot{ font-size:16rpx; color: #FF0000; padding-left: 8rpx;}
 					}
+					.unit{ padding-top: 20rpx; font-size: 20rpx; color: #999999;}
 					.cont{
 						text-align: right;
 						.price{
 							font-size: 26rpx;
 						}
-						.unit{ font-size: 20rpx; color: #999999;}
+						.unit{ text-decoration: line-through; font-size: 26rpx; color: #999999;}
 						
 						
 					} 
