@@ -45,6 +45,11 @@
 						<evan-switch v-model="isOpenAutoBusi" :beforeChange="openStore" activeColor="#46B85B" :size="22"></evan-switch>
 					</view>
 				</uni-list-item>
+				<uni-list-item showSwitch title="播报声音默认最大">
+					<view slot="right" class="text-muted">
+						<evan-switch v-model="issetVolume" :beforeChange="setVolume" activeColor="#46B85B" :size="22"></evan-switch>
+					</view>
+				</uni-list-item>
 			</view>
 			<view class="group">
 				<uni-list-item title="打印机设置" @click="navTo('../printer/printer')"></uni-list-item>
@@ -123,6 +128,7 @@
 				endTime:'23:59',
 				loginType: 1,
 				busiType: 0,
+				issetVolume: false,
 			}
 		},
 		onLoad() {
@@ -130,7 +136,7 @@
 			this.merchNo = uni.getStorageSync('user').merchNo
 			this.loginType = uni.getStorageSync('user').loginType
 			this.busiType = uni.getStorageSync('user').busiType
-
+			this.issetVolume = uni.getStorageSync('Volume')
 			this.getMerchDetail()
 			// this.getOpenPlace() 
 			this.initsietPlace() //一次获取坐标 
@@ -648,6 +654,15 @@
 						duration: 2000
 					})
 				})
+			},
+			setVolume(){
+				this.issetVolume = !this.issetVolume
+				if(this.issetVolume){
+					plus.device.setVolume(1)
+					uni.setStorageSync('Volume',true)
+				} else {
+					uni.removeStorageSync('Volume')
+				}
 			},
 		}
 	}

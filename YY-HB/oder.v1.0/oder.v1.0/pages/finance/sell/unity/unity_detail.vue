@@ -38,7 +38,10 @@
 							<view class="tit">配送费</view>
 							<view class="cont"><view class="price">{{parseFloat(currentItem.orderFee/100).toFixed(2)}}元</view></view>
 						</view>
-						
+						<view class="goods-group">
+							<view class="tit">打包费</view>
+							<view class="cont"><view class="price">{{parseFloat(currentItem.packageFee/100).toFixed(2)}}元</view></view>
+						</view>
 						<template v-if="currentItem.helpState == 1">
 							<view class="goods-group">
 								<view class="tit">垃圾分类</view>
@@ -186,37 +189,75 @@
 			},			
 			orderStatus:function(){	
 				let os = this.currentItem.orderState;	 
-				switch (os){
-					case 0 :
-						return '订单已审核';
-						break;
-					case 1 :
-						return '订单取货中';
-						break;
-					case 2 :
-						return '订单配送中';
-						break;
-					case 3 :
-						return '订单已完成';
-						break;
-					} 
+				let oe = this.currentItem.orderExcept;
+				let ars = this.currentItem.applyRefundState;
+				if(ars==0){
+					switch (os){
+						case 0 :
+							if(oe == 0){
+								return '订单已审核';
+							} else if(oe == 1) {
+								return '订单异常'
+							}
+							break;
+						case 1 :
+							if(oe == 0){
+								return '订单取货中';
+							} else if(oe == 1) {
+								return '订单异常'
+							}
+							break;
+						case 2 :
+							if(oe == 0){
+								return '订单配送中';
+							} else if(oe == 1) {
+								return '订单异常'
+							}
+							break;
+						case 3 :
+							return '订单已完成';
+							break;
+						} 
+				} else if(ars==1) {
+					return '退款订单'
+				}
+				
 			},
 			orderInfoTxt:function(){	
 				let os = this.currentItem.orderState;	 
-				switch (os){
-					case 0 :
-						return '您的订单审核中，请耐心等待';
-						break;
-					case 1 :
-						return '您的订单正在取货中，请耐心等待';
-						break;
-					case 2 :
-						return '您的订单正在配送中，祝您生活愉快';
-						break;
-					case 3 :
-						return '您的订单已完成，祝您生活愉快';
-						break;
-					} 
+				let oe = this.currentItem.orderExcept;
+				let ars = this.currentItem.applyRefundState;
+				let rs = this.currentItem.reason
+				if(ars==0){
+					switch (os){
+						case 0 :
+							if(oe == 0){
+								return '您的订单审核中，请耐心等待';
+							} else if (oe ==1) {
+								return ''
+							}
+							break;
+						case 1 :
+							if(oe == 0){
+								return '您的订单正在取货中，请耐心等待';
+							} else if (oe ==1) {
+								return ''
+							}
+							break;
+						case 2 :
+							if(oe == 0){
+								return '您的订单正在配送中，祝您生活愉快';
+							} else if (oe ==1) {
+								return ''
+							}
+							break;
+						case 3 :
+							return '您的订单已完成，祝您生活愉快';
+							break;
+						} 
+				} else if (ars == 1){
+					return ''
+				}
 			},
 			deliverType:function(){				 
 				let os = this.currentItem.deliverType;				
@@ -296,7 +337,6 @@
 				},{
 					token:true
 				}).then(res => {
-					console.log(res)
 					this.$api.initPage(res.code,res.message)  
 					if(res.code == 200){						
 						setTimeout(()=>{								
@@ -361,7 +401,7 @@
 						display: flex;
 						font-weight: bold;
 						align-items: flex-start;
-												
+						width: 400rpx;						
 						.hot{ font-size:16rpx; color: #FF0000; padding-left: 8rpx;}
 					}
 					.unit{ padding-top: 20rpx; font-size: 20rpx; color: #999999;}

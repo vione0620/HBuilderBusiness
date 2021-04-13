@@ -11,7 +11,25 @@
 				const bgAudioMannager = uni.getBackgroundAudioManager()
 				
 				// #ifdef APP-PLUS
-				
+				// plus.runtime.getProperty(plus.runtime.appid, function(widgetInfo) {
+				// 	console.log(plus.runtime.appid)
+				// 	console.log(widgetInfo)
+				// 	uni.downloadFile({
+				// 		url: 'http://res.yiyichina.cn/Busi1.5.5.apk',
+				// 		success: (downloadResult) => {
+				// 			if (downloadResult.statusCode === 200) { 
+				// 				plus.runtime.install(downloadResult.tempFilePath,{
+				// 					force: false
+				// 				},function(){
+				// 					console.log('install success...');  
+				// 					plus.runtime.restart();  
+				// 				},function(e){
+				// 					console.error('install fail...');
+				// 				})
+				// 			}
+				// 		}
+				// 	})
+				// })
 				plus.push.addEventListener('click', res => {   
 					
 					// clickPush.push(res.payload)
@@ -69,9 +87,13 @@
 							if(bgAudioMannager.src === 'static/user_order.wav'){							
 								bgAudioMannager.play()
 							}
+							this.getOrderDetail(navto_pushno)
+							if(this.devices && this.blueStatus.status){
+								setTimeout(()=>{
+									this.senBleLabel2()
+								},1000)
+							}
 						}
-						
-						
 					}else {
 						
 						//创建语音播报
@@ -105,22 +127,28 @@
 					}
 				})
 				// setTimeout(()=>{
-				// 	let res={"title":"订单已送达","content":"您对本次购物是否满意","notifyType":"4","extendParam":{"msg_action":"1","msg_external_param":"350203229000001143"}}
+				// 	let res={"title":"订单已送达","content":"您对本次购物是否满意","notifyType":"4","extendParam":{"msg_action":"1","msg_external_param":"350203208000001219"}}
 				// 	let navto_notifytype = res.notifyType
 				// 	let navto_action = res.extendParam.msg_action
 				// 	let navto_pushno = res.extendParam.msg_external_param
 				// 	plus.push.createMessage(res.content,res,{"title":res.title,"sound":"none"})
 				// 	if(navto_notifytype == 6 && navto_action == 0){
 						
-				// 		// bgAudioMannager.src = 'static/direct_order.wav' 	
-				// 		// if(bgAudioMannager.src === 'static/direct_order.wav'){							
-				// 		// 	bgAudioMannager.play()
-				// 		// }				  
+				// 		bgAudioMannager.src = 'static/direct_order.wav' 	
+				// 		if(bgAudioMannager.src === 'static/direct_order.wav'){							
+				// 			bgAudioMannager.play()
+				// 		}				  
 				// 	}
 				// 	if(navto_notifytype == 4 && navto_action == 1){ 
 				// 		bgAudioMannager.src = 'static/user_order.wav'
 				// 		if(bgAudioMannager.src === 'static/user_order.wav'){							
 				// 			bgAudioMannager.play()
+				// 		}
+				// 		this.getOrderDetail(navto_pushno)
+				// 		if(this.devices && this.blueStatus.status){
+				// 			setTimeout(()=>{
+				// 				this.senBleLabel2()
+				// 			},1000)
 				// 		}
 				// 	}
 				// },10000)
@@ -128,6 +156,8 @@
 			})
 			this.blueInit()
 			this.onBLEConnection()
+			this.initDay() //初始化日期
+			this.setVolume()
 			// this.switchBluetooth()
 		}, 
 		onShow: function() {
@@ -356,18 +386,17 @@
 				let serviceId = this.devices[0].services[0].serviceId;
 				let characteristicId = this.devices[0].services[0].characteristicId;
 				let merchName = uni.getStorageSync('user').merchName
-				let packageFee = parseFloat(uni.getStorageSync('packageFee')).toFixed(2)
-
+				let orderNum = this.getDay()
 				this.orderType()
 				let orderInfo = this.orderList
 				var command = this.$esc.jpPrinter.createNew()
 				command.init()
-				command.setFontStyleHan(28)
-				command.setSelectJustification(1)
-				command.setText("移移生活")
+				command.setFontStyle(48)
+				command.setSelectJustification(0)
+				command.setText('移移生活  #'+orderNum)
 				command.setPrint()
 				
-				command.setFontStyleHan(0)
+				command.setFontStyle(0)
 				command.setSelectJustification(0)
 				command.setText(merchName)
 				command.setPrintAndFeedRow(1)
@@ -400,7 +429,7 @@
 						command.setPrintL()
 						command.setText("  X"+item.goodsNum+item.goodsUnit+"  "+ (parseFloat(item.goodsNum*item.promotePrice).toFixed(2))+'元')
 					} else {
-						command.setText("  X"+item.goodsNum+item.goodsUnit+"  "+ (parseFloat(item.goodsNum*item.promotePrice).toFixed(2))+'元')	
+						command.setText("  X"+item.goodsNum+item.goodsUnit+"  "+ (parseFloat(item.goodsNum*item.goodsPrice).toFixed(2))+'元')	
 					}
 					command.setPrint()
 				})
@@ -411,8 +440,8 @@
 				command.setPrint()
 				
 				command.setFontStyle(16)
-				if(packageFee != 0){
-					command.setText(this.changeSpace('打包费',6,packageFee))
+				if(orderInfo.packageFee != 0){
+					command.setText(this.changeSpace('打包费',6,orderInfo.packageFee))
 					command.setPrint()
 				}
 				
@@ -451,7 +480,11 @@
 				command.setPrint()
 				
 				command.setFontStyle(48)
-				command.setText(orderInfo.reachAddr)
+				if(orderInfo.deliverType == 2){
+					command.setText('到店自取')
+				}else{
+					command.setText(orderInfo.reachAddr)
+				}
 				command.setPrint()
 				
 				command.setText(this.plusXing(orderInfo.receiver,1,0))
@@ -484,7 +517,20 @@
 				command.setPrint()
 				
 				command.setText("--------------------------------");
+				command.setPrintAndFeedRow(2)
+				
+				command.setSelectJustification(1)
+				command.setFontStyle(0)
+				command.setText("--------");
+				command.setPrintL()
+				command.setFontStyle(48)
+				command.setText('#'+orderNum+'完');
+				command.setPrintL()
+				command.setFontStyle(0)
+				command.setText("--------");
+				command.setPrint()
 				command.setPrintAndFeedRow(6)
+				
 				this.senBlData(deviceId, serviceId, characteristicId,command.getData())
 			},
 			getOrderDetail(_orderNo){
@@ -532,6 +578,7 @@
 				this.orderList.realAmt = parseFloat(this.orderList.realAmt/100).toFixed(2)
 				this.orderList.orderFee = parseFloat(this.orderList.orderFee/100).toFixed(2)
 				this.orderList.helpFee = parseFloat(this.orderList.helpFee/100).toFixed(2)
+				this.orderList.packageFee = parseFloat(this.orderList.packageFee/100).toFixed(2)
 				this.orderList.content.forEach((item,index) => {
 					item.goodsPrice = parseFloat(item.goodsPrice/100).toFixed(2)
 					item.promotePrice = parseFloat(item.promotePrice/100).toFixed(2)
@@ -578,6 +625,41 @@
 					this.blueStatus = uni.getStorageSync('blueStatus')
 				})
 			},
+			initDay(){
+				let oldDate = uni.getStorageSync('date')
+				let date = new Date()  
+				if(!oldDate){
+					console.log('初始化日期')
+					let order = {
+						day: date.getDate(),
+						orderNum: 0
+					}
+					uni.setStorageSync('date',order)
+				}
+			},
+			getDay(){
+				let oldDate = uni.getStorageSync('date')
+				let date = new Date()
+				if(date.getDate() == oldDate.day){
+					console.log('日期相同，订单号+1')
+					oldDate.orderNum += 1
+					uni.setStorageSync('date',oldDate)
+				} else {
+					console.log('日期不相同，重置订单号')
+					let order = {
+						day: date.getDate(),
+						orderNum: 1
+					}
+					uni.setStorageSync('date',order)
+				}
+				let newOrderNum = uni.getStorageSync('date').orderNum
+				return newOrderNum
+			},
+			setVolume(){
+				if(uni.getStorageSync('Volume')){
+					plus.device.setVolume(1)
+				}
+			}
 		},
 		watch: {
 			blueStatus: {

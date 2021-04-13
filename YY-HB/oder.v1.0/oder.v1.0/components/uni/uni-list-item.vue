@@ -232,7 +232,9 @@
 		display: flex;
 		flex-direction: row;
 		justify-content: flex-end;
-		align-items: center
+		align-items: center;
+		word-break:break-all;
+		text-align: right;
 	}
 
 	.uni-list-item__icon {

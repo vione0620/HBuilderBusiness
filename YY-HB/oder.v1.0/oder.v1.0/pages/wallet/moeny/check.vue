@@ -116,6 +116,10 @@
 			this.loginWhether = uni.getStorageSync('status') 
 			this.userStore = uni.getStorageSync('user')
 			this.merchNo = uni.getStorageSync('user').merchNo 
+			if(option.money){
+				this.getMoney = parseFloat(option.money/100).toFixed(2)
+				this.postMoeny = this.getMoney
+			}
 		}, 
 		methods:{  
 			chooseAmt(e){  

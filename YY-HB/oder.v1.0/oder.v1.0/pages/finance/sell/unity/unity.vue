@@ -17,16 +17,26 @@
 					<view class="head">  
 						<view class="tit">
 							<text class="titIcon iconfont iconstauts-ing"></text> 	 
-							<template v-if="group.deliverType !== 2">
-								<template v-if="group.orderState == 0"><text class="titTxt">等待接单</text></template>
-								<template v-if="group.orderState == 1"><text class="titTxt">订单取货中</text></template>
-								<template v-if="group.orderState == 2"><text class="titTxt">订单配送中</text></template>
-								<template v-if="group.orderState == 3"><text class="titTxt">订单已完成</text></template> 
+							<template v-if="group.applyRefundState == 0">
+								<template v-if="group.orderExcept ==0">
+									<template v-if="group.deliverType !== 2">
+										<template v-if="group.orderState == 0"><text class="titTxt">等待接单</text></template>
+										<template v-if="group.orderState == 1"><text class="titTxt">订单取货中</text></template>
+										<template v-if="group.orderState == 2"><text class="titTxt">订单配送中</text></template>
+										<template v-if="group.orderState == 3"><text class="titTxt">订单已完成</text></template> 
+									</template>
+									<template v-if="group.deliverType == 2">
+										<template v-if="group.orderState == 1"><text class="titTxt">订单取货中</text></template>
+										<template v-if="group.orderState == 3"><text class="titTxt">订单已完成</text></template> 
+									</template>
+								</template>
+								<template v-if="group.orderExcept == 1">
+									<text class="titTxt">订单异常</text>
+								</template>
 							</template>
-							<template v-if="group.deliverType == 2">
-								<template v-if="group.orderState == 1"><text class="titTxt">订单取货中</text></template>
-								<template v-if="group.orderState == 3"><text class="titTxt">订单已完成</text></template> 
-							</template>							
+							<template v-if="group.applyRefundState == 1">
+								<text class="titTxt">退款订单</text>
+							</template>
 						</view>
 						<view class="time">{{group.orderTime}}</view>
 						</view>

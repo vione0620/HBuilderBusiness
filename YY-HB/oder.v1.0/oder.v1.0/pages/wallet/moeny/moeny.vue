@@ -106,7 +106,7 @@
 					})
 				}else{
 					uni.navigateTo({
-						url:'./check'
+						url:'./check?money=' + this.walletData.remainAmt
 					})
 				}
 				
