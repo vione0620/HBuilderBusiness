@@ -131,6 +131,7 @@
 			startDisBTDev(){ //搜寻附近的蓝牙外围设备
 				return new Promise((resolve,reject)=>{
 					uni.startBluetoothDevicesDiscovery({
+						services: ['18F0'],
 						success: res=>{
 							resolve(res)
 						},
@@ -159,7 +160,7 @@
 				console.log("监听寻找到新设备的事件---------------")
 				uni.onBluetoothDeviceFound(res => {
 					let dev = res.devices[0]
-					if(dev.name){
+					if(dev.name && dev.localName){
 						let arr = this.devices.filter(item => item.deviceId ===dev.deviceId)
 						if(!arr.length > 0){
 							// 新设备
