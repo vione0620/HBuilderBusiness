@@ -28,8 +28,8 @@
 							<view class="tit">{{items.goodsName}}</view>
 							<view class="unit">{{items.goodsNum}} {{items.goodsUnit}}</view>
 							<view class="cont">
-								<view v-if="items.promotePrice != 0" class="price">{{parseFloat(items.promotePrice/100).toFixed(2)}} 元</view>
-								<view class="price" :class="[items.promotePrice != 0 ? 'unit' : '']">{{parseFloat(items.goodsPrice/100).toFixed(2)}} 元</view>
+								<view v-if="items.promotePrice && items.promotePrice != 0" class="price">{{parseFloat(items.promotePrice/100).toFixed(2)}} 元</view>
+								<view class="price" :class="[items.promotePrice && items.promotePrice != 0 ? 'unit' : '']">{{parseFloat(items.goodsPrice/100).toFixed(2)}} 元</view>
 							</view>
 						</view>
 					</block>
@@ -392,19 +392,17 @@
 				.goods-group{
 					display: flex;
 					justify-content: space-between;
+					align-items: center;
 					padding: 32rpx 0;
 					border-bottom: 1px solid #d4d4d4;
 					
 					.tit{
 						font-size: 30rpx;
-						padding-top: 12rpx;
-						display: flex;
 						font-weight: bold;
-						align-items: flex-start;
 						width: 400rpx;						
 						.hot{ font-size:16rpx; color: #FF0000; padding-left: 8rpx;}
 					}
-					.unit{ padding-top: 20rpx; font-size: 20rpx; color: #999999;}
+					.unit{ font-size: 26rpx; color: #999999;}
 					.cont{
 						text-align: right;
 						.price{

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/checkbox.css">
+    <script src="./js/vue.js"></script>
+    <script src="./js/rem.js"></script>
+    <style>
+        body{
+            margin: 0;
+        }
+        img{
+           display: block;
+        }
+        .bg{
+            width: 100%;
+            overflow: hidden;
+        }
+        .top_bg{
+            position: relative;
+        }
+        .top_bg img{
+            width: 100%;
+            height: 10.3rem;
+        }
+        .money{
+            width: 100%;
+            position: absolute;
+            top: 4.38rem;
+            color:#FC7B26;
+            font-size: .9rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .money span{
+            font-size: .54rem;
+        }
+        .content{
+            width: 100%;
+            background-color: #B41A20;
+            padding: .3rem;
+            box-sizing: border-box;
+            text-align: justify;
+        }
+        .content_top{
+            width: 100%;
+            height: .92rem;
+            background-image: url('./images/bg_top.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+        }
+        .content_center{
+            width: 100%;
+            background-image: url('./images/bg_center.png');
+            background-size: 100%;
+            background-repeat: repeat-y;
+            padding: 0 .5rem;
+            box-sizing: border-box;
+        }
+        .content_bottom{
+            width: 100%;
+            height: .48rem;
+            background-image: url('./images/bg_bottom.png');
+            background-size: 100%;
+            background-repeat: no-repeat;
+        }
+        .line{
+            width: .06rem;
+            height: .24rem;
+            float: left;
+            margin-top: .06rem;
+        }
+        .content_item{
+            padding-bottom: .4rem;
+        }
+        .content_item:nth-last-child(1){
+            padding-bottom: 0;
+        }
+        .content_text{
+            font-size: .24rem;
+            line-height: .36rem;
+            font-weight: 400;  
+            color: #990910;
+            padding-left: .18rem;
+        }
+        .tips{
+            font-size: .2rem;
+            color: #F2F2F2;
+            line-height: .36rem;
+            margin-top: .31rem;
+        }
+        .footer{
+            padding: .4rem 0;
+            box-sizing: border-box;
+        }
+        .footer_content{
+            background-color: #F2F2F2;
+            overflow: hidden;
+        }
+        .footer_content_item{
+            background-color: #FFFFFF;
+            padding: .3rem;
+            margin: .2rem 0;
+            box-sizing: border-box;
+        }
+        .item_title{
+            font-size: .32rem;
+            font-weight: bold;
+            color: #333333;
+            line-height: .6rem;
+        }
+        .item_info{
+            margin-top: .4rem;
+            padding: 0 .3rem;
+        }
+        .item{
+            display: flex;
+            align-items: baseline;
+            margin-bottom: .4rem;
+        }
+        .item:nth-last-child(1){
+            margin-bottom: 0;
+        }
+        input{  
+            background:none;  
+            outline:none;  
+            border:0px;
+        }
+        .item_span{
+            font-size: .28rem;   
+            color: #333333;
+            margin-right: .2rem;
+            line-height: .36rem;
+        }
+        .item_input{
+            font-size: .32rem;
+            flex: 1;
+            background-color: #F2F2F2;
+            border-radius: .34rem;
+            padding: .2rem .28rem;
+            box-sizing: border-box;
+        }
+        .more{
+            width: 100%;
+            font-size: .32rem;
+            font-weight: bold;
+            color: #333333;
+            line-height: .36rem;
+            text-align: center;
+            background-color: #FFFFFF;
+            padding: .34rem 0;
+            margin-bottom: .43rem;
+        }
+        .more img{
+            display: inline;
+            width: .32rem;
+            height: .32rem;
+            margin-right: .2rem;
+        }
+        .more span{
+            display: inline-block;
+            line-height: .36rem;
+            vertical-align: top;
+        }
+        .check{
+            padding: 0 .32rem 1rem;
+            font-size: .24rem;
+        }
+        .check_text{
+            color: #999999;
+            font-weight: 400;
+        }
+        .buttons{
+            padding: .1rem .32rem;
+        }
+        .button_dev{
+            width: 100%;
+            color: #FFFFFF;
+            font-size: .32rem;
+            text-align: center;
+            padding: .29rem 0;
+            border-radius: .44rem;
+            background: #B41A20;
+            box-sizing: border-box;
+        }
+        .plan{
+            width: 100%;
+            font-size: .26rem;
+            font-weight: 400;
+            color: #333333;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="bg">
+        <div class="top_bg">
+            <img src="./images/bg.png">
+            <div class="money"><span>￥</span>50</div>
+        </div>
+        <div class="content">
+            <div class="content_top"></div>
+            <div class="content_center">
+                <div class="content_item">
+                    <img class="line" src="./images/line.png">
+                    <div class="content_text">活动期间，成功邀请商户注册移移生活，并开店成功及售出即有资格领取现金红包！</div>
+                </div>
+                <div class="content_item">
+                    <img class="line" src="./images/line.png">
+                    <div class="content_text">参与方式：打开移移生活商家APP，填写被邀请商户的手机号码，姓名等信息。</div>
+                </div>
+                <div class="content_item">
+                    <img class="line" src="./images/line.png">
+                    <div class="content_text">奖励说明：每邀请一名新商户下载并注册移移生活商家APP，并成功转化，既得50元现金，可提现，多邀多得，上不封顶！</div>
+                </div>
+            </div>
+            <div class="content_bottom"></div>
+            <div class="tips">*温馨提示：新商户成功开通店铺并上架商品，可立即参加移移推荐有礼活动。推荐人和被推荐人信息填写错误，则无法获得移移推荐有礼活动奖励。</div>
+        </div>
+        <div class="footer">
+            <div v-show="clickFlag" class="footer_content">
+                <div v-for="(item,index) in itemList" class="footer_content_item">
+                    <div class="item_title">第{{index+1}}位商户</div>
+                    <div class="item_info">
+                        <div class="item"><div class="item_span">商户手机</div><input class="item_input" maxlength="11" v-model="item.phone" type="tel" /></div>
+                        <div class="item"><div class="item_span">商户姓名</div><input class="item_input" v-model="item.name" type="text" /></div>
+                        <div class="item"><div class="item_span">店铺名称</div><input class="item_input" v-model="item.shopName" type="text" /></div>
+                        <div class="item"><div class="item_span">所在地区</div><input class="item_input" v-model="item.address" type="text" /></div>
+                    </div>
+                </div>
+                <div class="more" @click="moreItem"><img src="./images/more.png"><span>添加下一位商户</span></div>
+                <div class="check">
+                    <div class="i-check" @click="checkbox">
+                        <input type="checkbox"/>  
+                        <label></label>
+                    </div>
+                    <div class="check_text">已阅读并同意<a style="color: #333333;">《授权条款》</a></div>
+                </div>
+            </div>
+            <div id="fot" class="buttons">
+                <div v-if="!clickFlag" class="button_dev" @click="returnTop">立即邀请</div>
+                <div v-else class="button_dev" @click="invite">提交</div>
+            </div>
+            <div class="plan">查看邀请进度</div>
+        </div>
+    </div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            requestUrl: '',
+            checkFlag: false,
+            clickFlag: false,
+            itemList: [
+                {
+                    phone: '',
+                    name: '',
+                    shopName: '',
+                    address: '',
+                }
+            ]
+        },
+        methods: {
+            checkbox(){
+                this.checkFlag = event.target.checked
+            },
+            moreItem(){
+                let i = {
+                    phone: '',
+                    name: '',
+                    shopName: '',
+                    address: '',
+                }
+                this.itemList.push(i)
+            },
+            invite(){
+                if(!this.checkFlag){
+                    
+                    return
+                }
+                
+            },
+            returnTop:function(){
+                this.clickFlag = true
+                setTimeout(()=>{
+                    document.querySelector("#fot").scrollIntoView(true);
+                },50)
+               
+            }
+        },
+        created: function() { 
+            
+        },
+        computed: {
+            
+        }
+    });
+</script>
+</html>

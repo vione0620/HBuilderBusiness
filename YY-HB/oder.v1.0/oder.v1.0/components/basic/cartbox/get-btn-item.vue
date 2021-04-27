@@ -42,7 +42,7 @@
 				this.$store.commit('value_food_count',{valueNums,food:this.foods}) 
 			},
 			addBtnFuc(valueNums){
-				if(valueNums >= this.foods.storeNum){
+				if(valueNums >= this.foods.storeNum/this.foods.goodsQuantity){
 					this.storeM = true
 				}else{
 					this.storeM = false

@@ -24,6 +24,7 @@
 			Welcome, 
 		},
 		onLoad() {						
+			// #ifdef APP-PLUS
 			const platform = uni.getSystemInfoSync().platform
 			const ready = plus.navigator.hasSplashscreen()
 			if(platform == "android"){  
@@ -39,11 +40,12 @@
 					})
 				}
 			}
-			
+			// #endif
 			
 		},
 		methods: {
 			showLoad(){				
+				// #ifdef APP-PLUS
 				const ready = plus.navigator.hasSplashscreen()
 				const platform = uni.getSystemInfoSync().platform 
 				if(ready && !this.iswelcome){ 
@@ -60,6 +62,7 @@
 				}else{
 					this.loadExecution()  
 				} 
+				// #endif
 			},
 			loadpage(){   
 				const platform = uni.getSystemInfoSync().platform

@@ -71,7 +71,7 @@
 											<view class="input-box">
 												<text>库存</text>
 												<span class="minu" @click="reduce(item)">-</span>
-												<input style="padding-left: 0" type="number" v-model="item.storeNum" class="kc" />
+												<input id="storeInput" style="padding-left: 0" type="number" v-model="item.storeNum" class="kc" @input="clearInput($event,index)"/>
 												<span class="add" @click="add(item)">+</span>
 											</view>
 										</view>
@@ -439,9 +439,7 @@
 					if (res.code === 200) {
 						let resData = res.data;
 						if (resData) {
-							if(resData.length === this.dataListCopy.length){
-								this.dataListCopy = []
-							}
+							this.dataListCopy = []
 							resData.forEach((item, index) => {
 								item.right = '0';
 								item.showClearIcon = false;
@@ -450,8 +448,8 @@
 								let newObject = {
 									"goodsName": item.goodsName,
 									"goodsNo": item.goodsNo,
-									"goodsPrice": (item.goodsPrice*100).toString(),
-									"promotePrice": (item.promotePrice*100).toString(),
+									"goodsPrice": Math.round((item.goodsPrice*100)).toString(),
+									"promotePrice": Math.round((item.promotePrice*100)).toString(),
 									"storeNum": item.storeNum.toString()
 								}
 								this.dataListCopy.push(newObject)
@@ -545,7 +543,6 @@
 				this.clearGoods(goodsNo);
 			},
 			clearInput: function(event, index) {
-				// this.dataList[index].goodsPrice = event.target.value;
 				if(event.currentTarget.id == "oldInput"){
 					if (event.target.value.length > 0) {
 						this.dataList[index].showClearIcon = true;
@@ -554,7 +551,13 @@
 					} else {
 						this.dataList[index].showClearIcon = false;
 					}
-				} else {
+					//正则表达试 只能输入两位小数
+					event.target.value = (event.target.value.match(/^\d*(\.?\d{0,2})/g)[0]) || null
+					//重新赋值给input
+					this.$nextTick(() => {
+						this.dataList[index].goodsPrice= event.target.value
+					})
+				} else if(event.currentTarget.id == "newInput") {
 					if (event.target.value.length > 0) {
 						this.dataList[index].showClearIconTo = true;
 						var itemVal=this.dataList[index].goodsNo;
@@ -562,6 +565,19 @@
 					} else {
 						this.dataList[index].showClearIconTo = false;
 					}
+					//正则表达试 只能输入两位小数
+					event.target.value = (event.target.value.match(/^\d*(\.?\d{0,2})/g)[0]) || null
+					//重新赋值给input
+					this.$nextTick(() => {
+						this.dataList[index].promotePrice= event.target.value
+					})
+				} else {
+					//正则表达试 只能输入两位小数
+					event.target.value = (event.target.value.match(/^\d*/g)[0]) || null
+					//重新赋值给input
+					this.$nextTick(() => {
+						this.dataList[index].storeNum= event.target.value
+					})
 				}
 
 			},
@@ -695,8 +711,9 @@
 						// 	uni.hideLoading()
 						// }, 1000)
 						this.checkedArr = [];
-						this.getOnSaleClassCategory();
-						this.getMerchCategoryGoods(this.categoryNo, this.onSale);
+						setTimeout(()=>{
+							this.getMerchCategoryGoods(this.categoryNo, this.onSale);
+						},500)
 					}
 				}).catch((err) => {
 					uni.showToast({
@@ -856,8 +873,8 @@
 							let newObject = {
 								"goodsName": item.goodsName,
 								"goodsNo": item.goodsNo,
-								"goodsPrice": (item.goodsPrice*100).toString(),
-								"promotePrice": (item.promotePrice*100).toString(),
+								"goodsPrice": Math.round((item.goodsPrice*100)).toString(),
+								"promotePrice": Math.round((item.promotePrice*100)).toString(),
 								"storeNum": item.storeNum.toString()
 							}
 							newArr.push(newObject);
@@ -885,7 +902,7 @@
 					});
 					resolve(newArr)
 				})
-			}
+			},
 		},
 	}
 </script>

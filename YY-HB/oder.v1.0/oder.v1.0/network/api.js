@@ -99,6 +99,8 @@ export default {
 					}
 				},
 			})
+			uni.removeStorageSync('user');
+			uni.removeStorageSync('status') 
 		}else if(code === 500){
 			uni.showToast({
 				icon:'none',

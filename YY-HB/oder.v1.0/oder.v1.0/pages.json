@@ -31,7 +31,8 @@
 						"autoBackButton":false
 					}
 				},
-				"enablePullDownRefresh": true
+				"enablePullDownRefresh": true,
+				"backgroundColorTop": "#46B85B"
 			}
 		}
 		,{

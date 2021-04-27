@@ -284,6 +284,7 @@
 				let bs = uni.getStorageSync('blueStatus')
 				this.blueStatus = bs
 			},3000)
+			this.onBLEConnection()
 		},
 		onShow(){
 			let bs = uni.getStorageSync('blueStatus')
@@ -621,6 +622,14 @@
 				this.getPlatParam(this.loginWhether.md5key)		 
 			}, 
 			initUser() {  
+				if(this.merchNo==undefined || this.loginNo==undefined){
+					this.isload = true
+					this.isready = false
+					uni.reLaunch({
+						url:'../../account/login/login'
+					}) 
+					return
+				}
 				let vVlue = {"merchNo": this.merchNo,"loginNo": this.loginNo} 
 				let sSort = getSortAscii(vVlue)   		
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase()	
@@ -882,6 +891,18 @@
 				setTimeout(function () {
 					uni.stopPullDownRefresh()
 				}, 1000)
+			},
+			onBLEConnection(){
+				uni.onBLEConnectionStateChange(res => {
+					if(res.connected){
+						this.blueStatus.status = true;
+						this.blueStatus.text = '已连接';
+					} else {
+						this.blueStatus.status = false;
+						this.blueStatus.text = '未连接';
+					}
+					uni.setStorageSync('blueStatus',this.blueStatus)
+				})
 			},
 		}
 	}

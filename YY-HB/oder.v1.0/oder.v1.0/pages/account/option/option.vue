@@ -141,9 +141,6 @@
 			// this.getOpenPlace() 
 			this.initsietPlace() //一次获取坐标 
 		},
-		onShow(){
-			this.getMerchDetail()
-		},
 		methods: {
 			pinckerTime(e) {
 				this.index = e.target.value
@@ -387,6 +384,7 @@
 				if(this.merchNo=='35110000000000'){
 					let testDate = {"merchName":"移移-好友便利店 XM1002","deliverState":0,"busiState":1,"busiAutoOpen":1,"busiHoursStart":"05:15","busiHoursEnd":"23:30","merchPic":"http://res.yiyichina.cn/merch/3a2b8166-ef06-4ab2-985c-e215ddf7c524.jpg","serviceContactMobile":["0592-2096880","0592-2096882"]}
 					this.merchData = testDate
+					this.dealStatus()
 					return
 				}
 				let vVlue = {

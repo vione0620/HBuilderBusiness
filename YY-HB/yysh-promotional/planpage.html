@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/step.css">
+    <script src="./js/vue.js"></script>
+    <script src="./js/rem.js"></script>
+    <style>
+        body{
+            margin: 0;
+            background: #F2F2F2;
+        }
+        img{
+           display: block;
+        }
+        #app{
+            overflow: hidden;
+        }
+        .bg{
+            position: absolute;
+            width: 100%;
+            height: 3.4rem;
+            background: linear-gradient(0deg, #F2F2F2 0%, #FFAC63 100%);
+            opacity: 0.5;
+            z-index: -1;
+        }
+        .plan_body{
+            padding: .24rem .32rem;
+        }
+        .plan_data{
+            position: relative;
+            background: #FFFFFF;
+            border-radius: .2rem .2rem 0 0;
+            padding: .33rem 0 .36rem;
+            display: flex;
+            justify-content: space-around;
+        }
+        .plan_title{
+            font-size: .26rem;
+            font-weight: 400;
+            color: #333333;
+            margin-bottom: .32rem;
+        }
+        .plan_content{
+            font-size: .22rem;
+            font-weight: 400;
+            color: #999999;
+            text-align: center;
+        }
+        .plan_content span{
+            font-size: .48rem;
+            font-weight: 500;
+            color: #FF4C30;
+            margin-right: .09rem;
+        }
+        .line{
+            position: absolute;
+            width: 6.86rem;
+            height: .01rem;  
+            background: #EEEEEE;
+            bottom: 0;
+        }
+        .plan_pending{
+            background: #FFFFFF;
+            border-radius: 0 0 .2rem .2rem;
+            padding: .2rem .24rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .plan_pending_title{
+            font-size: .28rem;
+            font-weight: 400;
+            color: #333333;
+        }
+        .plan_pending_title span{
+            font-size: .38rem;
+            font-weight: 500;
+            color: #FF4C30;
+            margin-left: .24rem;
+        }
+        .plan_pending_title span:nth-last-child(1){
+            font-size: .22rem;
+            color: #999999;
+            margin-left: .09rem;
+        }
+        .plan_pending_btn{
+            font-size: .24rem;
+            font-weight: 400;
+            color: #FFFFFF;
+            background: #FF6600;
+            border-radius: 1rem;
+            text-align: center;
+            padding: .19rem .37rem;
+        }
+        .plan_info{
+            margin-top: .24rem;
+            background: #FFFFFF;
+            border-radius: .2rem;
+        }
+        .change_page{
+            background: #FFDFC2;
+            border-radius: .2rem .2rem 0 0;
+            font-size: .28rem;
+            color: #FF6608;
+            display: flex;
+            justify-content: space-around;
+        }
+        .page_item{
+            line-height: .9rem;
+        }
+        .page_active{
+            border-bottom: .06rem #FF6608 solid;
+        }
+        .plan_info_content{
+            color: #999999;
+            background-color: #FFFFFF;
+            border-radius: 0 0 .2rem .2rem;
+            font-size: .24rem;
+            font-weight: 400;
+        }
+        .plan_info_titles{
+            display: flex;
+            justify-content: space-between;
+            padding: .24rem .24rem .09rem;
+        }
+        .plan_info_title{
+            font-size: .22rem;
+            text-align: right;
+        }
+        .step{
+            margin-top: .31rem;
+            border-bottom: .01rem #F2F2F2 solid;
+        }
+        .step_top{
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0 .24rem;
+        }
+        .step_title{
+            font-weight: bold;
+            color: #333333;
+            font-size: .32rem;
+        }
+
+        .step_icon{
+            color: #4FB562;
+            position: relative;
+            padding-left: .4rem;
+        }
+        .step_icon label {
+            width: .3rem;
+            height: .3rem;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background: #4fb562;  
+        }
+        .step_icon label:after {   
+            content: '';   
+            width: .14rem;
+            height: .06rem;
+            position: absolute;
+            top: .08rem;
+            left: .06rem;
+            border: .04rem solid #fff;   
+            border-top: none;   
+            border-right: none;   
+            opacity: 1;   
+            transform: rotate(-45deg);   
+        }
+
+        .step_btn{
+            background: #FFFFFF;
+            border: .01rem solid #4FB562;
+            border-radius: .44rem;
+            padding: .12rem .19rem;
+        }
+        .step_money{
+            font-size: .32rem;
+            color: #FF4C30;
+            font-weight: bold;
+        }
+        .step_phone{
+            display: flex;
+            justify-content: space-between;
+            margin: .12rem 0 .24rem;
+            padding: 0 .24rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="bg"></div>
+        <div class="plan_body">
+            <div class="plan_data">
+                <div class="paln_money">
+                    <div class="plan_title">累计获得奖励</div>
+                    <div class="plan_content"><span>0</span>元</div>
+                </div>
+                <div class="paln_count">
+                    <div class="plan_title">已成功邀请</div>
+                    <div class="plan_content"><span>0</span>人</div>
+                </div>
+                <div class="line"></div>
+            </div>
+            <div class="plan_pending">
+                <div class="plan_pending_title">待领取奖励: <span>0</span><span>元</span></div>
+                <div class="plan_pending_btn">领取奖励</div>
+            </div>
+            <div class="plan_info">
+                <div class="change_page">
+                    <div class="page_item" :class="{page_active: !pageFlag}" @click="changePage(false)">待完成</div>
+                    <div class="page_item" :class="{page_active: pageFlag}"  @click="changePage(true)">已完成</div>
+                </div>
+                <div class="plan_info_content">
+                    <div class="plan_info_titles">
+                        <div>新商户入驻上架及首卖即可达标</div>
+                        <div class="plan_info_title">数据更新于2021.04.07</div>
+                    </div>
+                    <div v-show="!pageFlag">
+                        <div class="step">
+                            <div class="step_top">
+                                <div class="step_title">张**</div>
+                                <div class="step_btn">提醒TA</div>
+                            </div>
+                            <div class="step_phone">
+                                <div>159****0819</div>
+                                <div>该商户已经注册过</div>
+                            </div>
+                            <div class="step-div">
+                                <div class="eis-horizontal-steps">
+                                    <div class="eis-form-steps">
+                                        <div class="eis-form-step is-finish">
+                                            <div class="eis-step-head">
+                                                <div class="eis-step-icon">
+                                                    <label></label>
+                                                </div>
+                                                <div class="eis-step-line"></div>
+                                            </div>
+                                            <div class="eis-step-main">邀请</div>
+                                            <div class="eis-step-date">04.06</div>
+                                        </div>
+        
+                                        <div class="eis-form-step is-finish">
+                                            <div class="eis-step-head">
+                                                <div class="eis-step-icon">
+                                                    <label></label>
+                                                </div>
+                                                <div class="eis-step-line"></div>
+                                            </div>
+                                            <div class="eis-step-main">注册</div>
+                                            <div class="eis-step-date">04.07</div>
+                                        </div>
+        
+                                        <div class="eis-form-step is-finish">
+                                            <div class="eis-step-head">
+                                                <div class="eis-step-icon">
+                                                    <label></label>
+                                                </div>
+                                                <div class="eis-step-line"></div>
+                                            </div>
+                                            <div class="eis-step-main">审核</div>
+                                            <div class="eis-step-date">04.07</div>
+                                        </div>
+                                        
+                                        <div class="eis-form-step is-stop">
+                                            <div class="eis-step-head">
+                                                <div class="eis-step-icon">
+                                                    <label></label>
+                                                </div>
+                                                <div class="eis-step-line"></div>
+                                            </div>
+                                            <div class="eis-step-main">开店</div>
+                                            <div class="eis-step-date">04.08</div>
+                                        </div>
+                                        <div class="eis-form-step">
+                                            <div class="eis-step-head">
+                                                <div class="eis-step-icon">
+                                                    <label></label>
+                                                </div>
+                                                <div class="eis-step-line"></div>
+                                            </div>
+                                            <div class="eis-step-main">首卖</div>
+                                            <div class="eis-step-date">04.09</div>
+                                        </div>
+                                        <!-- <div class="eis-step-progress"></div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-show="pageFlag">
+                        <div class="step">
+                            <div class="step_top">
+                                <div class="step_title">张**</div>
+                                <div class="step_icon"><label></label>已售出首单</div>
+                                <div class="step_money">+50元</div>
+                            </div>
+                            <div class="step_phone">
+                                <div>159****0819</div>
+                                <div style="margin-left: -1.6rem;">04.06</div>
+                                <div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            pageFlag: false
+        },
+        methods: {
+           changePage(flag){
+                this.pageFlag = flag
+           }
+        },
+        created: function() { 
+            
+        },
+        computed: {
+            
+        }
+    });
+</script>
+</html>

@@ -325,6 +325,8 @@
 						identityName: "金锦",
 						isRegular: "1",
 						joinNo: "FZ000002",
+						loginNo: '1068292',
+						loginType: '1',
 						md5key: "dDG_hkaWBFFZsSrz",
 						merchName: "移移-好友便利店 XM1002",
 						merchNo: "35110000000000",
@@ -342,6 +344,8 @@
 						merchName:'移移-好友便利店 XM1002',
 						merchType:'2',
 						busiType:'2',
+						loginType: '1',
+						loginNo: '1068292'
 					}
 					this.$store.commit('loginN',testDate)
 					this.$store.commit('logStatus',haslogin)

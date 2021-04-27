@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>Document</title>
+    <script src="./js/vue.js"></script>
+    <script src="./js/rem.js"></script>
+    <script src="./js/m-share.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <style>
+        body{
+            margin: 0;
+            background: #F2F2F2;
+        }
+        img{
+           display: block;
+        }
+        .succes{
+            padding: .3rem;
+        }
+        .icon{
+            margin-bottom: .9rem;
+        }
+        .icon img{
+            width: 1.08rem;
+            margin: 0 auto .15rem;
+        }
+        .icon_text{
+            font-size: .24rem;
+            font-weight: 400;
+            color: #333333;
+            line-height: .24rem;
+            text-align: center;
+        }
+        .share_box{
+            width: 100%;
+            background: #FFFFFF;
+            border-radius: .2rem;
+            padding: .26rem;
+            box-sizing: border-box;
+        }
+        .share_title{
+            font-size: .26rem;
+            font-weight: bold;
+            color: #333333;
+            line-height: .24rem;
+        }
+        .share_content{
+            margin: .24rem 0 .32rem;
+            border: 1px solid #DDDDDD;
+            border-radius: 1px;
+            font-size: .22rem;
+            font-weight: 400;
+            color: #999999;
+            line-height: .3rem;
+            padding: .24rem;
+            text-align: justify;
+            /* 英文字母强制换行 */
+            word-break:break-all; 
+        }
+        .share_road{
+            display: flex;
+            justify-content: space-around;
+        }
+        .share_road img{
+            width: .64rem;
+            height: .64rem;
+            margin: 0 auto .15rem;
+        }
+        .road_text{
+            font-size: .24rem;
+            font-weight: bold;
+            color: #333333;
+            line-height: .24rem;
+        }
+        .more_{
+            margin-top: .33rem;
+        }
+        .more_btn{
+            color: #4FB562;
+            float: right;
+        }
+        .more_btn span{
+            display: inline-block;
+            line-height: .2rem;
+            vertical-align: top;
+        }
+        .more_btn img{
+            width: .11rem;
+            height: .2rem;
+            display: inline;
+            margin-left: .12rem;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="succes">
+            <div class="icon">
+                <img src="./images/icon.png">
+                <div class="icon_text">您已成功邀请1位商户</div>
+            </div>
+            <div class="share_box">
+                <div class="share_title">赶紧通知您邀请的商户，填写尽快资料</div>
+                <div class="share_content">xxx邀请你入驻移移生活，赶紧去https://www.baidu.com/s?wd=%E7%A7%BB%E7%A7%BB%E7%94%9F%E6%B4%BB&rsv_spt=1&rsv_iqid=0xc5df7c9a000109aa&issp=1&f 下载移移生活并填写资料哦~</div>
+                <div class="share_road">
+                    <div class="wechar" @click="shareSystem">
+                        <img src="./images/wechar.png">
+                        <div class="road_text">微信通知</div>
+                    </div>
+                    <div class="note">
+                        <img src="./images/note.png">
+                        <div class="road_text">短信通知</div>
+                    </div>
+                </div>
+            </div>
+            <div class="more_">
+                <div class="road_text">
+                    <span>继续推荐，推荐越多拿到更多的现金奖励！</span>
+                    <div class="more_btn">
+                        <span>推荐更多人</span>
+                        <img src="./images/arrows.png">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+
+        },
+        methods: {
+            shareSystem(){
+				// #ifdef APP-PLUS
+                plus.share.sendWithSystem({type:'text',content:'分享内容',href:'http://www.dcloud.io/'}, ()=>{
+                    console.log('分享成功');
+                }, (e)=>{
+                    console.log('分享失败：'+JSON.stringify(e));
+                });
+				// #endif
+            }
+        },
+        created: function() { 
+
+        },
+        computed: {
+            //判断是否是微信浏览器
+            isWechant() {
+                var ua = window.navigator.userAgent.toLowerCase();
+                if (ua.match(/MicroMessenger/i) == "micromessenger") {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+        },
+    })
+</script>
+</html>

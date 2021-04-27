@@ -250,7 +250,6 @@ var jpPrinter = {
     }
 
     jpPrinter.setBitmap = function (res) { //参数，画布的参数
-      console.log(res)
       var width = parseInt((res.width + 7) / 8 * 8 / 8)
       var height = res.height;
       var time = 1;

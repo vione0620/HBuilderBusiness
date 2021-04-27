@@ -1,35 +1,120 @@
 <script>   	 
-	import {b64Md5,hexMD5} from '@/network/md5.js'	
-	import {getSortAscii, arrayExclude,} from '@/common/util/utils.js'
+	import {hexMD5} from '@/network/md5.js'	
+	import {getSortAscii,changeSpace,plusXing,compare} from '@/common/util/utils.js'
+	import Bluetooth from '@/common/util/bluetooth.js'
+	
+	let bluetooth = new Bluetooth();
 	export default {
 		onLaunch: function() {
 			console.log('App Launch') 	 
-			 this.$nextTick(() => {     
+			this.$nextTick(() => {     
 				// 开启监听推送
 				let getPush = []
 				let clickPush = [] 
 				const bgAudioMannager = uni.getBackgroundAudioManager()
 				
 				// #ifdef APP-PLUS
-				// plus.runtime.getProperty(plus.runtime.appid, function(widgetInfo) {
-				// 	console.log(plus.runtime.appid)
-				// 	console.log(widgetInfo)
-				// 	uni.downloadFile({
-				// 		url: 'http://res.yiyichina.cn/Busi1.5.5.apk',
-				// 		success: (downloadResult) => {
-				// 			if (downloadResult.statusCode === 200) { 
-				// 				plus.runtime.install(downloadResult.tempFilePath,{
-				// 					force: false
-				// 				},function(){
-				// 					console.log('install success...');  
-				// 					plus.runtime.restart();  
-				// 				},function(e){
-				// 					console.error('install fail...');
-				// 				})
-				// 			}
-				// 		}
-				// 	})
-				// })
+				setTimeout(()=>{
+					plus.runtime.getProperty(plus.runtime.appid, (widgetInfo) => {
+						// console.log(widgetInfo)
+						uni.request({
+							url: 'http://versionbusi.yiyichina.cn/getVerBusi',
+							success: (res) => {
+								// console.log(res)
+								let data = res.data.data;
+								let is_update = data.is_update==1 ? false : true;
+								let update_type = data.update_type==1 ? false : true;
+								let downurl = data.downurl;
+								let wgturl = data.wgturl;
+								let str = data.content;
+								str = str.split('，')
+								let msg = ''
+								str.forEach((item,index)=>{
+									if(str.length!=index+1){
+										msg += item + '\r\n'
+									} else {
+										msg += item
+									}
+								})
+								if(compare(data.version,widgetInfo.version)){ //对比是否更新
+									console.log('升级')
+									uni.showModal({
+										title: '更新 V' + data.version,
+										content: msg,
+										cancelText: '取消',
+										confirmText: '立即更新',
+										showCancel: is_update,
+										success: (res) => {
+											if(res.confirm){
+												if(update_type){
+													uni.showToast({
+														icon: 'loading',
+														title: '开始后台更新资源',
+														position: 'bottom'
+													})
+													let downloadTask = uni.downloadFile({
+														url: wgturl,
+														success: (downloadResult) => {
+															if (downloadResult.statusCode === 200) { 
+																plus.runtime.install(downloadResult.tempFilePath,{
+																	force: false
+																},function(){
+																	console.log('install success...');  
+																	plus.runtime.restart();  
+																},function(e){
+																	console.error('install fail...');
+																})
+															} 
+														}
+													})
+													// downloadTask.onProgressUpdate(res => {
+													// 	console.log('下载进度' + res.progress);
+													// 	console.log('已经下载的数据长度' + (parseFloat(res.totalBytesWritten/1024/1024).toFixed(2)) + 'MB');
+													// 	console.log('预期需要下载的数据总长度' + (parseFloat(res.totalBytesExpectedToWrite/1024/1024).toFixed(2)) + 'MB');
+													// })
+												} else {
+													//整包更新
+													if(plus.os.name=='Android'){
+														uni.showToast({
+															icon: 'loading',
+															title: '开始后台下载apk',
+															position: 'bottom'
+														})
+														let downloadTask = uni.downloadFile({
+															url: downurl,
+															success: (downloadResult) => {
+																if (downloadResult.statusCode === 200) { 
+																	uni.saveFile({
+																		tempFilePath: downloadResult.tempFilePath,
+																		success: res => {
+																			plus.runtime.install(res.savedFilePath,{
+																				force: false
+																			},function(){
+																				console.log('install success...');  
+																			},function(e){
+																				console.error('install fail...');
+																			})
+																		}
+																	})
+																	
+																} 
+															}
+														})
+													} else {
+														//ios
+														plus.runtime.launchApplication({
+															action: 'http://itunes.apple.com/us/app/id1527720616',
+														})
+													}
+												}
+											}
+										}
+									})
+								}
+							}
+						})
+					})
+				},3000)
 				plus.push.addEventListener('click', res => {   
 					
 					// clickPush.push(res.payload)
@@ -90,7 +175,7 @@
 							this.getOrderDetail(navto_pushno)
 							if(this.devices && this.blueStatus.status){
 								setTimeout(()=>{
-									this.senBleLabel2()
+									this.senBleLabel()
 								},1000)
 							}
 						}
@@ -119,7 +204,7 @@
 							this.getOrderDetail(navto_pushno)
 							if(this.devices && this.blueStatus.status){
 								setTimeout(()=>{
-									this.senBleLabel2()
+									this.senBleLabel()
 								},1000)
 							}
 						}
@@ -127,7 +212,7 @@
 					}
 				})
 				// setTimeout(()=>{
-				// 	let res={"title":"订单已送达","content":"您对本次购物是否满意","notifyType":"4","extendParam":{"msg_action":"1","msg_external_param":"350203208000001219"}}
+				// 	let res={"title":"订单已送达","content":"您对本次购物是否满意","notifyType":"4","extendParam":{"msg_action":"1","msg_external_param":"350203316000000077"}}
 				// 	let navto_notifytype = res.notifyType
 				// 	let navto_action = res.extendParam.msg_action
 				// 	let navto_pushno = res.extendParam.msg_external_param
@@ -147,7 +232,7 @@
 				// 		this.getOrderDetail(navto_pushno)
 				// 		if(this.devices && this.blueStatus.status){
 				// 			setTimeout(()=>{
-				// 				this.senBleLabel2()
+				// 				this.senBleLabel()
 				// 			},1000)
 				// 		}
 				// 	}
@@ -187,227 +272,29 @@
 					this.devices.push(bd)
 				}
 			},
-			switchBluetooth(){
-				uni.openBluetoothAdapter({ //初始化蓝牙设备
-					success: res => {
-						this.startSearchBTDev()
-					},
-					fail: err => {
-						console.log('请打开手机蓝牙')
-					}
-				})
-			},
-			// 开始搜索蓝牙列表
-			startSearchBTDev(){
-				this.getBTAdapterState().then(res=>{
-					let available = res.available // 蓝牙适配器是否可用
-					let discovering = res.discovering // 是否处于搜索状态
-					console.log(res)
-					if(available) {
-						// if (discovering) {
-							// this.stopFindBule()//停止搜寻设备
-						// }
-						// console.log("开始搜寻附近的蓝牙外围设备")
-						// this.startDisBTDev().then(res=>{
-						// 	// this.onDevice()
-						// 	console.log('扫描成功', res)
-						// }).catch(err=>{
-						// 	console.log('扫描失败',err)
-						// })
-						if(this.devices && !this.blueStatus.status){
-							console.log('准备连接')
-							this.createBLE()
-						}
-					} else {
-						console.log('本机蓝牙不可用')
-					}
-				})
-			},
-			startDisBTDev(){ //搜寻附近的蓝牙外围设备
-				return new Promise((resolve,reject)=>{
-					uni.startBluetoothDevicesDiscovery({
-						success: res=>{
-							resolve(res)
-						},
-						fail: (err)=>{
-							reject(err)
-						}
-					})
-				})
-			},
-			getBTAdapterState (){ //获取本机蓝牙适配器状态
-				return new Promise((resolve,reject)=>{
-					uni.getBluetoothAdapterState({ 
-						success: (res)=>{
-							resolve(res)
-						},
-						fail: (err)=>{
-							reject(err)
-						}
-					})
-				})
-			},
-			onDevice(){
-				console.log("监听寻找到新设备的事件---------------")
-				uni.onBluetoothDeviceFound(res => {
-					let dev = res.devices[0]
-					if(dev.name && dev.localName){
-						let arr = this.devices.filter(item => item.deviceId ===dev.deviceId)
-						if(arr.length > 0){
-							// 存在相同设备，要进行RSSI（信号强度）更新
-							let n = this.devices.indexOf(arr[0])
-							// 转换信号
-							let rssi = Math.floor(max(0, dev.RSSI + 100) / 10)
-							if(rssi <= 0){
-								// 无信号删除
-								this.devices.splice(n,1)
-							} else {
-								// 有信号更新
-								this.devices[n].RSSI = rssi
-							}
-						}
-					}
-				})
-			},
-			stopFindBule(){
-				console.log("停止搜寻附近的蓝牙外围设备---------------")
-				uni.stopBluetoothDevicesDiscovery({
-					success: res => {
-						console.log(res)
-					},
-					fail: err => {
-						console.log(err)
-					}
-				})
-			},
-			//初始化蓝牙连接
-			createBLE(){
-				let item
-				if(this.devices){
-					item = this.devices[0]
-				}
-				let deviceId = item.deviceId
-				uni.createBLEConnection({
-					deviceId: deviceId,
-					success: res => {
-						if(res.errMsg == "createBLEConnection:ok"){
-							console.log("连接蓝牙-[" + item.name + "]--成功")
-							this.devicesId = item.deviceId
-							this.blueStatus.text = '已连接'
-							this.blueStatus.status = true
-							this.$store.commit('blueStatus',this.blueStatus)
-						}
-						//连接成功 关闭搜索
-						// this.stopFindBule()
-					},
-					fail: err => {
-						console.log(err)
-					}
-				})
-			
-			},
-			closeBLE(){
-				if(this.devicesId){
-					uni.closeBLEConnection({
-						deviceId: this.devicesId,
-						success: res => {
-							console.log('断开蓝牙连接',res)
-						}
-					})
-				}
-			},
-			//获取蓝牙设备所有服务
-			getBLEServices(item){
-				let deviceId = item.deviceId
-				console.log(this.devices)
-				uni.getBLEDeviceServices({
-					deviceId: deviceId,
-					success: res => {
-						if(res.services.length === 0){
-							//有的低版本设备连接会出错，但是重新连接就可以链接上，所以在这里先断开连接再重新连接该设备
-							uni.closeBLEConnection({
-								deviceId: deviceId,
-								success: res => {
-									console.log('断开与设备的连接', res)
-									setTimeout(()=>{
-										this.createBLE(item)
-									},1000)
-								}
-								
-							})
-							return
-						}
-					},
-					fail: err => {
-						console.log('获取服务出错',err)
-					}
-				})
-			},
-			senBlData(deviceId, serviceId, characteristicId, uint8Array) {
-				let uint8Buf = Array.from(uint8Array);
-				function split_array(datas,size){
-					var result = {};
-					var j = 0
-					for (var i = 0; i < datas.length; i += size) {
-						result[j] = datas.slice(i, i + size)
-						j++
-					}
-					console.log(result)
-					return result
-				}
-				let sendloop = split_array(uint8Buf, 20);
-				function realWriteData(sendloop, i) {
-					let data = sendloop[i]
-					if(typeof(data) == "undefined"){
-						return
-					}
-					console.log("第【" + i + "】次写数据"+data)
-					let buffer = new ArrayBuffer(data.length)
-					let dataView = new DataView(buffer)
-					for (let j = 0; j < data.length; j++) {
-						dataView.setUint8(j, data[j]);
-					}
-					uni.writeBLECharacteristicValue({
-						deviceId,
-						serviceId,
-						characteristicId,
-						value: buffer,
-						success(res) {
-							realWriteData(sendloop, i + 1);
-						}
-					})
-				}
-				let i = 0;
-				realWriteData(sendloop, i);
-			},
-			senBleLabel2(){
+			senBleLabel(){
 				//票据模式
 				let deviceId = this.devices[0].deviceId;
 				let serviceId = this.devices[0].services[0].serviceId;
 				let characteristicId = this.devices[0].services[0].characteristicId;
+				// let Qrcode_res = getApp().globalData.image_data
 				let merchName = uni.getStorageSync('user').merchName
 				let orderNum = this.getDay()
 				this.orderType()
 				let orderInfo = this.orderList
 				var command = this.$esc.jpPrinter.createNew()
 				command.init()
+				// command.setBitmap(Qrcode_res)
+				
 				command.setFontStyle(48)
 				command.setSelectJustification(0)
 				command.setText('移移生活  #'+orderNum)
 				command.setPrint()
 				
 				command.setFontStyle(0)
-				command.setSelectJustification(0)
 				command.setText(merchName)
 				command.setPrintAndFeedRow(1)
 				
-				// command.setFontStyle(28)
-				// command.setSelectJustification(1)
-				// command.setText("—"+orderInfo.patTypeText+"—")
-				// command.setPrintAndFeedRow(1)
-				
-				// command.setFontStyle(0)
-				// command.setSelectJustification(0)
 				command.setText("--------------------------------");
 				command.setPrint()
 				
@@ -441,21 +328,21 @@
 				
 				command.setFontStyle(16)
 				if(orderInfo.packageFee != 0){
-					command.setText(this.changeSpace('打包费',6,orderInfo.packageFee))
+					command.setText(changeSpace('打包费',6,orderInfo.packageFee))
 					command.setPrint()
 				}
 				
 				if(orderInfo.deliverFirm==1){
-					command.setText(this.changeSpace('配送费(达达配送)',16,orderInfo.orderFee))
+					command.setText(changeSpace('配送费(达达配送)',16,orderInfo.orderFee))
 				} else if(orderInfo.deliverFirm==2) {
-					command.setText(this.changeSpace('配送费(顺丰配送)',16,orderInfo.orderFee))
+					command.setText(changeSpace('配送费(顺丰配送)',16,orderInfo.orderFee))
 				} else if(orderInfo.deliverFirm==3) {
-					command.setText(this.changeSpace('配送费(蜂鸟配送)',16,orderInfo.orderFee))
+					command.setText(changeSpace('配送费(蜂鸟配送)',16,orderInfo.orderFee))
 				}
 				command.setPrint()
 				
 				if(orderInfo.couponAmt != 0){
-					command.setText(this.changeSpace('红包/优惠券',11,("-"+orderInfo.couponAmt)))
+					command.setText(changeSpace('红包/优惠券',11,("-"+orderInfo.couponAmt)))
 					command.setPrint()
 				}
 				
@@ -464,7 +351,7 @@
 				command.setPrint()
 				
 				command.setFontStyle(16)
-				command.setText(this.changeSpace('订单金额',8,orderInfo.orderAmt))
+				command.setText(changeSpace('订单金额',8,orderInfo.orderAmt))
 				command.setPrint()
 				
 				command.setFontStyle(0)
@@ -472,7 +359,7 @@
 				command.setPrint()
 				
 				command.setFontStyle(16)
-				command.setText(this.changeSpace('实付金额',8,orderInfo.realAmt))
+				command.setText(changeSpace('实付金额',8,orderInfo.realAmt))
 				command.setPrint()
 				
 				command.setFontStyle(0)
@@ -487,10 +374,10 @@
 				}
 				command.setPrint()
 				
-				command.setText(this.plusXing(orderInfo.receiver,1,0))
+				command.setText(plusXing(orderInfo.receiver,1,0))
 				command.setPrintAndFeedRow(1)
 				
-				command.setText(this.plusXing(orderInfo.recPhone,3,4))
+				command.setText(plusXing(orderInfo.recPhone,3,4))
 				command.setPrint()
 				
 				if(orderInfo.remark){
@@ -521,17 +408,17 @@
 				
 				command.setSelectJustification(1)
 				command.setFontStyle(0)
-				command.setText("--------");
+				command.setText("*********");
 				command.setPrintL()
 				command.setFontStyle(48)
 				command.setText('#'+orderNum+'完');
 				command.setPrintL()
 				command.setFontStyle(0)
-				command.setText("--------");
+				command.setText("*********");
 				command.setPrint()
 				command.setPrintAndFeedRow(6)
 				
-				this.senBlData(deviceId, serviceId, characteristicId,command.getData())
+				bluetooth.senBlData(deviceId, serviceId, characteristicId,command.getData())
 			},
 			getOrderDetail(_orderNo){
 				this.loginWhether = uni.getStorageSync('status')
@@ -547,6 +434,7 @@
 				},{
 					token:true
 				}).then(res => {
+					console.log(res)
 					this.$api.initPage(res.code,res.message)  
 					if(res.code == 200){														
 						this.orderList = res.data
@@ -554,24 +442,24 @@
 				}).catch() 
 			},
 			orderType(){
-				switch(this.orderList.payType){
-					case 1: this.$set(this.orderList,'patTypeText','微信');break
-					case 2: this.$set(this.orderList,'patTypeText','支付宝');break
-				}
-				switch(this.orderList.deliverType){
-					case 0: this.$set(this.orderList,'deliverTypeText','接单中心');break
-					case 1: this.$set(this.orderList,'deliverTypeText','商家');break
-					case 2: this.$set(this.orderList,'deliverTypeText','自取');break
-					case 3: this.$set(this.orderList,'deliverTypeText','移移');break
-				}
-				switch(this.orderList.helpState){
-					case 0: this.$set(this.orderList,'helpStateText','否');break
-					case 1: this.$set(this.orderList,'helpStateText','是');break
-				}
-				switch(this.orderList.sex){
-					case 1: this.$set(this.orderList,'sexText','先生');break
-					case 2: this.$set(this.orderList,'sexText','女士');break
-				}
+				// switch(this.orderList.payType){
+				// 	case 1: this.$set(this.orderList,'patTypeText','微信');break
+				// 	case 2: this.$set(this.orderList,'patTypeText','支付宝');break
+				// }
+				// switch(this.orderList.deliverType){
+				// 	case 0: this.$set(this.orderList,'deliverTypeText','接单中心');break
+				// 	case 1: this.$set(this.orderList,'deliverTypeText','商家');break
+				// 	case 2: this.$set(this.orderList,'deliverTypeText','自取');break
+				// 	case 3: this.$set(this.orderList,'deliverTypeText','移移');break
+				// }
+				// switch(this.orderList.helpState){
+				// 	case 0: this.$set(this.orderList,'helpStateText','否');break
+				// 	case 1: this.$set(this.orderList,'helpStateText','是');break
+				// }
+				// switch(this.orderList.sex){
+				// 	case 1: this.$set(this.orderList,'sexText','先生');break
+				// 	case 2: this.$set(this.orderList,'sexText','女士');break
+				// }
 				this.orderList.orderAmt = parseFloat(this.orderList.orderAmt/100).toFixed(2)
 				this.orderList.couponAmt = parseFloat(this.orderList.couponAmt/100).toFixed(2)
 				this.orderList.discountAmt = parseFloat(this.orderList.discountAmt/100).toFixed(2)
@@ -584,45 +472,17 @@
 					item.promotePrice = parseFloat(item.promotePrice/100).toFixed(2)
 				})
 			},
-			changeSpace(str,s,n){
-				let len = this.getStrBytes(n)
-				for(let i=1;i<=32-s-len;i++){
-					str += ' '
-				}
-				str += n
-				return str
-			},
-			plusXing(str,frontLen,endLen) { 
-				let len = str.length-frontLen-endLen;
-				let xing = '';
-				for (let i=0;i<len;i++) {
-					xing+='*';
-				}
-				return str.substring(0,frontLen)+xing+str.substring(str.length-endLen);
-			},
-			getStrBytes(str) {
-			     if (str == null || str === undefined) return 0;
-			     if (typeof str != "string") {
-			         return 0;
-			     }
-			     var total = 0, charCode, i, len;
-			     for (i = 0, len = str.length; i < len; i++) {
-			         charCode = str.charCodeAt(i);
-			         if (charCode <= 0x007f) {
-			             total += 1;//字符代码在000000 – 00007F之间的，用一个字节编码
-			         } else if (charCode <= 0x07ff) {
-			             total += 2;//000080 – 0007FF之间的字符用两个字节
-			         } else if (charCode <= 0xffff) {
-			             total += 3;//000800 – 00D7FF 和 00E000 – 00FFFF之间的用三个字节，注: Unicode在范围 D800-DFFF 中不存在任何字符
-			         } else {
-			             total += 4;//010000 – 10FFFF之间的用4个字节
-			         }
-			     }
-			     return total;
-			},
 			onBLEConnection(){
 				uni.onBLEConnectionStateChange(res => {
-					this.blueStatus = uni.getStorageSync('blueStatus')
+					if(res.connected){
+						this.blueStatus.status = true;
+						this.blueStatus.text = '已连接';
+					} else {
+						this.blueStatus.status = false;
+						this.blueStatus.text = '未连接';
+					}
+					this.blueStatus = JSON.parse(JSON.stringify(this.blueStatus))
+					uni.setStorageSync('blueStatus',this.blueStatus)
 				})
 			},
 			initDay(){
@@ -676,6 +536,10 @@
 					}
 				}
 			}
+		},
+		globalData: {
+			image_data: {},
+			code_data: {}
 		}
 	}
 </script>
@@ -720,7 +584,7 @@
 		height: 20rpx;
 		line-height: 20rpx;
 		text-align: center;
-		font-size: 18rpx;
+		font-size: 28rpx;
 		color: #fff;
 		background: transparent;
 		transform: translate(-70%, -50%) scale(1);

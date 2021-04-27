@@ -82,10 +82,10 @@ export default {
 							icon:'none',
 							title:`当前单品限制${state.limitNum}份`
 						})
-					}else if(_this.boxNums+1 > _this.storeNum){ //当前库存量storeNum
+					}else if(_this.boxNums+1 > _this.storeNum/_this.goodsQuantity){ //当前库存量storeNum
 						return uni.showToast({
 							icon:'none',
-							title:`当前单品今日仅剩${_this.storeNum}份`
+							title:'当前单品今日仅剩'+_this.storeNum/_this.goodsQuantity+'份'
 						})
 					}else{					
 						_this.boxNums++
@@ -193,7 +193,7 @@ export default {
 					if(_value === 0){ //输入0 自行移除
 						state.cartGoods.splice(state.cartGoods.indexOf(_this),1) 
 					}else if(_value+1 >= _this.storeNum){ //当前库存量storeNum
-						_this.boxNums = +_this.storeNum //赋予最大库存值storeNum
+						_this.boxNums = _this.storeNum/_this.goodsQuantity //赋予最大库存值storeNum
 						return uni.showToast({
 							icon:'none',
 							title:`当前单品今日仅剩${_this.storeNum}份`
@@ -232,10 +232,10 @@ export default {
 						})
 						
 					}else if(_value+1 > _this.storeNum){ //当前库存量 storeNum
-						_this.boxNums = +_this.storeNum  //赋予最大库存值storeNum
+						_this.boxNums = +_this.storeNum/_this.goodsQuantity  //赋予最大库存值storeNum
 						return uni.showToast({
 							icon:'none',
-							title:`当前单品今日仅剩${_this.storeNum}份`
+							title:'当前单品今日仅剩'+_this.storeNum/_this.goodsQuantity+'份'
 						})
 					}else{ //>限制量=当前输入量
 					

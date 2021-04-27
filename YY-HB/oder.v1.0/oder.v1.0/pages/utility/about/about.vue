@@ -2,7 +2,7 @@
 	<view class="about">
 		<view class="main">
 			<image class="icon" src="@/static/myicon.png"></image>
-			<view class="txt">v1.5.6版本</view>
+			<view class="txt">v{{version}}版本</view>
 		</view>
 		<view class="list"> 
 			<view class="group">
@@ -22,10 +22,15 @@
 	export default {
 		data() {
 			return { 
-				
+				version: '1.0.0',
 			}
 		},
 		onLoad() { 	  
+			// #ifdef APP-PLUS
+			plus.runtime.getProperty(plus.runtime.appid, (widgetInfo) => {
+				this.version = widgetInfo.version
+			})
+			// #endif
 		},
 		components:{
 			UniListItem,

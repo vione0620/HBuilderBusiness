@@ -1,0 +1,147 @@
+.eis-horizontal-steps .eis-form-steps {
+    overflow: hidden;
+    padding: 0;
+    font-size: 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-bottom: .32rem;
+}
+.eis-horizontal-steps .eis-form-steps .eis-form-step {
+    display: inline-block;
+    vertical-align: middle;
+    width: 1.3rem;
+    text-align: center
+}
+.eis-horizontal-steps .eis-form-steps .eis-step-progress {
+    height: .04rem;
+    background: #4fb562;
+    width: 4.45rem; /* 1是22%，2是44% */
+    /* margin-left: 4%; */
+    position: absolute;
+    top: .3rem;
+    left: .21rem;
+}
+
+.eis-horizontal-steps .eis-form-steps .eis-step-head {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.eis-step-head .eis-step-icon {
+    width: .6rem;
+    height: .6rem;
+    font-size: .32rem;
+    border-radius: 50%;
+    position: relative;
+    z-index: 1;
+}
+.eis-step-icon label{
+    width: .3rem;
+    height: .3rem;
+    cursor: pointer;
+    position: absolute;
+    top: .16rem;
+    left: .16rem;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1px solid #DDDDDD;  
+    box-sizing: border-box;
+}
+.is-finish .eis-step-icon label {
+    background: #4fb562;
+    border: none;
+}
+.is-stop .eis-step-icon label {
+    background: #FF6600;
+    border: none;
+    transform: rotate(45deg)
+}
+.is-finish .eis-step-icon label:after {   
+    content: '';   
+    width: .14rem;
+    height: .06rem;
+    position: absolute;
+    top: .08rem;
+    left: .06rem;
+    border: .04rem solid #fff;   
+    border-top: none;   
+    border-right: none;   
+    opacity: 1;   
+    transform: rotate(-45deg);   
+}
+
+.is-stop .eis-step-icon label:after {  
+    content: '';
+    width: .21rem;
+    height: .03rem;
+    position: absolute;
+    top: .14rem;
+    left: .04rem;
+    background: #FFFFFF;
+    color: #FFFFFF;
+    transform: rotate(-90deg);
+}
+.is-stop .eis-step-icon label::before {  
+    content: '';
+    width: .21rem;
+    height: .03rem;
+    position: absolute;
+    top: .13rem;
+    left: .04rem;
+    background: #FFFFFF;
+    color: #FFFFFF;
+}
+
+.eis-step-head .eis-step-icon .step-icon-txt {
+    width: .52rem;
+    height: .52rem;
+    background: #ddd;
+    border: 1px solid #ddd;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    text-align: center;
+    line-height: .52rem;
+    color: #fff;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto
+}
+
+.is-finish .eis-step-icon .step-icon-txt {
+    background: #4fb562;
+    border: 1px solid #4fb562;
+}
+
+.eis-horizontal-steps .eis-step-head .eis-step-line {
+    position: absolute;
+    background-color: #f1f1f1;
+    height: .04rem;
+    top: .3rem;
+    left: 0;
+    right: 0;
+}
+
+.eis-horizontal-steps .eis-form-step .eis-step-main {
+    font-size: .24rem;
+    padding: .12rem 0 0;
+    color: #666666;
+    text-align: center;
+}
+.is-finish .eis-step-main {
+    color: #4fb562 !important;
+}
+.is-stop .eis-step-main {
+    color: #FF6600 !important;
+}
+.eis-horizontal-steps .eis-form-step .eis-step-date{
+    font-size: .22rem;
+    padding: .12rem 0 0;
+    color: #999999;
+}
