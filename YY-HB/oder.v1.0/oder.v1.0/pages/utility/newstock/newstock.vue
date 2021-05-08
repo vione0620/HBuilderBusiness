@@ -891,13 +891,15 @@
 						}
 						let goodsPrice = parseInt(item.goodsPrice)
 						let promotePrice = parseInt(item.promotePrice)
-						if(goodsPrice<=promotePrice){
-							uni.showToast({
-								icon: 'none',
-								title: item.goodsName+"的促销价不能大于原价",
-								duration: 2000
-							})
-							reject()
+						if(promotePrice!=0){
+							if(goodsPrice<=promotePrice){
+								uni.showToast({
+									icon: 'none',
+									title: item.goodsName+"的促销价不能大于原价",
+									duration: 2000
+								})
+								reject()
+							}
 						}
 					});
 					resolve(newArr)

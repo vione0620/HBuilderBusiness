@@ -18,10 +18,10 @@
 				测试蓝牙打印
 			</view>
 		</view>
-		<view style='width:0px;height:0px;overflow:hidden;'>
+<!-- 		<view style='width:0px;height:0px;overflow:hidden;'>
 			<canvas canvas-id="imgCanvas" style="width: 48px; height: 48px;"></canvas>
 			<uni-qrcode cid="codeCanvas" :size="size" text="www.baidu.com" :makeOnLoad="true" backgroundColor="transparent"></uni-qrcode>
-		</view>
+		</view> -->
 	</view>
 </template>
 

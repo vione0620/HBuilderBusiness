@@ -52,6 +52,7 @@
 				},{
 					token:true
 				}).then((res)=>{ 
+					this.$api.initPage(res.code,res.message)
 					if(res.code===200){
 						this.salesList = res.data
 					} else {

@@ -193,9 +193,13 @@
 		},
 		onLoad() {  
 			let history = uni.getStorageSync('userAccount')
+			let userPhone = uni.getStorageSync('userPhone')
 			let legal = uni.getStorageSync('legal')
 			if(history){				
 				this.account = history
+			}
+			if(userPhone){
+				this.staff = userPhone
 			}
 			if(!legal){
 				setTimeout(()=>{
@@ -550,6 +554,7 @@
 							loginNo: res.data.loginNo
 						}
 						this.$store.commit('logStatus',haslogin)
+						uni.setStorageSync('userPhone',this.staff)
 						uni.setStorageSync('isRegular',res.data.isRegular)  
 						if(res.data.isRegular == 1){
 							uni.setStorageSync('agreeChecked',false) 

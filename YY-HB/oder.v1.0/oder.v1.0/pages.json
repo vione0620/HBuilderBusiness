@@ -508,6 +508,28 @@
 					} 
 				}
 			}
+		},
+		{
+			"path":"pages/utility/share/share",
+			"style":{
+				"navigationBarTitleText":"分享页面",
+				"app-plus":{
+					"titleNView":{
+						"titleColor":"#FFFFFF",  
+						"autoBackButton":true,
+						"backgroundColor":"#46B85B"
+					} 
+				}
+			}
+		},
+		{
+			"path" : "pages/utility/newstore/newstore",
+			"style" : { 
+				"navigationBarTitleText":"商品管理",		 
+				"app-plus":{  
+					"titleNView":false
+				}
+			}
 		}
     ],
 	"globalStyle": {

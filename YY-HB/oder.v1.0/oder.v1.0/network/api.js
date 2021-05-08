@@ -101,7 +101,18 @@ export default {
 			})
 			uni.removeStorageSync('user');
 			uni.removeStorageSync('status') 
-		}else if(code === 500){
+		} else if (code === 423){
+			uni.showToast({
+				icon:'none',
+				title: '登录已过期，请重新登录',
+				duration:2000
+			}) 
+			setTimeout(()=>{
+				uni.reLaunch({
+					url:'../../account/login/login'
+				})
+			},0)
+		} else if(code === 500){
 			uni.showToast({
 				icon:'none',
 				title:res.msg,

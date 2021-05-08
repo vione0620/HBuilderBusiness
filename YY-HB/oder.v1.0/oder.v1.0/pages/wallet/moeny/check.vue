@@ -133,6 +133,8 @@
 				}else if(value >= 1){					
 					this.getMoney = parseFloat(e.target.value).toFixed(2)
 					this.postMoeny = e.target.value
+				}else if(value == ''){
+					this.postMoeny = ''
 				}
 			},			
 			radioChange(e){

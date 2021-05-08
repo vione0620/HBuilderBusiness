@@ -193,6 +193,18 @@
 			"urls": "../../wallet/rebate/rebate",
 			"navto":"rebate",
 		},  
+		//{
+		//	"icon": 'iconfont icon-money',
+		//	"text": "商家推广",
+		//	"urls": "../../utility/share/share",
+		//	"navto":"share",
+		//}
+		{
+			"icon": 'iconfont iconoder-stock',
+			"text": "商品管理",
+			"urls": "../../utility/newstore/newstore",
+			"navto":"newstore",
+		}
 	]
 	const serVer = [{
 			"icon": 'iconfont iconcontact',
@@ -622,7 +634,7 @@
 				this.getPlatParam(this.loginWhether.md5key)		 
 			}, 
 			initUser() {  
-				if(this.merchNo==undefined || this.loginNo==undefined){
+				if(this.loginWhether=='' || this.userStore==''){
 					this.isload = true
 					this.isready = false
 					uni.reLaunch({
@@ -675,13 +687,7 @@
 								duration: 2000
 							})
 						}else{							
-							uni.showToast({
-								icon:'none',
-								title:res.message
-							})
-							uni.reLaunch({
-								url:'../../account/login/login'
-							}) 
+							this.$api.initPage(res.code,res.message) 
 						}
 					}).catch((err)=>{ 
 						this.isload = true

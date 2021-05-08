@@ -527,8 +527,10 @@
 					if(val.status && val.text==='已连接'){
 						setTimeout(()=>{
 							let bd = uni.getStorageSync('blueDevices')
+							let temp = []
+							temp.push(bd)
 							if(bd.services){
-								this.devices.push(bd)
+								this.devices = temp
 							}
 						},2000)
 					} else {

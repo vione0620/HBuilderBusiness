@@ -33,12 +33,11 @@
 			this.loginWhether = uni.getStorageSync('status')
 			this.merchNo = uni.getStorageSync('user').merchNo
 			this.loginType = uni.getStorageSync('user').loginType
-			this.packageFee = uni.getStorageSync('packageFee').toString()
-			this.packageFee = parseFloat(this.packageFee/100).toFixed(2)
+			this.packageFee = parseFloat(uni.getStorageSync('packageFee')/100).toFixed(2)
 		},
 		methods: {
 			setPackageFee(){
-				this.packageFee *= 100
+				this.packageFee =(this.packageFee*100).toFixed(0)
 				let vVlue = {"merchNo": this.merchNo,"packageFee": this.packageFee} //必传
 				let sSort = getSortAscii(vVlue) ///排序
 				let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码
@@ -48,9 +47,10 @@
 				},{
 					token:true
 				}).then((res)=>{ 
-					console.log(res)
+					this.$api.initPage(res.code,res.message)
 					this.packageFee = parseFloat(this.packageFee/100).toFixed(2)
 					if(res.code===200){
+						uni.setStorageSync('packageFee',this.packageFee*100)
 						uni.showToast({
 							icon:'success',
 							title: res.message,
@@ -66,8 +66,14 @@
 					}
 				}).catch()
 			},
-			packfeeChange: function(e) {
-				this.packageFee = e.target.value
+			packfeeChange: function(event) {
+				this.packageFee = event.target.value
+				//正则表达试 只能输入两位小数
+				event.target.value = (event.target.value.match(/^\d*(\.?\d{0,2})/g)[0]) || null
+				//重新赋值给input
+				this.$nextTick(() => {
+					this.packageFee= event.target.value
+				})
 			}
 		}
 	}
