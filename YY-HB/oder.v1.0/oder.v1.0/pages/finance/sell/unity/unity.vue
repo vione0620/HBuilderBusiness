@@ -74,7 +74,7 @@
 						</view>	 
 						<view class="foot-btn">
 							<view class="price">{{parseFloat(group.realAmt/100).toFixed(2)}}<text class="ant">元</text></view> 
-								
+							<view class="btn print" @click="printOrder(group.orderSn)">打印小票</view>
 							<view class="btn" @click="navTo(group.orderSn)">查看更多</view>
 						</view> 							 
 				
@@ -86,7 +86,11 @@
 		</view>
 		
 		<view class="lodingMore" v-if="!Nothing">{{loadmore}}</view>
-	
+		<view v-if="!this.blueStatus.status" class="BottomPrompt"  @click="navTob('../../../account/printer/printer')">
+			<image src="../../../../static/warning.png" mode="aspectFit"></image>
+			<text class="tis">打印机未连接</text>
+			<image src="../../../../static/moretis.png" mode="aspectFit"></image>
+		</view>
 	</template>
 	</view>
 </template>
@@ -94,9 +98,12 @@
 <script>
 	import {mapState} from 'vuex'
 	import {b64Md5,hexMD5} from '@/network/md5.js'
-	import {getSortAscii, arrayExclude,} from '@/common/util/utils.js'
+	import {getSortAscii, arrayExclude,changeSpace,plusXing} from '@/common/util/utils.js'
 	
 	import DefaultPage from '@/components/basic/default-page.vue'	
+	import Bluetooth from '@/common/util/bluetooth.js'
+	
+	let bluetooth = new Bluetooth();
 	export default {
 		data() {
 			return {
@@ -110,13 +117,21 @@
 				isload:true, 
 				isnohave:false,
 				isready:false,
+				orderList: {},
+				blueStatus: {
+					status: false,
+					text: '未连接'
+				},
+				devices: [],
 			}
 		},
 		onLoad() { 		 
 			this.loginWhether = uni.getStorageSync('status')  
 			this.merchNo = uni.getStorageSync('user').merchNo		
 			
+			this.blueStatus = uni.getStorageSync('blueStatus')
 			this.getUserOrder()
+			this.onBLEConnection()
 		}, 
 		components:{
 			DefaultPage
@@ -282,12 +297,254 @@
 					url:'./unity_detail?orderNo='+ orderSn					
 				})
 			},
+			printOrder(orderSn){
+				this.blueStatus = uni.getStorageSync('blueStatus')
+				let bd = uni.getStorageSync('blueDevices')
+				if(bd){
+					this.devices.push(bd)
+				}
+				this.getOrderDetail(orderSn).then(()=>{
+					if(this.devices && this.blueStatus.status){
+						this.senBleLabel()
+					} else {
+						uni.showToast({
+							icon: 'none',
+							title: '未连接蓝牙打印机'
+						})
+					}
+				})
+			},
+			senBleLabel(){
+				console.log(this.devices)
+				//票据模式
+				let deviceId = this.devices[0].deviceId;
+				let serviceId = this.devices[0].services[0].serviceId;
+				let characteristicId = this.devices[0].services[0].characteristicId;
+				
+				let merchName = uni.getStorageSync('user').merchName
+
+				let orderNum = getApp().getDay()
+				this.orderType()
+				let orderInfo = this.orderList
+				console.log(this.orderList)
+				var command = this.$esc.jpPrinter.createNew()
+				command.init()
+				
+				command.setFontStyle(48)
+				command.setSelectJustification(0)
+				command.setText('移移生活  #'+orderNum)
+				command.setPrint()
+				
+				command.setFontStyle(0)
+				command.setText(merchName)
+				command.setPrintAndFeedRow(1)
+				
+				command.setText("--------------------------------");
+				command.setPrint()
+				
+				command.setText("下单时间："+orderInfo.orderTime);
+				command.setPrint()
+				
+				command.setText("------------商品明细------------");
+				command.setPrint()
+				
+				command.setFontStyle(16)
+				orderInfo.content.forEach((item,index) => {
+					command.setSelectJustification(0)
+					command.setText(item.goodsName)
+					command.setPrint()
+					
+					command.setSelectJustification(2)
+					if(item.promotePrice != 0){
+						command.setText("原价:"+item.goodsPrice)
+						command.setPrintL()
+						command.setText("  X"+item.goodsNum+item.goodsUnit+"  "+ (parseFloat(item.goodsNum*item.promotePrice).toFixed(2))+'元')
+					} else {
+						command.setText("  X"+item.goodsNum+item.goodsUnit+"  "+ (parseFloat(item.goodsNum*item.goodsPrice).toFixed(2))+'元')	
+					}
+					command.setPrint()
+				})
+				
+				command.setFontStyle(0)
+				command.setSelectJustification(0)
+				command.setText("------------其它费用------------");
+				command.setPrint()
+				
+				command.setFontStyle(16)
+				if(orderInfo.packageFee != 0){
+					command.setText(changeSpace('打包费',6,orderInfo.packageFee))
+					command.setPrint()
+				}
+				
+				if(orderInfo.deliverFirm==1){
+					command.setText(changeSpace('配送费(达达配送)',16,orderInfo.orderFee))
+				} else if(orderInfo.deliverFirm==2) {
+					command.setText(changeSpace('配送费(顺丰配送)',16,orderInfo.orderFee))
+				} else if(orderInfo.deliverFirm==3) {
+					command.setText(changeSpace('配送费(蜂鸟配送)',16,orderInfo.orderFee))
+				}
+				command.setPrint()
+				
+				if(orderInfo.couponAmt != 0){
+					command.setText(changeSpace('红包/优惠券',11,("-"+orderInfo.couponAmt)))
+					command.setPrint()
+				}
+				
+				command.setFontStyle(0)
+				command.setText("--------------------------------");
+				command.setPrint()
+				
+				command.setFontStyle(16)
+				command.setText(changeSpace('订单金额',8,orderInfo.orderAmt))
+				command.setPrint()
+				
+				command.setFontStyle(0)
+				command.setText("--------------------------------");
+				command.setPrint()
+				
+				command.setFontStyle(16)
+				command.setText(changeSpace('实付金额',8,orderInfo.realAmt))
+				command.setPrint()
+				
+				command.setFontStyle(0)
+				command.setText("--------------------------------");
+				command.setPrint()
+				
+				command.setFontStyle(48)
+				if(orderInfo.deliverType == 2){
+					command.setText('到店自取')
+				}else{
+					command.setText(orderInfo.reachAddr)
+				}
+				command.setPrint()
+				
+				command.setText(plusXing(orderInfo.receiver,1,0))
+				command.setPrintAndFeedRow(1)
+				
+				command.setText(plusXing(orderInfo.recPhone,3,4))
+				command.setPrint()
+				
+				if(orderInfo.remark){
+					command.setText('备注：'+orderInfo.remark)
+					command.setPrint()
+				}
+				
+				command.setFontStyle(0)
+				command.setText("订单编号："+orderInfo.orderSn);
+				command.setPrint()
+			
+				command.setText("--------------------------------");
+				command.setPrint()
+				
+				command.setSelectJustification(1)
+				command.setText('商品如有问题请联系商家')
+				command.setPrint()
+				command.setText(orderInfo.merchContactPhone)
+				command.setPrint()
+				
+				command.setText('移移平台客服电话')
+				command.setPrint()
+				command.setText(orderInfo.serviceContactMobile)
+				command.setPrint()
+				
+				command.setText("--------------------------------");
+				command.setPrintAndFeedRow(2)
+				
+				command.setSelectJustification(1)
+				command.setFontStyle(0)
+				command.setText("*********");
+				command.setPrintL()
+				command.setFontStyle(48)
+				command.setText('#'+orderNum+'完');
+				command.setPrintL()
+				command.setFontStyle(0)
+				command.setText("*********");
+				command.setPrint()
+				command.setPrintAndFeedRow(6)
+				
+				bluetooth.senBlData(deviceId, serviceId, characteristicId,command.getData())
+			},
+			getOrderDetail(_orderNo){
+				return new Promise((resolve,reject)=>{
+					this.loginWhether = uni.getStorageSync('status')
+					this.merchNo = uni.getStorageSync('user').merchNo
+					this.orderNo = _orderNo
+					let vVlue = ''
+					vVlue = {"merchNo":this.merchNo,"orderNo":this.orderNo} //必传 
+					let sSort = getSortAscii(vVlue) //排序
+					let sSign = hexMD5(sSort + "&key=" + this.loginWhether.md5key).toUpperCase() //转码 	
+					this.$request.post('getUserOrderDetail',{
+						...vVlue, 
+						"sign": sSign
+					},{
+						token:true
+					}).then(res => {
+						this.$api.initPage(res.code,res.message)  
+						if(res.code == 200){														
+							this.orderList = res.data
+							resolve()
+						}
+					}).catch() 
+				})
+				
+			},
+			orderType(){
+				this.orderList.orderAmt = parseFloat(this.orderList.orderAmt/100).toFixed(2)
+				this.orderList.couponAmt = parseFloat(this.orderList.couponAmt/100).toFixed(2)
+				this.orderList.discountAmt = parseFloat(this.orderList.discountAmt/100).toFixed(2)
+				this.orderList.realAmt = parseFloat(this.orderList.realAmt/100).toFixed(2)
+				this.orderList.orderFee = parseFloat(this.orderList.orderFee/100).toFixed(2)
+				this.orderList.helpFee = parseFloat(this.orderList.helpFee/100).toFixed(2)
+				this.orderList.packageFee = parseFloat(this.orderList.packageFee/100).toFixed(2)
+				this.orderList.content.forEach((item,index) => {
+					item.goodsPrice = parseFloat(item.goodsPrice/100).toFixed(2)
+					item.promotePrice = parseFloat(item.promotePrice/100).toFixed(2)
+				})
+			},
+			onBLEConnection(){
+				uni.onBLEConnectionStateChange(res => {
+					if(res.connected){
+						this.blueStatus.status = true;
+						this.blueStatus.text = '已连接';
+					} else {
+						this.blueStatus.status = false;
+						this.blueStatus.text = '未连接';
+					}
+					uni.setStorageSync('blueStatus',this.blueStatus)
+				})
+			},
+			navTob(path){
+				uni.navigateTo({
+					url:path,
+					animationType: 'pop-in',
+					animationDuration: 200
+				});
+			}
 		},
 	}
 </script>
 
 <style lang="scss" scoped>
-	
+	.BottomPrompt{
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		position: fixed;
+		bottom: 0;
+		background: #FEF7E5;
+		padding: 30rpx 50rpx;
+		image{
+			width: 42rpx;
+			height: 42rpx;
+		}
+		.tis{
+			width: 82%;
+			text-align: left;
+			color: #FF6600;
+			font-size: 28rpx;
+			line-height: 42rpx;
+		}
+	}
 	.main-wrapper{
 		width: 100vw;
 		padding: 20rpx;
@@ -371,6 +628,12 @@
 					border-radius: 12rpx;
 					font-size: 26rpx;
 				}				
+				.print{
+					margin-left: 80rpx;
+					background-color: #FFFFFF;
+					color: #46B85B;
+					border: 1px solid #46B85B;
+				}
 			}
 	}
 		

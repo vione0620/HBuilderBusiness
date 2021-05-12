@@ -178,7 +178,8 @@
 
 	.uni-popup__wrapper-box {
 		position: relative;
-		box-sizing: border-box
+		box-sizing: border-box;
+		border-radius: 20rpx;
 	}
 
 	.uni-popup__wrapper.uni-custom .uni-popup__wrapper-box {

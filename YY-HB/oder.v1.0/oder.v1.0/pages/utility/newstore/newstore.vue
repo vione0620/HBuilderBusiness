@@ -22,40 +22,84 @@
 						</block>
 					</scroll-view>
 				</view>
-				<view class="goods-box">
-					<view class="goods-info">
-						<image class="goods-info-img" src="../../../static/noImg.png"></image>
-						<view class="goods-info-items">
-							<view class="goods-item-title">纯牛奶24X250ML</view>
-							<view class="goods-item-stock">
-								<text style="margin-right: 24rpx;">库存 100</text>
-								<text>月售 100</text>
+				<view class="goods-right">
+					<scroll-view class="scroll-goods-box" scroll-y="true" @scroll="scroll" :show-scrollbar="false">
+						<view class="goods-box" v-for="(goodItem,index) in goodList" :key="index">
+							<view class="goods-info">
+								<image class="goods-info-img" src="../../../static/noImg.png"></image>
+								<view class="goods-info-items">
+									<view class="goods-item-title">{{goodItem.goodName}}</view>
+									<view class="goods-item-stock">
+										<text style="margin-right: 24rpx;">库存 {{goodItem.goodStore}}</text>
+										<text>月售 {{goodItem.goodSale}}</text>
+									</view>
+									<view class="goods-item-price">￥{{goodItem.goodPrice}}</view>
+								</view>
 							</view>
-							<view class="goods-item-price">￥22</view>
+							<view class="goods-mode-btns">
+								<view class="goods-mode-btn" @click="modPrice">价格</view>
+								<view class="goods-mode-btn">库存</view>
+								<view class="goods-mode-btn" @click="open=true">下架</view>
+								<view class="goods-mode-btn">编辑</view>
+							</view>
 						</view>
-					</view>
-					<view class="goods-mode-btns">
-						<view class="goods-mode-btn">价格</view>
-						<view class="goods-mode-btn">库存</view>
-						<view class="goods-mode-btn">下架</view>
-						<view class="goods-mode-btn">编辑</view>
-					</view>
+					</scroll-view>
 				</view>
 			</view>
+			<view class="nav-bottom">
+				<view class="nav-item">
+					<image class="nav-icon" src="../../../static/storemanage.png"></image>
+					<view class="nav-text">管理分类</view>
+				</view>
+				<view class="nav-item">
+					<image class="nav-icon" src="../../../static/storetaxis.png"></image>
+					<view class="nav-text">商品排序</view>
+				</view>
+				<view class="nav-item">
+					<image class="nav-icon" src="../../../static/storebatch.png"></image>
+					<view class="nav-text">批量管理</view>
+				</view>
+				<view class="nav-item">
+					<image class="nav-icon" src="../../../static/storeadd.png"></image>
+					<view class="nav-text">发布商品</view>
+				</view>
+			</view>
+			<!-- 价格弹窗 -->
+			<uni-popup ref="price" type="center" :maskClick="false">
+				<view class="popup_edit_price">
+					<view class="edit_title">调整商品价格</view>
+					<view class="edit_item">
+						<view class="edit_lable">现&emsp;价</view>
+						<input class="edit_input" type="number" />
+						<text class="edit_unit">元</text>
+					</view>
+					<view class="edit_item" style="margin-bottom: 76rpx;">
+						<view class="edit_lable">促销价</view>
+						<input class="edit_input" type="number" />
+						<text class="edit_unit">元</text>
+					</view>
+					<btn-combo @cancel="edit_cancel" @confirm="edit_cancel"></btn-combo>
+				</view>
+			</uni-popup>
+			<!-- 下架弹窗 -->
+			<tips-model tips="确认下架这2个商品？" :open="open" @confirm="edit_cancel" @cancel="open=false"></tips-model>
 		</template>
-		<view class="nav-bottom">
-			
-		</view>
 	</view>
 </template>
 
 <script>
 	import UniNavBar from '@/components/uni/uni-nav-bar.vue'
 	import UniIcons from '@/components/uni/uni-icons.vue'
+	import UniPopup from '@/components/uni/uni-popup.vue'
+	import BtnCombo from '@/components/store/btn-combo.vue'
+	import TipsModel from '@/components/store/tips-model.vue'
 	export default{
 		components: {
 			UniNavBar,
-			UniIcons
+			UniIcons,
+			UniPopup,
+			BtnCombo,
+			TipsModel
 		},
 		data(){
 			return{
@@ -64,6 +108,7 @@
 				old: {
 					scrollTop: 0
 				},
+				open: false,
 				tabIndex: 0, //顶部标签下标
 				onSale: 0, //当前标签页面（全部或仓库...）
 				tabCurrentIndex: 0, //大类选中标记
@@ -149,11 +194,114 @@
 						className: '呃呃呃呃 '
 					},
 				],
+				goodList: [
+					{
+						goodName: '纯牛奶24X250ML',
+						goodStore: '53',
+						goodSale: '22',
+						goodPrice: '60.50'
+					},
+					{
+						goodName: '蒙牛纯甄12X200ML',
+						goodStore: '23',
+						goodSale: '55',
+						goodPrice: '70.80'
+					},
+					{
+						goodName: '特仑苏16X235ML',
+						goodStore: '66',
+						goodSale: '21',
+						goodPrice: '75.40'
+					},
+					{
+						goodName: '纯牛奶24X250ML',
+						goodStore: '53',
+						goodSale: '22',
+						goodPrice: '60.50'
+					},
+					{
+						goodName: '蒙牛纯甄12X200ML',
+						goodStore: '23',
+						goodSale: '55',
+						goodPrice: '70.80'
+					},
+					{
+						goodName: '特仑苏16X235ML',
+						goodStore: '66',
+						goodSale: '21',
+						goodPrice: '75.40'
+					},
+					{
+						goodName: '纯牛奶24X250ML',
+						goodStore: '53',
+						goodSale: '22',
+						goodPrice: '60.50'
+					},
+					{
+						goodName: '蒙牛纯甄12X200ML',
+						goodStore: '23',
+						goodSale: '55',
+						goodPrice: '70.80'
+					},
+					{
+						goodName: '特仑苏16X235ML',
+						goodStore: '66',
+						goodSale: '21',
+						goodPrice: '75.40'
+					},
+					{
+						goodName: '纯牛奶24X250ML',
+						goodStore: '53',
+						goodSale: '22',
+						goodPrice: '60.50'
+					},
+					{
+						goodName: '蒙牛纯甄12X200ML',
+						goodStore: '23',
+						goodSale: '55',
+						goodPrice: '70.80'
+					},
+					{
+						goodName: '特仑苏16X235ML',
+						goodStore: '66',
+						goodSale: '21',
+						goodPrice: '75.40'
+					},
+					{
+						goodName: '纯牛奶24X250ML',
+						goodStore: '53',
+						goodSale: '22',
+						goodPrice: '60.50'
+					},
+					{
+						goodName: '蒙牛纯甄12X200ML',
+						goodStore: '23',
+						goodSale: '55',
+						goodPrice: '70.80'
+					},
+					{
+						goodName: '特仑苏16X235ML',
+						goodStore: '66',
+						goodSale: '21',
+						goodPrice: '75.40'
+					}
+				]
 			}
+		},
+		onLoad(){
+
 		},
 		methods:{
 			scroll: function(e) {
 				this.old.scrollTop = e.detail.scrollTop
+			},
+			changeTab(index){ //打标签点击
+				this.tabIndex = index;
+			},
+			tabClick(index,classNo){
+				this.tabCurrentIndex = index
+				this.classNo = classNo
+				console.log(this.classNo)
 			},
 			back() {
 				uni.navigateBack({
@@ -175,19 +323,17 @@
 					title: '点击了更多'
 				})
 			},
-			changeTab(index){ //打标签点击
-				this.tabIndex = index;
+			modPrice(){
+				this.$refs.price.open()
 			},
-			tabClick(index,classNo){
-				this.tabCurrentIndex = index
-				this.classNo = classNo
-				console.log(this.classNo)
-			}
+			edit_cancel(){
+				this.$refs.price.close()
+			},
 		}
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	page {
 		width: 100vw;
 		font-size: 26rpx;
@@ -195,6 +341,7 @@
 	}
 	.tab_box{
 		width: 100vw;
+		height: 6vh;
 		position: fixed;
 		top: 168rpx;
 		left: 0;
@@ -202,6 +349,8 @@
 		-webkit-overflow-scrolling: touch;   /*这句是为了滑动更顺畅*/
 		background-color: #FFFFFF;
 		padding: 15rpx 0;
+		display: flex;
+		align-items: center;
 		box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.1);
 		.scroll-tab-box{
 			white-space: nowrap;
@@ -231,60 +380,130 @@
 		}
 	}
 	.class_list{
-		padding-top: 88rpx;
+		padding-top: 6vh;
 		display: flex;
 		.nav_left{
 			width: 160rpx;
-			background-color: #FFFFFF;
-		}
-		.scroll-class-box{
-			white-space: nowrap;
-			height: 77vh;
-			.item{
-				text-align: center;
-				padding: 36rpx 0;
-				box-sizing: border-box;
-				border-bottom: 1px solid #EEEEEE;
+			.scroll-class-box{
+				white-space: nowrap;
+				height: 76vh;
+				background-color: #FFFFFF;
+				.item{
+					text-align: center;
+					padding: 36rpx 0;
+					box-sizing: border-box;
+					border-bottom: 1px solid #EEEEEE;
+				}
+				.active {
+					color: #4FB562;
+				}
 			}
-			.active {
-				color: #4FB562;
+		}
+		.goods-right{
+			padding: 0 24rpx;
+			flex-grow: 1; // flex布局下占据剩余宽度
+			.scroll-goods-box{
+				white-space: nowrap;
+				height: 76vh;
+			}
+			.goods-box{
+				padding-bottom: 24rpx;
+				.goods-info{
+					display: flex;
+					.goods-info-img{
+						width: 118rpx;
+						height: 118rpx;
+						border-radius: 10rpx;
+					}
+					.goods-info-items{
+						margin-left: 15rpx;
+						.goods-item-title{
+							font-weight: bold;
+							margin-bottom: 18rpx;
+						}
+						.goods-item-stock{
+							font-size: 24rpx;
+							color: #999999;
+							margin-bottom: 18rpx;
+						}
+						.goods-item-price{
+							color: #FF4C30;
+						}
+					}
+				}
+				.goods-mode-btns{
+					display: flex;
+					justify-content: space-between;
+					margin-top: 20rpx;
+					.goods-mode-btn{
+						background-color: #FFFFFF;
+						padding: 16rpx 38rpx;
+						border-radius: 10rpx;
+					}
+				}
+			}
+			.goods-box:nth-child(1){
+				padding-top: 24rpx;
+			}
+			.goods-box:nth-last-child(1){
+				padding-bottom: 48rpx;
 			}
 		}
 	}
-	.goods-box{
-		padding: 24rpx;
-		flex-grow: 1; // flex布局下占据剩余宽度
-		.goods-info{
-			display: flex;
-			.goods-info-img{
-				width: 118rpx;
-				height: 118rpx;
-				border-radius: 10rpx;
+	.nav-bottom{
+		width: 100vw;
+		height: 8vh;
+		display: flex;
+		justify-content: space-around;
+		padding: 20rpx 0;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		z-index: 99;
+		background-color: #FFFFFF;
+		.nav-item{
+			.nav-icon{
+				display: block;
+				width: 30rpx;
+				height: 30rpx;
+				margin: 0 auto;
 			}
-			.goods-info-items{
-				margin-left: 15rpx;
-				.goods-item-title{
-					font-weight: bold;
-					margin-bottom: 18rpx;
-				}
-				.goods-item-stock{
-					font-size: 24rpx;
-					color: #999999;
-					margin-bottom: 18rpx;
-				}
-				.goods-item-price{
-					color: #FF4C30;
-				}
+			.nav-text{
+				margin-top: 11rpx;
 			}
 		}
-		.goods-mode-btns{
+	}
+	.popup_edit_price{
+		width: 540rpx;
+		background-color: #FFFFFF;
+		color: #000000;
+		font-size: 32rpx;
+		position: relative;
+		.edit_title{
+			text-align: center;
+			padding-top: 32rpx;
+			padding-bottom: 60rpx;
+		}
+		.edit_item{
 			display: flex;
-			justify-content: space-between;
-			margin-top: 20rpx;
-			.goods-mode-btn{
-				background-color: #FFFFFF;
-				padding: 16rpx 36rpx;
-				border-radius: 10rpx;
+			justify-content: center;
+			align-items: center;
+			margin-bottom: 30rpx;
+			.edit_lable{
+				
+			}
+			.edit_input{
+				width: 186rpx;
+				height: 64rpx;
+				border: 1px solid #EEEEEE;
+				border-radius: 5px;
+				text-align: right;
+				padding: 16rpx 26rpx;
+				margin: 0 10rpx 0 16rpx;
+			}
+			.edit_unit{
+				color: #999999;
+				font-size: 24rpx;
 			}
 		}
 	}
