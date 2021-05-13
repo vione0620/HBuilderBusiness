@@ -208,7 +208,9 @@
 	.uni-popup__wrapper.uni-top {
 		transform: translateY(0)
 	}
-
+	.uni-popup__wrapper.uni-custom.bottom .uni-popup__wrapper-box{
+		border-radius: 20rpx 20rpx 0px 0px;
+	}
 	.uni-popup__wrapper.uni-center {
 		transform: scale(1);
 		opacity: 1

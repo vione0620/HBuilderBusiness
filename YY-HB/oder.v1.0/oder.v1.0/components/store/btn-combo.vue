@@ -26,7 +26,7 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	.buttons{
 		width: 100%;
 		height: 92rpx;

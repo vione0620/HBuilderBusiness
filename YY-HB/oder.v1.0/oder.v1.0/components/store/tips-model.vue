@@ -26,11 +26,6 @@
 				default: false
 			}
 		},
-		data(){
-			return{
-				opens: false
-			}
-		},
 		methods: {
 			cancel(){
 				this.$refs.popup.close()
@@ -45,6 +40,8 @@
 				handler(val){
 					if(val){
 						this.$refs.popup.open()
+					} else {
+						this.$refs.popup.close()
 					}
 				}
 			}
@@ -52,7 +49,7 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	.tips{
 		width: 540rpx;
 		background-color: #FFFFFF;

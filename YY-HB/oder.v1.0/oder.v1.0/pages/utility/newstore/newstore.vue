@@ -37,31 +37,19 @@
 								</view>
 							</view>
 							<view class="goods-mode-btns">
-								<view class="goods-mode-btn" @click="modPrice">价格</view>
-								<view class="goods-mode-btn">库存</view>
-								<view class="goods-mode-btn" @click="open=true">下架</view>
-								<view class="goods-mode-btn">编辑</view>
+								<view class="goods-mode-btn" @click="modPrice(goodItem)">价格</view>
+								<view class="goods-mode-btn" @click="modStock(goodItem)">库存</view>
+								<view class="goods-mode-btn" @click="modOffshelf(goodItem)">下架</view>
+								<view class="goods-mode-btn" @click="modEdit(goodItem)">编辑</view>
 							</view>
 						</view>
 					</scroll-view>
 				</view>
 			</view>
 			<view class="nav-bottom">
-				<view class="nav-item">
-					<image class="nav-icon" src="../../../static/storemanage.png"></image>
-					<view class="nav-text">管理分类</view>
-				</view>
-				<view class="nav-item">
-					<image class="nav-icon" src="../../../static/storetaxis.png"></image>
-					<view class="nav-text">商品排序</view>
-				</view>
-				<view class="nav-item">
-					<image class="nav-icon" src="../../../static/storebatch.png"></image>
-					<view class="nav-text">批量管理</view>
-				</view>
-				<view class="nav-item">
-					<image class="nav-icon" src="../../../static/storeadd.png"></image>
-					<view class="nav-text">发布商品</view>
+				<view v-for="(item,index) in tabPage" :key="index" class="nav-item" @click="navTo(item.path,item.navto)">
+					<image class="nav-icon" :src="item.icon"></image>
+					<view class="nav-text">{{item.text}}</view>
 				</view>
 			</view>
 			<!-- 价格弹窗 -->
@@ -70,50 +58,130 @@
 					<view class="edit_title">调整商品价格</view>
 					<view class="edit_item">
 						<view class="edit_lable">现&emsp;价</view>
-						<input class="edit_input" type="number" />
+						<input class="edit_input" type="number" v-model="goodInfo.goodPrice"/>
 						<text class="edit_unit">元</text>
 					</view>
 					<view class="edit_item" style="margin-bottom: 76rpx;">
 						<view class="edit_lable">促销价</view>
-						<input class="edit_input" type="number" />
+						<input class="edit_input" type="number" v-model="goodInfo.goodPrice"/>
 						<text class="edit_unit">元</text>
 					</view>
-					<btn-combo @cancel="edit_cancel" @confirm="edit_cancel"></btn-combo>
+					<btn-combo @cancel="closeModel" @confirm="closeModel"></btn-combo>
+				</view>
+			</uni-popup>
+			<!-- 库存弹窗 -->
+			<uni-popup ref="stock" type="center" :maskClick="false">
+				<view class="popup_edit_price">
+					<view class="edit_title">调整商品库存</view>
+					<view class="edit_item">
+						<view class="edit_lable">库&emsp;存</view>
+						<view class="edit_btn">清零</view>
+						<input class="edit_input" type="number" v-model="goodInfo.goodStore" style="width: 150rpx;"/>
+						<text class="edit_unit">袋</text>
+					</view>
+					<view class="edit_item" style="margin-bottom: 76rpx;">
+						<view class="edit_lable">自动补足</view>
+						<input class="edit_input" type="number" />
+						<evan-switch v-model="addAuto" :beforeChange="addAutofun" activeColor="#46B85B" :size="22"></evan-switch>
+					</view>
+					<btn-combo @cancel="closeModel" @confirm="closeModel"></btn-combo>
 				</view>
 			</uni-popup>
 			<!-- 下架弹窗 -->
-			<tips-model tips="确认下架这2个商品？" :open="open" @confirm="edit_cancel" @cancel="open=false"></tips-model>
+			<tips-model :tips="`是否要下架 ${goodInfo.goodName}`" :open="open" @confirm="closeModel" @cancel="open=false"></tips-model>
+			<!-- <bottom-menu title="请选择录入方式" :open="menuOpen" :classList="classList" @click="meneClick" @cancel="menuOpen=false" ></bottom-menu> -->
+			<!-- 编辑弹窗 -->
+			<uni-popup ref="info" type="bottom" :maskClick="false">
+				<view class="info_box">
+					<view class="info_top">
+						<view class="title">编辑商品</view>
+						<view class="icon">
+							<uni-icons type="trash" :size="22" color="#999999"></uni-icons>
+							<text class="icon_text">删除</text>
+						</view>
+					</view>
+					<view class="info_items">
+						<info-list-item title="商品名称" v-model="goodInfo.goodName" @changeInput="changeInput"></info-list-item>
+						<info-list-item title="商品类目" value="休闲零食>蛋糕糕点>麻薯" type="class"></info-list-item>
+						<info-list-item title="现价" v-model="goodInfo.goodPrice" type="price"></info-list-item>
+						<info-list-item :must="false" v-model="goodInfo.goodPrice" title="折扣价" value="27.9" type="price"></info-list-item>
+						<info-list-item title="库存" v-model="goodInfo.goodStore" unit="件" type="stock"></info-list-item>
+						<info-list-item title="上下架状态" :value="true" type="status" @changeSwitch="changeSwitch"></info-list-item>
+						<view class="buttons">
+							<btn-cancel type="cancel" color="#333333" @click="closeModel"></btn-cancel>
+							<btn-cancel type="confirm"></btn-cancel>
+						</view>
+					</view>
+				</view>
+			</uni-popup>
 		</template>
 	</view>
 </template>
 
 <script>
+	const tabPage = [
+		{
+			text: '管理分类',
+			icon: '../../../static/storemanage.png',
+			path: '',
+			navto: ''
+		},
+		{
+			text: '商品排序',
+			icon: '../../../static/storetaxis.png',
+			path: '',
+			navto: ''
+		},
+		{
+			text: '批量管理',
+			icon: '../../../static/storebatch.png',
+			path: '',
+			navto: 'batch'
+		},
+		{
+			text: '发布商品',
+			icon: '../../../static/storeadd.png',
+			path: '',
+			navto: ''
+		},
+	]
 	import UniNavBar from '@/components/uni/uni-nav-bar.vue'
 	import UniIcons from '@/components/uni/uni-icons.vue'
 	import UniPopup from '@/components/uni/uni-popup.vue'
 	import BtnCombo from '@/components/store/btn-combo.vue'
 	import TipsModel from '@/components/store/tips-model.vue'
+	import EvanSwitch from '@/components/plugin-ui/evan-switch.vue'
+	import BottomMenu from '@/components/store/bottom-menu.vue'
+	import InfoListItem from '@/components/store/info-list-item.vue'
+	import BtnCancel from '@/components/store/btn_cancel.vue'
 	export default{
 		components: {
 			UniNavBar,
 			UniIcons,
 			UniPopup,
 			BtnCombo,
-			TipsModel
+			TipsModel,
+			EvanSwitch,
+			BottomMenu,
+			InfoListItem,
+			BtnCancel
 		},
 		data(){
 			return{
+				tabPage,
 				icolor: '#666666',
 				isize: 26,
 				old: {
 					scrollTop: 0
 				},
 				open: false,
+				addAuto: false,
 				tabIndex: 0, //顶部标签下标
 				onSale: 0, //当前标签页面（全部或仓库...）
 				tabCurrentIndex: 0, //大类选中标记
 				smallTabCurrentIndex: 0,
 				classNo: '', //大类编号
+				goodInfo: {},
 				tabs: [ //分类列表
 					{
 						tabName: '全部商品',
@@ -285,6 +353,24 @@
 						goodSale: '21',
 						goodPrice: '75.40'
 					}
+				],
+				classList: [
+					{
+						Stair: '编辑名称',
+						Second: ''
+					},
+					{
+						Stair: '添加二级分类',
+						Second: ''
+					},
+					{
+						Stair: '设为二级分类',
+						Second: '类下已有二级分类，无法设置'
+					},
+					{
+						Stair: '删除',
+						Second: ''
+					}
 				]
 			}
 		},
@@ -295,13 +381,24 @@
 			scroll: function(e) {
 				this.old.scrollTop = e.detail.scrollTop
 			},
-			changeTab(index){ //打标签点击
+			changeTab(index){ //顶部标签点击
 				this.tabIndex = index;
 			},
-			tabClick(index,classNo){
+			tabClick(index,classNo){ //左侧标签点击
 				this.tabCurrentIndex = index
 				this.classNo = classNo
 				console.log(this.classNo)
+			},
+			navTo(url,navto){
+				if(navto){
+
+				} else {
+					// uni.navigateTo({
+					// 	url:url,
+					// 	animationType: 'pop-in',
+					// 	animationDuration: 200
+					// });
+				}
 			},
 			back() {
 				uni.navigateBack({
@@ -323,17 +420,45 @@
 					title: '点击了更多'
 				})
 			},
-			modPrice(){
+			modPrice(item){
+				this.goodInfo = item
 				this.$refs.price.open()
 			},
-			edit_cancel(){
-				this.$refs.price.close()
+			modStock(item){
+				this.goodInfo = item
+				this.$refs.stock.open()
 			},
+			modOffshelf(item){
+				this.goodInfo = item
+				this.open = true
+			},
+			modEdit(item){
+				this.goodInfo = item
+				this.$refs.info.open()
+			},
+			addAutofun(){ // 自动补足按钮
+				this.addAuto = !this.addAuto
+			},
+			closeModel(){ // 关闭所有弹窗
+				this.$refs.price.close()
+				this.$refs.stock.close()
+				this.$refs.info.close()
+				this.open = false
+			},
+			meneClick(index){
+				console.log(index)
+			},
+			changeInput(val){
+				console.log(val)
+			},
+			changeSwitch(isSwitch){
+				console.log(isSwitch)
+			}
 		}
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	page {
 		width: 100vw;
 		font-size: 26rpx;
@@ -490,7 +615,16 @@
 			align-items: center;
 			margin-bottom: 30rpx;
 			.edit_lable{
-				
+				width: 4em;
+			}
+			.edit_btn{
+				width: 100rpx;
+				padding: 16rpx 0;
+				text-align: center;
+				color: #FF6600;
+				border: 1px solid #EEEEEE;
+				border-radius: 5px;
+				font-size: 26rpx;
 			}
 			.edit_input{
 				width: 186rpx;
@@ -504,6 +638,30 @@
 			.edit_unit{
 				color: #999999;
 				font-size: 24rpx;
+			}
+		}
+	}
+	.info_box{
+		padding: 32rpx 36rpx;
+		.info_top{
+			display: flex;
+			justify-content: space-between;
+			.title{
+				font-size: 32rpx;
+				color: #000000;
+			}
+			.icon{
+				color: #999999;
+				display: flex;
+				align-items: center;
+			}
+		}
+		.info_items{
+			padding: 36rpx 0 40rpx;
+			.buttons{
+				margin-top: 40rpx;
+				display: flex;
+				justify-content: space-between;
 			}
 		}
 	}
